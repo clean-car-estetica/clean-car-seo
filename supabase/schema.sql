@@ -113,3 +113,14 @@ create table if not exists transformacoes (
 );
 alter table transformacoes enable row level security;
 create policy "public read transformacoes" on transformacoes for select using (true);
+
+-- FAQ da home (editável pelo console), também usado como dado estruturado
+-- FAQPage para mecanismos de busca e assistentes de IA lerem.
+create table if not exists faqs (
+  id bigint generated always as identity primary key,
+  pergunta text not null,
+  resposta text not null,
+  ordem int not null default 0
+);
+alter table faqs enable row level security;
+create policy "public read faqs" on faqs for select using (true);

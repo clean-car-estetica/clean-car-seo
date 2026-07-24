@@ -94,6 +94,39 @@ export async function getConteudoLocalPublico(servico: ServicoDB, cidade: { slug
   return { paragrafos: template.paragrafos, imagemOverride: null as string | null };
 }
 
+export type FaqDB = { id: number; pergunta: string; resposta: string };
+
+const faqsPadrao: FaqDB[] = [
+  {
+    id: -1,
+    pergunta: "A vitrificação protege contra riscos profundos?",
+    resposta:
+      "Não. A vitrificação protege contra micro-riscos de lavagem, raios UV e sujeira do dia a dia, além de dar um brilho intenso. Riscos profundos (que chegam na tinta) ainda podem acontecer em caso de impacto forte.",
+  },
+  {
+    id: -2,
+    pergunta: "O polimento tira muito verniz da pintura?",
+    resposta:
+      "Fazemos o polimento técnico, medindo a espessura da tinta para remover só o necessário pra tirar o risco, preservando ao máximo a vida útil do verniz.",
+  },
+  {
+    id: -3,
+    pergunta: "Preciso deixar o carro na loja o dia todo?",
+    resposta:
+      "Depende do serviço. Uma higienização geralmente leva algumas horas. Polimento e vitrificação pedem mais tempo de cura — no agendamento a gente já informa o prazo certo.",
+  },
+];
+
+export async function getFaqsPublicos(): Promise<FaqDB[]> {
+  try {
+    const { data, error } = await supabasePublico.from("faqs").select("*").order("ordem");
+    if (error || !data || data.length === 0) throw error ?? new Error("vazio");
+    return data as FaqDB[];
+  } catch {
+    return faqsPadrao;
+  }
+}
+
 export async function getTransformacoesPublicas(): Promise<Transformacao[]> {
   try {
     const { data, error } = await supabasePublico.from("transformacoes").select("*").order("ordem");

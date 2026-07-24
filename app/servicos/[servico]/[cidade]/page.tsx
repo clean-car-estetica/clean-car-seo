@@ -16,10 +16,11 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { servico: string; cidade: string };
+  params: Promise<{ servico: string; cidade: string }>;
 }): Promise<Metadata> {
-  const servico = await getServicoPublico(params.servico);
-  const cidade = cidades.find((c) => c.slug === params.cidade);
+  const { servico: servicoSlug, cidade: cidadeSlug } = await params;
+  const servico = await getServicoPublico(servicoSlug);
+  const cidade = cidades.find((c) => c.slug === cidadeSlug);
   if (!servico || !cidade) return {};
   return {
     title: `${servico.nome} em ${cidade.nome} | Clean Car`,
@@ -30,10 +31,11 @@ export async function generateMetadata({
 export default async function ServicoCidadePage({
   params,
 }: {
-  params: { servico: string; cidade: string };
+  params: Promise<{ servico: string; cidade: string }>;
 }) {
-  const servico = await getServicoPublico(params.servico);
-  const cidade = cidades.find((c) => c.slug === params.cidade);
+  const { servico: servicoSlug, cidade: cidadeSlug } = await params;
+  const servico = await getServicoPublico(servicoSlug);
+  const cidade = cidades.find((c) => c.slug === cidadeSlug);
   if (!servico || !cidade) return notFound();
 
   const conteudo = await getConteudoLocalPublico(servico, cidade);

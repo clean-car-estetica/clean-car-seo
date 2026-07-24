@@ -17,9 +17,10 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { servico: string };
+  params: Promise<{ servico: string }>;
 }): Promise<Metadata> {
-  const servico = await getServicoPublico(params.servico);
+  const { servico: servicoSlug } = await params;
+  const servico = await getServicoPublico(servicoSlug);
   if (!servico) return {};
   return {
     title: `${servico.nome} em Mogi das Cruzes e Região`,
@@ -30,9 +31,10 @@ export async function generateMetadata({
 export default async function ServicoPage({
   params,
 }: {
-  params: { servico: string };
+  params: Promise<{ servico: string }>;
 }) {
-  const servico = await getServicoPublico(params.servico);
+  const { servico: servicoSlug } = await params;
+  const servico = await getServicoPublico(servicoSlug);
   if (!servico) return notFound();
 
   return (

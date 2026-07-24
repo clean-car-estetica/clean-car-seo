@@ -7,10 +7,11 @@ import { salvarPost, excluirPost } from "./actions";
 export default async function BlogAdminPage({
   searchParams,
 }: {
-  searchParams: { editar?: string };
+  searchParams: Promise<{ editar?: string }>;
 }) {
+  const sp = await searchParams;
   const { data: posts } = await supabaseAdmin.from("blog_posts").select("*").order("publicado_em", { ascending: false });
-  const editando = searchParams.editar ? posts?.find((p) => p.slug === searchParams.editar) : null;
+  const editando = sp.editar ? posts?.find((p) => p.slug === sp.editar) : null;
 
   return (
     <div>

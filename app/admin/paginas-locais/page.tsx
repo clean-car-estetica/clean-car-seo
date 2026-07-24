@@ -9,10 +9,11 @@ import { salvarPaginaLocal } from "./actions";
 export default async function PaginasLocaisPage({
   searchParams,
 }: {
-  searchParams: { servico?: string; cidade?: string };
+  searchParams: Promise<{ servico?: string; cidade?: string }>;
 }) {
-  const servicoSlug = searchParams.servico || servicos[0].slug;
-  const cidadeSlug = searchParams.cidade || cidades[0].slug;
+  const sp = await searchParams;
+  const servicoSlug = sp.servico || servicos[0].slug;
+  const cidadeSlug = sp.cidade || cidades[0].slug;
   const servico = servicos.find((s) => s.slug === servicoSlug)!;
   const cidade = cidades.find((c) => c.slug === cidadeSlug)!;
 

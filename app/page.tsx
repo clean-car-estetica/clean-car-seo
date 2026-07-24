@@ -7,15 +7,17 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { cidades } from "@/lib/data";
 import { getHeroContent } from "@/lib/site-content";
-import { getServicosPublicos, getTransformacoesPublicas } from "@/lib/site-data";
+import Faq from "@/components/Faq";
+import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos } from "@/lib/site-data";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes] = await Promise.all([
+  const [hero, servicos, transformacoes, faqs] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
+    getFaqsPublicos(),
   ]);
 
   return (
@@ -114,6 +116,8 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        <Faq itens={faqs} />
       </main>
       <Footer />
       <WhatsappFloat />

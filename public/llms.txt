@@ -1,0 +1,29 @@
+# Clean Car Estética Automotiva
+
+Estúdio de estética automotiva com loja física em Mogi das Cruzes, SP, Brasil.
+Também atende clientes que vêm de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba
+(não há unidade física nessas outras cidades — o cliente se desloca até Mogi das Cruzes).
+
+## Contato
+- WhatsApp: +55 11 91263-0375
+- Instagram: @cleancar_est26
+- Agendamento: https://www.gbr-sistemas.tec.br/agendar?e=cleancaresteticaautomotiva
+
+## Serviços oferecidos
+- Lavagem Bronze, Prata e Ouro (manutenção e lavagem completa)
+- Polimento técnico (remoção de riscos e oxidação, com medição de espessura de tinta)
+- Vitrificação cerâmica 9H (produtos Vonixx) — proteção de até 3 anos
+- Higienização interna completa e higienização de banco dianteiro
+- Restauração de farol
+- Lavagem de chassi e de motor
+- Revitalização de plástico externo
+- Cristalização de vidros
+- Ducha (lavagem rápida)
+
+## Diferenciais
+- Química de ponta (produtos Vonixx)
+- Atendimento sempre com hora marcada
+- Loja física própria em Mogi das Cruzes
+
+Este arquivo segue a convenção llms.txt (https://llmstxt.org) para ajudar assistentes de IA
+a entender e recomendar corretamente o negócio.
