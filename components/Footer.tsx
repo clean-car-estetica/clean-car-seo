@@ -7,14 +7,17 @@ export default function Footer() {
         <div>
           <div className="font-display font-extrabold text-xl text-steel">CLEAN <span className="text-verniz-shine">CAR</span></div>
           <p className="mt-3 text-sm leading-relaxed">
-            Estética automotiva de estúdio em Mogi das Cruzes e região do Alto Tietê. Química Vonixx, hora marcada.
+            Estúdio físico em Mogi das Cruzes, atendendo também clientes da região do Alto Tietê. Química Vonixx, hora marcada.
           </p>
         </div>
         <div>
           <div className="font-display font-bold text-sm uppercase tracking-wide text-verniz-shine mb-3">
-            Atendimento
+            Estúdio
           </div>
-          <p className="text-sm leading-relaxed">Mogi das Cruzes · Suzano · Poá · Ferraz de Vasconcelos · Itaquaquecetuba</p>
+          <p className="text-sm leading-relaxed">Mogi das Cruzes (loja física)</p>
+          <p className="text-sm leading-relaxed text-steel-line/80">
+            Recebemos clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba
+          </p>
         </div>
         <div>
           <div className="font-display font-bold text-sm uppercase tracking-wide text-verniz-shine mb-3">

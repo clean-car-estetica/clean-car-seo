@@ -13,6 +13,7 @@ export type Cidade = {
   slug: string;
   nome: string;
   bairros: string[];
+  sede: boolean; // true só para a cidade onde fica a loja física
 };
 
 export const servicos: Service[] = [
@@ -32,9 +33,9 @@ export const servicos: Service[] = [
 ];
 
 export const cidades: Cidade[] = [
-  { slug: "mogi-das-cruzes", nome: "Mogi das Cruzes", bairros: ["Centro", "Vila Oliveira", "Jundiapeba", "Braz Cubas"] },
-  { slug: "suzano", nome: "Suzano", bairros: ["Centro", "Palmeiras", "Cidade Boa Vista"] },
-  { slug: "poa", nome: "Poá", bairros: ["Centro", "Jardim Silvina"] },
-  { slug: "ferraz-de-vasconcelos", nome: "Ferraz de Vasconcelos", bairros: ["Centro", "Jardim Vitória Régia"] },
-  { slug: "itaquaquecetuba", nome: "Itaquaquecetuba", bairros: ["Centro", "Jardim Odete"] },
+  { slug: "mogi-das-cruzes", nome: "Mogi das Cruzes", bairros: ["Centro", "Vila Oliveira", "Jundiapeba", "Braz Cubas"], sede: true },
+  { slug: "suzano", nome: "Suzano", bairros: ["Centro", "Palmeiras", "Cidade Boa Vista"], sede: false },
+  { slug: "poa", nome: "Poá", bairros: ["Centro", "Jardim Silvina"], sede: false },
+  { slug: "ferraz-de-vasconcelos", nome: "Ferraz de Vasconcelos", bairros: ["Centro", "Jardim Vitória Régia"], sede: false },
+  { slug: "itaquaquecetuba", nome: "Itaquaquecetuba", bairros: ["Centro", "Jardim Odete"], sede: false },
 ];

@@ -89,7 +89,12 @@ export default function Home() {
         {/* Cidades */}
         <section className="bg-carbon-soft py-20 border-y border-card-line">
           <div className="mx-auto max-w-6xl px-6">
-            <h2 className="font-display font-bold text-3xl md:text-4xl mb-10 text-steel">Onde atendemos</h2>
+            <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">
+              Nosso estúdio fica em Mogi das Cruzes
+            </h2>
+            <p className="text-steel-line mb-10 max-w-xl">
+              Recebemos também clientes de toda a região do Alto Tietê, sempre com hora marcada.
+            </p>
             <div className="flex flex-wrap gap-3">
               {cidades.map((c) => (
                 <Link
