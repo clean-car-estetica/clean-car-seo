@@ -21,7 +21,7 @@ export default async function HomeAdminPage() {
             className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Título (parte normal)</label>
             <input

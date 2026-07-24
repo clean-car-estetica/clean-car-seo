@@ -36,7 +36,7 @@ export default async function PaginasLocaisPage({
         Escolha uma combinação para editar o texto exibido nela.
       </p>
 
-      <form method="GET" className="flex gap-3 mb-6">
+      <form method="GET" className="flex flex-wrap gap-3 mb-6">
         <select name="servico" defaultValue={servicoSlug} className="px-3 py-2 rounded-lg bg-card border border-card-line text-steel text-sm">
           {servicos.map((s) => (
             <option key={s.slug} value={s.slug}>{s.nome}</option>

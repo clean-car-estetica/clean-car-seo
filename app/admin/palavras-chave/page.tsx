@@ -19,7 +19,7 @@ export default async function PalavrasChavePage() {
         (ex: pesquisando no modo anônimo). No futuro dá pra automatizar com uma API paga de rastreamento.
       </p>
 
-      <form action={registrarPosicao} className="bg-card border border-card-line rounded-2xl p-6 grid md:grid-cols-[1fr_180px_120px_120px] gap-3 mb-8">
+      <form action={registrarPosicao} className="bg-card border border-card-line rounded-2xl p-6 grid sm:grid-cols-2 md:grid-cols-[1fr_180px_120px_120px] gap-3 mb-8">
         <input
           name="keyword"
           required
