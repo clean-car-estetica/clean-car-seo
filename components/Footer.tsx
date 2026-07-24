@@ -1,6 +1,11 @@
-import { CONTATO, whatsappLink } from "@/lib/config";
+"use client";
+
+import { whatsappLink } from "@/lib/config";
+import { useContato } from "@/components/ContatoProvider";
 
 export default function Footer() {
+  const contato = useContato();
+
   return (
     <footer id="contato" className="bg-carbon-soft border-t border-card-line text-steel-line mt-auto">
       <div className="mx-auto max-w-6xl px-6 py-14 grid gap-10 md:grid-cols-3">
@@ -14,8 +19,8 @@ export default function Footer() {
           <div className="font-display font-bold text-sm uppercase tracking-wide text-verniz-shine mb-3">
             Estúdio
           </div>
-          <p className="text-sm leading-relaxed">Mogi das Cruzes (loja física)</p>
-          <p className="text-sm leading-relaxed text-steel-line/80">
+          <p className="text-sm leading-relaxed">{contato.endereco}</p>
+          <p className="text-sm leading-relaxed text-steel-line/80 mt-1">
             Recebemos clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba
           </p>
         </div>
@@ -24,18 +29,18 @@ export default function Footer() {
             Contato
           </div>
           <p className="text-sm">
-            <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
-              WhatsApp: (11) 91263-0375
+            <a href={whatsappLink(contato)} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+              WhatsApp: {contato.whatsapp}
             </a>
           </p>
           <p className="text-sm">
-            <a href={CONTATO.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
-              @{CONTATO.instagram}
+            <a href={contato.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+              @{contato.instagram}
             </a>
           </p>
           <p className="text-sm">
-            <a href={CONTATO.googleUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
-              Ver avaliações no Google
+            <a href={contato.googleUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+              Ver no Google Maps / avaliações
             </a>
           </p>
         </div>

@@ -1,4 +1,15 @@
 import { supabasePublico } from "@/lib/supabase";
+import { CONTATO_PADRAO, type Contato } from "@/lib/config";
+
+export async function getContatoContent(): Promise<Contato> {
+  try {
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "contato").single();
+    if (!data?.data) return CONTATO_PADRAO;
+    return { ...CONTATO_PADRAO, ...(data.data as Partial<Contato>) };
+  } catch {
+    return CONTATO_PADRAO;
+  }
+}
 
 export type HeroContent = {
   titulo_parte1: string;

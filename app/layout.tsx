@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
+import { ContatoProvider } from "@/components/ContatoProvider";
+import { getContatoContent } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: {
@@ -11,11 +13,13 @@ export const metadata: Metadata = {
     "Lavagem, polimento, vitrificação e higienização automotiva em Mogi das Cruzes e região.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const contato = await getContatoContent();
+
   return (
     <html lang="pt-BR" className="h-full">
       <head>
@@ -35,12 +39,14 @@ export default function RootLayout({
               description:
                 "Estética automotiva em Mogi das Cruzes com produtos Vonixx: lavagem, polimento técnico, vitrificação e cristalização de vidros com hidrofobia e proteção contra chuva ácida.",
               image: "https://clean-car-seo.vercel.app/opengraph-image",
-              telephone: "+5511912630375",
+              telephone: `+${contato.whatsapp}`,
               url: "https://clean-car-seo.vercel.app",
               address: {
                 "@type": "PostalAddress",
+                streetAddress: "Rua Prefeito Sebastião Cascardo, 438 - Jardim Universo",
                 addressLocality: "Mogi das Cruzes",
                 addressRegion: "SP",
+                postalCode: "08740-450",
                 addressCountry: "BR",
               },
               areaServed: [
@@ -50,15 +56,17 @@ export default function RootLayout({
                 "Ferraz de Vasconcelos",
                 "Itaquaquecetuba",
               ],
-              sameAs: ["https://www.instagram.com/cleancar_est26/"],
+              sameAs: [contato.instagramUrl, contato.googleUrl],
               priceRange: "R$",
             }),
           }}
         />
       </head>
       <body className="min-h-full flex flex-col bg-paper text-ink">
-        <PageviewTracker />
-        {children}
+        <ContatoProvider contato={contato}>
+          <PageviewTracker />
+          {children}
+        </ContatoProvider>
       </body>
     </html>
   );

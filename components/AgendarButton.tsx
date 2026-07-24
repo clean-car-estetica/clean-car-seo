@@ -1,12 +1,13 @@
 "use client";
 
-import { CONTATO } from "@/lib/config";
+import { useContato } from "@/components/ContatoProvider";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { usePathname } from "next/navigation";
 import { parseRota } from "@/lib/track";
 
 export default function AgendarButton({ className, children }: { className?: string; children: React.ReactNode }) {
   const pathname = usePathname();
+  const contato = useContato();
 
   function registrarClique() {
     const { service_slug, city_slug } = parseRota(pathname);
@@ -17,7 +18,7 @@ export default function AgendarButton({ className, children }: { className?: str
   }
 
   return (
-    <a href={CONTATO.agendamentoUrl} onClick={registrarClique} className={className}>
+    <a href={contato.agendamentoUrl} onClick={registrarClique} className={className}>
       {children}
     </a>
   );

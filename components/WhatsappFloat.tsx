@@ -1,12 +1,14 @@
 "use client";
 
 import { whatsappLink } from "@/lib/config";
+import { useContato } from "@/components/ContatoProvider";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { usePathname } from "next/navigation";
 import { parseRota } from "@/lib/track";
 
 export default function WhatsappFloat() {
   const pathname = usePathname();
+  const contato = useContato();
 
   function registrarClique() {
     const { service_slug, city_slug } = parseRota(pathname);
@@ -18,7 +20,7 @@ export default function WhatsappFloat() {
 
   return (
     <a
-      href={whatsappLink()}
+      href={whatsappLink(contato)}
       onClick={registrarClique}
       target="_blank"
       rel="noopener noreferrer"
