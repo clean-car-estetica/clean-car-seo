@@ -83,3 +83,33 @@ create policy "public read published posts" on blog_posts for select using (stat
 create policy "public insert events" on events for insert with check (true);
 
 -- keyword_rankings não tem policy de leitura pública: só o console (service_role) acessa.
+
+-- Fase 2.5 — conteúdo geral do site (home, etc.) editável pelo console
+create table if not exists site_content (
+  section text primary key,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table site_content enable row level security;
+create policy "public read site_content" on site_content for select using (true);
+
+-- Bucket de imagens (upload feito pelo console via service_role)
+insert into storage.buckets (id, name, public)
+values ('imagens', 'imagens', true)
+on conflict (id) do nothing;
+
+create policy "public read imagens bucket"
+on storage.objects for select
+using (bucket_id = 'imagens');
+
+-- Blocos de "antes e depois" mostrados na home (editável pelo console)
+create table if not exists transformacoes (
+  id bigint generated always as identity primary key,
+  titulo text not null,
+  descricao text not null,
+  imagem_antes text not null,
+  imagem_depois text not null,
+  ordem int not null default 0
+);
+alter table transformacoes enable row level security;
+create policy "public read transformacoes" on transformacoes for select using (true);

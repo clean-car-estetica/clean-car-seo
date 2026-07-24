@@ -3,12 +3,21 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ServiceCard from "@/components/ServiceCard";
 import BeforeAfter from "@/components/BeforeAfter";
-import VonixxBadge from "@/components/VonixxBadge";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
-import { servicos, cidades } from "@/lib/data";
+import { cidades } from "@/lib/data";
+import { getHeroContent } from "@/lib/site-content";
+import { getServicosPublicos, getTransformacoesPublicas } from "@/lib/site-data";
 
-export default function Home() {
+export const revalidate = 60;
+
+export default async function Home() {
+  const [hero, servicos, transformacoes] = await Promise.all([
+    getHeroContent(),
+    getServicosPublicos(),
+    getTransformacoesPublicas(),
+  ]);
+
   return (
     <>
       <Header />
@@ -17,19 +26,20 @@ export default function Home() {
         <section
           className="shine-sweep bg-carbon text-steel bg-cover bg-center"
           style={{
-            backgroundImage:
-              "linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.95)), url('https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1600&q=80')",
+            backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.95)), url('${hero.imagem_url}')`,
           }}
         >
           <div className="mx-auto max-w-6xl px-6 py-28 md:py-36">
-            <VonixxBadge />
+            <span className="inline-flex items-center gap-2 rounded-full bg-cera/10 border border-cera/30 px-4 py-2">
+              <span className="w-2 h-2 rounded-full bg-cera" />
+              <span className="text-xs font-display font-bold tracking-wide text-cera uppercase">
+                {hero.badge_texto}
+              </span>
+            </span>
             <h1 className="font-display font-extrabold text-5xl md:text-7xl leading-[0.95] max-w-3xl mt-6">
-              Seu carro sai daqui com o <span className="text-verniz-shine glow-text">brilho de zero-km</span>.
+              {hero.titulo_parte1} <span className="text-verniz-shine glow-text">{hero.titulo_destaque}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-steel-line text-lg leading-relaxed">
-              Lavagem, polimento técnico e vitrificação cerâmica no nosso estúdio em Mogi das Cruzes.
-              Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.
-            </p>
+            <p className="mt-6 max-w-xl text-steel-line text-lg leading-relaxed">{hero.subtitulo}</p>
             <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
               Agendar horário
             </AgendarButton>
@@ -37,32 +47,31 @@ export default function Home() {
         </section>
 
         {/* Antes e depois */}
-        <section className="bg-carbon py-20">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="text-center mb-12">
-              <h2 className="font-display font-bold text-3xl md:text-4xl text-steel">
-                Arraste e veja a <span className="text-verniz-shine">transformação</span>
-              </h2>
-              <p className="mt-2 text-steel-line max-w-xl mx-auto">
-                Resultados reais dos nossos serviços de polimento e vitrificação.
-              </p>
+        {transformacoes.length > 0 && (
+          <section className="bg-carbon py-20">
+            <div className="mx-auto max-w-6xl px-6">
+              <div className="text-center mb-12">
+                <h2 className="font-display font-bold text-3xl md:text-4xl text-steel">
+                  Arraste e veja a <span className="text-verniz-shine">transformação</span>
+                </h2>
+                <p className="mt-2 text-steel-line max-w-xl mx-auto">
+                  Resultados reais dos nossos serviços de polimento e vitrificação.
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                {transformacoes.map((t) => (
+                  <BeforeAfter
+                    key={t.id}
+                    title={t.titulo}
+                    description={t.descricao}
+                    before={t.imagem_antes}
+                    after={t.imagem_depois}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <BeforeAfter
-                title="Correção de verniz e espelhamento"
-                description="Eliminamos hologramas e micro-riscos causados por lavagens incorretas, revelando o brilho real da pintura."
-                before="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=700&q=80"
-                after="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=700&q=80"
-              />
-              <BeforeAfter
-                title="Recuperação de plásticos e frisos"
-                description="Acabamentos ressecados pelo sol voltam à cor original com revitalizadores de alta durabilidade."
-                before="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=80"
-                after="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=700&q=80"
-              />
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Serviços */}
         <section className="mx-auto max-w-6xl px-6 py-20">
@@ -75,9 +84,9 @@ export default function Home() {
                 slug={s.slug}
                 nome={s.nome}
                 resumo={s.resumo}
-                precoDesde={s.precoDesde}
-                image={s.imagem}
-                tag={s.tag}
+                precoDesde={s.preco_desde ?? undefined}
+                image={s.imagem_url}
+                tag={s.tag ?? undefined}
               />
             ))}
           </div>

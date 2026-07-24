@@ -5,18 +5,20 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { servicos, cidades } from "@/lib/data";
-import { getConteudoLocal } from "@/lib/content";
+import { getServicoPublico, getConteudoLocalPublico } from "@/lib/site-data";
+
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return servicos.flatMap((s) => cidades.map((c) => ({ servico: s.slug, cidade: c.slug })));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
   params: { servico: string; cidade: string };
-}): Metadata {
-  const servico = servicos.find((s) => s.slug === params.servico);
+}): Promise<Metadata> {
+  const servico = await getServicoPublico(params.servico);
   const cidade = cidades.find((c) => c.slug === params.cidade);
   if (!servico || !cidade) return {};
   return {
@@ -25,16 +27,17 @@ export function generateMetadata({
   };
 }
 
-export default function ServicoCidadePage({
+export default async function ServicoCidadePage({
   params,
 }: {
   params: { servico: string; cidade: string };
 }) {
-  const servico = servicos.find((s) => s.slug === params.servico);
+  const servico = await getServicoPublico(params.servico);
   const cidade = cidades.find((c) => c.slug === params.cidade);
   if (!servico || !cidade) return notFound();
 
-  const conteudo = getConteudoLocal(servico, cidade);
+  const conteudo = await getConteudoLocalPublico(servico, cidade);
+  const imagemFundo = conteudo.imagemOverride || servico.imagem_url;
 
   return (
     <>
@@ -43,7 +46,7 @@ export default function ServicoCidadePage({
         <section
           className="bg-carbon text-steel bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.65), rgba(10,10,13,0.97)), url('${servico.imagem}')`,
+            backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.65), rgba(10,10,13,0.97)), url('${imagemFundo}')`,
           }}
         >
           <div className="mx-auto max-w-4xl px-6 py-20">

@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { importarDadosPadrao, atualizarServico } from "./actions";
+import ImageUploader from "@/components/ImageUploader";
 
 export default async function ConteudoPage() {
   const { data: servicos, error } = await supabaseAdmin
@@ -65,13 +66,8 @@ export default async function ConteudoPage() {
                 rows={2}
                 className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
               />
-              <div className="grid grid-cols-[1fr_140px] gap-3">
-                <input
-                  name="imagem_url"
-                  defaultValue={s.imagem_url}
-                  placeholder="URL da imagem"
-                  className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
-                />
+              <div className="grid grid-cols-[1fr_140px] gap-3 items-end">
+                <ImageUploader name="imagem_url" initialUrl={s.imagem_url} label="Foto do serviço" />
                 <input
                   name="preco_desde"
                   type="number"

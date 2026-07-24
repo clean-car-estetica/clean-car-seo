@@ -6,17 +6,20 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { servicos, cidades } from "@/lib/data";
+import { getServicoPublico } from "@/lib/site-data";
+
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return servicos.map((s) => ({ servico: s.slug }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
   params: { servico: string };
-}): Metadata {
-  const servico = servicos.find((s) => s.slug === params.servico);
+}): Promise<Metadata> {
+  const servico = await getServicoPublico(params.servico);
   if (!servico) return {};
   return {
     title: `${servico.nome} em Mogi das Cruzes e Região`,
@@ -24,12 +27,12 @@ export function generateMetadata({
   };
 }
 
-export default function ServicoPage({
+export default async function ServicoPage({
   params,
 }: {
   params: { servico: string };
 }) {
-  const servico = servicos.find((s) => s.slug === params.servico);
+  const servico = await getServicoPublico(params.servico);
   if (!servico) return notFound();
 
   return (
@@ -39,7 +42,7 @@ export default function ServicoPage({
         <section
           className="shine-sweep bg-carbon text-steel bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.6), rgba(10,10,13,0.97)), url('${servico.imagem}')`,
+            backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.6), rgba(10,10,13,0.97)), url('${servico.imagem_url}')`,
           }}
         >
           <div className="mx-auto max-w-4xl px-6 py-24">
@@ -52,7 +55,7 @@ export default function ServicoPage({
             <p className="mt-6 text-lg text-steel-line max-w-2xl leading-relaxed">{servico.descricao}</p>
             <div className="mt-8 flex gap-6 font-display text-sm text-steel-line">
               {servico.duracao && <span>⏱ {servico.duracao}</span>}
-              {servico.precoDesde && <span className="text-verniz-shine font-bold">A partir de R$ {servico.precoDesde}</span>}
+              {servico.preco_desde && <span className="text-verniz-shine font-bold">A partir de R$ {servico.preco_desde}</span>}
             </div>
             <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
               Agendar este serviço
