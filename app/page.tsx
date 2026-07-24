@@ -1,68 +1,100 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ServiceCard from "@/components/ServiceCard";
+import BeforeAfter from "@/components/BeforeAfter";
+import VonixxBadge from "@/components/VonixxBadge";
+import WhatsappFloat from "@/components/WhatsappFloat";
 import { servicos, cidades } from "@/lib/data";
 
 export default function Home() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 pt-20">
         {/* Hero */}
-        <section className="shine-sweep bg-carbon text-steel">
-          <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
-            <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm mb-4">
-              Estética automotiva · Alto Tietê
-            </p>
-            <h1 className="font-display font-extrabold text-5xl md:text-7xl leading-[0.95] max-w-3xl">
-              Seu carro sai daqui com a <span className="text-verniz-shine">pintura protegida</span> e o brilho de zero-km.
+        <section
+          className="shine-sweep bg-carbon text-steel bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.95)), url('https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1600&q=80')",
+          }}
+        >
+          <div className="mx-auto max-w-6xl px-6 py-28 md:py-36">
+            <VonixxBadge />
+            <h1 className="font-display font-extrabold text-5xl md:text-7xl leading-[0.95] max-w-3xl mt-6">
+              Seu carro sai daqui com o <span className="text-verniz-shine glow-text">brilho de zero-km</span>.
             </h1>
-            <p className="mt-6 max-w-xl text-steel-line/90 text-lg">
-              Lavagem, polimento, vitrificação e higienização em Mogi das Cruzes,
-              Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba.
+            <p className="mt-6 max-w-xl text-steel-line text-lg leading-relaxed">
+              Lavagem, polimento técnico e vitrificação cerâmica em Mogi das Cruzes,
+              Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba. Sempre com hora marcada.
             </p>
             <a
               href="#contato"
-              className="inline-block mt-8 rounded-full bg-cera text-carbon font-display font-bold px-8 py-3 tracking-wide hover:brightness-95"
+              className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors"
             >
               Agendar horário
             </a>
           </div>
         </section>
 
+        {/* Antes e depois */}
+        <section className="bg-carbon py-20">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="text-center mb-12">
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-steel">
+                Arraste e veja a <span className="text-verniz-shine">transformação</span>
+              </h2>
+              <p className="mt-2 text-steel-line max-w-xl mx-auto">
+                Resultados reais dos nossos serviços de polimento e vitrificação.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              <BeforeAfter
+                title="Correção de verniz e espelhamento"
+                description="Eliminamos hologramas e micro-riscos causados por lavagens incorretas, revelando o brilho real da pintura."
+                before="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=700&q=80"
+                after="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=700&q=80"
+              />
+              <BeforeAfter
+                title="Recuperação de plásticos e frisos"
+                description="Acabamentos ressecados pelo sol voltam à cor original com revitalizadores de alta durabilidade."
+                before="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=80"
+                after="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=700&q=80"
+              />
+            </div>
+          </div>
+        </section>
+
         {/* Serviços */}
         <section className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="font-display font-bold text-3xl md:text-4xl mb-2">Nossos serviços</h2>
-          <p className="text-ink/60 mb-10">Do dia a dia à proteção de longa duração.</p>
+          <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">Catálogo de serviços</h2>
+          <p className="text-steel-line mb-10">Química Vonixx, do dia a dia à proteção de longa duração.</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {servicos.map((s) => (
-              <Link
+              <ServiceCard
                 key={s.slug}
-                href={`/servicos/${s.slug}`}
-                className="group rounded-2xl border border-steel-line bg-white p-6 hover:border-verniz transition-colors"
-              >
-                <h3 className="font-display font-bold text-xl group-hover:text-verniz">{s.nome}</h3>
-                <p className="mt-2 text-sm text-ink/70">{s.resumo}</p>
-                {s.precoDesde && (
-                  <p className="mt-4 text-xs uppercase tracking-wide text-verniz font-display font-bold">
-                    A partir de R$ {s.precoDesde}
-                  </p>
-                )}
-              </Link>
+                slug={s.slug}
+                nome={s.nome}
+                resumo={s.resumo}
+                precoDesde={s.precoDesde}
+                image={s.imagem}
+                tag={s.tag}
+              />
             ))}
           </div>
         </section>
 
         {/* Cidades */}
-        <section className="bg-steel py-20">
+        <section className="bg-carbon-soft py-20 border-y border-card-line">
           <div className="mx-auto max-w-6xl px-6">
-            <h2 className="font-display font-bold text-3xl md:text-4xl mb-10">Onde atendemos</h2>
+            <h2 className="font-display font-bold text-3xl md:text-4xl mb-10 text-steel">Onde atendemos</h2>
             <div className="flex flex-wrap gap-3">
               {cidades.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/servicos/vitrificacao/${c.slug}`}
-                  className="rounded-full bg-white border border-steel-line px-5 py-2 font-display font-bold text-sm hover:border-verniz hover:text-verniz"
+                  className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-sm text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
                 >
                   {c.nome}
                 </Link>
@@ -72,6 +104,7 @@ export default function Home() {
         </section>
       </main>
       <Footer />
+      <WhatsappFloat />
     </>
   );
 }

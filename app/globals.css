@@ -1,24 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  /* Carbono — base escura, referência ao asfalto/lataria escura */
-  --carbon: #14161a;
-  --carbon-soft: #1d2027;
-  /* Aço — cinza frio de chapa metálica */
-  --steel: #eef0f3;
-  --steel-line: #d7dbe1;
-  /* Verniz — azul profundo de pintura automotiva, cor de assinatura */
-  --verniz: #1d4ed8;
-  --verniz-shine: #5b8def;
-  /* Cera — âmbar quente, usado com moderação em destaques/CTA */
-  --cera: #e8a33d;
-  --ink: #14161a;
-  --paper: #f7f8fa;
+  /* Estúdio — fundo escuro, referência ao ambiente do box de detalhamento */
+  --carbon: #0a0a0d;
+  --carbon-soft: #131318;
+  --card: #16161c;
+  --card-line: #26262f;
+  /* Cristal — ciano de vitrificação/cerâmica, cor de assinatura */
+  --verniz: #22d3ee;
+  --verniz-shine: #67e8f9;
+  --verniz-glow: rgba(34, 211, 238, 0.35);
+  /* Selo — dourado/âmbar de produto premium (Vonixx) */
+  --cera: #f2b544;
+  --steel: #e8eaed;
+  --steel-line: #9aa0ab;
+  --ink: #eef0f3;
+  --paper: #0a0a0d;
+  --ok: #34d399;
+  --warn: #fb7185;
 }
 
 @theme inline {
   --color-carbon: var(--carbon);
   --color-carbon-soft: var(--carbon-soft);
+  --color-card: var(--card);
+  --color-card-line: var(--card-line);
   --color-steel: var(--steel);
   --color-steel-line: var(--steel-line);
   --color-verniz: var(--verniz);
@@ -26,6 +32,8 @@
   --color-cera: var(--cera);
   --color-ink: var(--ink);
   --color-paper: var(--paper);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
   --font-display: "Barlow Condensed", sans-serif;
   --font-sans: "Inter", Arial, sans-serif;
 }
@@ -34,6 +42,10 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans), Arial, sans-serif;
+}
+
+.glow-text {
+  text-shadow: 0 0 20px var(--verniz-glow);
 }
 
 .shine-sweep {
@@ -47,14 +59,23 @@ body {
   left: -60%;
   width: 40%;
   height: 100%;
-  background: linear-gradient(115deg, transparent, rgba(255,255,255,0.14), transparent);
-  animation: sweep 5s ease-in-out infinite;
+  background: linear-gradient(115deg, transparent, rgba(103, 232, 249, 0.12), transparent);
+  animation: sweep 6s ease-in-out infinite;
 }
 @keyframes sweep {
   0% { left: -60%; }
   55% { left: 130%; }
   100% { left: 130%; }
 }
+
+@keyframes pulse-wa {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55); }
+  70% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+.pulse-wa { animation: pulse-wa 2.4s infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .shine-sweep::after { animation: none; display: none; }
+  .pulse-wa { animation: none; }
 }
