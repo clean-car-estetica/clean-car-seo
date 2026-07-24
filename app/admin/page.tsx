@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { cidades } from "@/lib/data";
+import { cidades, servicos } from "@/lib/data";
 import { Eye, MessageCircle, CalendarCheck, FileText } from "lucide-react";
 
 function Card({ label, value, icon: Icon }: { label: string; value: number | string; icon: any }) {
@@ -57,13 +57,16 @@ export default async function Dashboard({
   let porTipo: Record<string, number> = {};
   let topPaginas: { page_path: string; total: number }[] = [];
   let porCidade: Record<string, { visitas: number; whatsapp: number; agendar: number }> = {};
+  let porServico: Record<string, { visitas: number; whatsapp: number; agendar: number }> = {};
+  let recentes: { created_at: string; event_type: string; page_path: string; service_slug: string | null; city_slug: string | null }[] = [];
 
   try {
     const { data, error } = await supabaseAdmin
       .from("events")
-      .select("event_type, page_path, city_slug, created_at")
+      .select("event_type, page_path, city_slug, service_slug, created_at")
       .gte("created_at", inicio.toISOString())
-      .lte("created_at", fim.toISOString());
+      .lte("created_at", fim.toISOString())
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
@@ -75,7 +78,15 @@ export default async function Dashboard({
       if (row.event_type === "pageview") porCidade[cidadeKey].visitas++;
       if (row.event_type === "click_whatsapp") porCidade[cidadeKey].whatsapp++;
       if (row.event_type === "click_agendar") porCidade[cidadeKey].agendar++;
+
+      const servicoKey = row.service_slug ?? "sem-servico";
+      if (!porServico[servicoKey]) porServico[servicoKey] = { visitas: 0, whatsapp: 0, agendar: 0 };
+      if (row.event_type === "pageview") porServico[servicoKey].visitas++;
+      if (row.event_type === "click_whatsapp") porServico[servicoKey].whatsapp++;
+      if (row.event_type === "click_agendar") porServico[servicoKey].agendar++;
     }
+
+    recentes = (data ?? []).slice(0, 30);
 
     const contagemPorPagina: Record<string, number> = {};
     for (const row of data ?? []) {
@@ -143,7 +154,7 @@ export default async function Dashboard({
         <Card label="Formulários enviados" value={porTipo["form_submit"] ?? 0} icon={FileText} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 mb-6">
         <div className="bg-card border border-card-line rounded-2xl p-6">
           <h2 className="font-display font-bold text-lg text-steel mb-4">Por cidade</h2>
           {Object.keys(porCidade).length === 0 ? (
@@ -161,7 +172,9 @@ export default async function Dashboard({
               <tbody>
                 {Object.entries(porCidade).map(([slug, v]) => (
                   <tr key={slug} className="border-t border-card-line">
-                    <td className="py-2 text-steel-line">{cidades.find((c) => c.slug === slug)?.nome ?? "Sem cidade (home/blog)"}</td>
+                    <td className="py-2 text-steel-line">
+                      {slug === "sem-cidade" ? "Sem cidade (home/blog/pilar)" : cidades.find((c) => c.slug === slug)?.nome ?? slug}
+                    </td>
                     <td className="py-2 text-right text-steel">{v.visitas}</td>
                     <td className="py-2 text-right text-steel">{v.whatsapp}</td>
                     <td className="py-2 text-right text-steel">{v.agendar}</td>
@@ -172,6 +185,38 @@ export default async function Dashboard({
           )}
         </div>
 
+        <div className="bg-card border border-card-line rounded-2xl p-6">
+          <h2 className="font-display font-bold text-lg text-steel mb-4">Por serviço</h2>
+          {Object.keys(porServico).length === 0 ? (
+            <p className="text-steel-line text-sm">Sem dados neste período.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-steel-line text-xs uppercase tracking-wide">
+                  <th className="pb-2">Serviço</th>
+                  <th className="pb-2 text-right">Visitas</th>
+                  <th className="pb-2 text-right">WhatsApp</th>
+                  <th className="pb-2 text-right">Agendar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(porServico).map(([slug, v]) => (
+                  <tr key={slug} className="border-t border-card-line">
+                    <td className="py-2 text-steel-line">
+                      {slug === "sem-servico" ? "Sem serviço (home/blog)" : servicos.find((s) => s.slug === slug)?.nome ?? slug}
+                    </td>
+                    <td className="py-2 text-right text-steel">{v.visitas}</td>
+                    <td className="py-2 text-right text-steel">{v.whatsapp}</td>
+                    <td className="py-2 text-right text-steel">{v.agendar}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
         <div className="bg-card border border-card-line rounded-2xl p-6">
           <h2 className="font-display font-bold text-lg text-steel mb-4">Páginas mais visitadas</h2>
           {topPaginas.length === 0 ? (
@@ -187,6 +232,36 @@ export default async function Dashboard({
                 ))}
               </tbody>
             </table>
+          )}
+        </div>
+
+        <div className="bg-card border border-card-line rounded-2xl p-6">
+          <h2 className="font-display font-bold text-lg text-steel mb-4">Últimos eventos</h2>
+          {recentes.length === 0 ? (
+            <p className="text-steel-line text-sm">Sem eventos neste período.</p>
+          ) : (
+            <div className="max-h-80 overflow-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-steel-line uppercase tracking-wide sticky top-0 bg-card">
+                    <th className="pb-2">Quando</th>
+                    <th className="pb-2">Tipo</th>
+                    <th className="pb-2">Página</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentes.map((r, i) => (
+                    <tr key={i} className="border-t border-card-line">
+                      <td className="py-1.5 text-steel-line whitespace-nowrap">
+                        {new Date(r.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td className="py-1.5 text-steel-line">{r.event_type}</td>
+                      <td className="py-1.5 text-steel">{r.page_path}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
