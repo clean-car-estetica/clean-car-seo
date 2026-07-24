@@ -11,7 +11,7 @@ export default function Faq({ itens }: { itens: FaqItem[] }) {
   if (itens.length === 0) return null;
 
   return (
-    <section className="bg-carbon-soft border-y border-card-line py-20">
+    <section id="faq" className="bg-carbon-soft border-y border-card-line py-20">
       <div className="mx-auto max-w-3xl px-6">
         <div className="text-center mb-10">
           <h2 className="font-display font-bold text-3xl md:text-4xl text-steel">

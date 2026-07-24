@@ -3,7 +3,8 @@ import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
 import CupomPopup from "@/components/CupomPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
-import { getContatoContent } from "@/lib/site-content";
+import { PromoProvider } from "@/components/PromoProvider";
+import { getContatoContent, getPromocoes } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +20,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const contato = await getContatoContent();
+  const [contato, promocoes] = await Promise.all([getContatoContent(), getPromocoes()]);
 
   return (
     <html lang="pt-BR" className="h-full">
@@ -65,9 +66,11 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-paper text-ink">
         <ContatoProvider contato={contato}>
-          <PageviewTracker />
-          {children}
-          <CupomPopup />
+          <PromoProvider promocoes={promocoes}>
+            <PageviewTracker />
+            {children}
+            <CupomPopup />
+          </PromoProvider>
         </ContatoProvider>
       </body>
     </html>

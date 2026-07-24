@@ -84,7 +84,7 @@ export default async function Home() {
         )}
 
         {/* Serviços */}
-        <section className="mx-auto max-w-6xl px-6 py-20">
+        <section id="servicos" className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">Catálogo de serviços</h2>
           <p className="text-steel-line mb-10">Química Vonixx, do dia a dia à proteção de longa duração.</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

@@ -165,3 +165,14 @@ create table if not exists depoimentos (
 );
 alter table depoimentos enable row level security;
 create policy "public read depoimentos" on depoimentos for select using (true);
+
+-- Fase 6 — textos de promoções (cupom 1a visita, indique e ganhe) editaveis pelo console
+create table if not exists promocoes (
+  chave text primary key,
+  titulo text not null,
+  texto text not null,
+  regras text not null default '',
+  updated_at timestamptz not null default now()
+);
+alter table promocoes enable row level security;
+create policy "public read promocoes" on promocoes for select using (true);

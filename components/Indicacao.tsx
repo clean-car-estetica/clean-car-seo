@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Users } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { usePromocoes } from "@/components/PromoProvider";
 
 export default function Indicacao() {
+  const { indicacao } = usePromocoes();
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [codigo, setCodigo] = useState("");
@@ -25,12 +27,10 @@ export default function Indicacao() {
   }
 
   return (
-    <section className="mx-auto max-w-2xl px-6 py-20 text-center">
+    <section id="indicacao" className="mx-auto max-w-2xl px-6 py-20 text-center">
       <Users className="mx-auto text-verniz-shine mb-4" size={32} />
-      <h2 className="font-display font-bold text-3xl text-steel mb-2">Indique um amigo</h2>
-      <p className="text-steel-line mb-8">
-        Já é cliente e tem um código de indicação? Cadastre aqui e a gente confirma seu benefício.
-      </p>
+      <h2 className="font-display font-bold text-3xl text-steel mb-2">{indicacao.titulo}</h2>
+      <p className="text-steel-line mb-8">{indicacao.texto}</p>
 
       {enviado ? (
         <p className="text-verniz-shine font-display font-bold">Recebemos! Vamos confirmar e te avisar pelo WhatsApp. 🙌</p>
@@ -63,6 +63,7 @@ export default function Indicacao() {
           >
             {enviando ? "Enviando..." : "Cadastrar indicação"}
           </button>
+          {indicacao.regras && <p className="text-xs text-steel-line/70 leading-relaxed mt-2">{indicacao.regras}</p>}
         </form>
       )}
     </section>

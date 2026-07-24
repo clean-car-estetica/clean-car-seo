@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { X, Gift } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { usePromocoes } from "@/components/PromoProvider";
 
 const CHAVE_LOCAL = "cleancar_cupom_fechado";
 
 export default function CupomPopup() {
   const pathname = usePathname();
+  const { cupom } = usePromocoes();
   const [visivel, setVisivel] = useState(false);
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -54,8 +56,8 @@ export default function CupomPopup() {
         ) : (
           <>
             <Gift className="text-verniz-shine mb-3" size={28} />
-            <h3 className="font-display font-bold text-lg text-steel mb-1">Primeira vez na Clean Car?</h3>
-            <p className="text-sm text-steel-line mb-4">Deixa seu contato e ganhe um desconto especial no primeiro serviço.</p>
+            <h3 className="font-display font-bold text-lg text-steel mb-1">{cupom.titulo}</h3>
+            <p className="text-sm text-steel-line mb-4">{cupom.texto}</p>
             <form onSubmit={enviar} className="grid gap-3">
               <input
                 required
@@ -78,6 +80,7 @@ export default function CupomPopup() {
               >
                 {enviando ? "Enviando..." : "Quero meu cupom"}
               </button>
+              {cupom.regras && <p className="text-[11px] text-steel-line/70 leading-relaxed">{cupom.regras}</p>}
             </form>
           </>
         )}

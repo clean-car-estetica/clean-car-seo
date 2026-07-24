@@ -1,6 +1,37 @@
 import { supabasePublico } from "@/lib/supabase";
 import { CONTATO_PADRAO, type Contato } from "@/lib/config";
 
+export type Promocao = { titulo: string; texto: string; regras: string };
+
+export const PROMOCOES_PADRAO: Record<"cupom" | "indicacao", Promocao> = {
+  cupom: {
+    titulo: "Primeira vez na Clean Car?",
+    texto: "Deixa seu contato e ganhe um desconto especial no primeiro serviço.",
+    regras: "Válido para novos clientes, uma vez por CPF/veículo. Desconto informado no contato pelo WhatsApp.",
+  },
+  indicacao: {
+    titulo: "Indique um amigo",
+    texto: "Já é cliente e tem um código de indicação? Cadastre aqui e a gente confirma seu benefício.",
+    regras: "Consulte as regras vigentes do programa Indique e Ganhe com a equipe Clean Car.",
+  },
+};
+
+export async function getPromocoes(): Promise<Record<"cupom" | "indicacao", Promocao>> {
+  try {
+    const { data, error } = await supabasePublico.from("promocoes").select("*");
+    if (error) throw error;
+    const resultado = { ...PROMOCOES_PADRAO };
+    for (const row of data ?? []) {
+      if (row.chave === "cupom" || row.chave === "indicacao") {
+        resultado[row.chave as "cupom" | "indicacao"] = { titulo: row.titulo, texto: row.texto, regras: row.regras };
+      }
+    }
+    return resultado;
+  } catch {
+    return PROMOCOES_PADRAO;
+  }
+}
+
 export async function getContatoContent(): Promise<Contato> {
   try {
     const { data } = await supabasePublico.from("site_content").select("data").eq("section", "contato").single();
