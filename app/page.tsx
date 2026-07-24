@@ -5,6 +5,7 @@ import ServiceCard from "@/components/ServiceCard";
 import BeforeAfter from "@/components/BeforeAfter";
 import VonixxBadge from "@/components/VonixxBadge";
 import WhatsappFloat from "@/components/WhatsappFloat";
+import { CONTATO } from "@/lib/config";
 import { servicos, cidades } from "@/lib/data";
 
 export default function Home() {
@@ -30,7 +31,7 @@ export default function Home() {
               Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba. Sempre com hora marcada.
             </p>
             <a
-              href="#contato"
+              href={CONTATO.agendamentoUrl}
               className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors"
             >
               Agendar horário

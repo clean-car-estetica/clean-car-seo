@@ -1,3 +1,5 @@
+import { CONTATO, whatsappLink } from "@/lib/config";
+
 export default function Footer() {
   return (
     <footer id="contato" className="bg-carbon-soft border-t border-card-line text-steel-line mt-auto">
@@ -18,8 +20,21 @@ export default function Footer() {
           <div className="font-display font-bold text-sm uppercase tracking-wide text-verniz-shine mb-3">
             Contato
           </div>
-          <p className="text-sm">WhatsApp: (11) 99999-9999</p>
-          <p className="text-sm">@cleancar_est26</p>
+          <p className="text-sm">
+            <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+              WhatsApp: (11) 91263-0375
+            </a>
+          </p>
+          <p className="text-sm">
+            <a href={CONTATO.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+              @{CONTATO.instagram}
+            </a>
+          </p>
+          <p className="text-sm">
+            <a href={CONTATO.googleUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+              Ver avaliações no Google
+            </a>
+          </p>
         </div>
       </div>
       <div className="text-center text-xs text-steel-line/60 py-4 border-t border-card-line">

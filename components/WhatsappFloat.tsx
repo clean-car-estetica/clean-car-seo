@@ -1,7 +1,9 @@
+import { whatsappLink } from "@/lib/config";
+
 export default function WhatsappFloat() {
   return (
     <a
-      href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Clean%20Car%20e%20gostaria%20de%20um%20or%C3%A7amento."
+      href={whatsappLink()}
       target="_blank"
       rel="noopener noreferrer"
       className="pulse-wa fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform"

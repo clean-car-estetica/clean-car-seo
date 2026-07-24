@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTATO } from "@/lib/config";
 
 export default function Header() {
   return (
@@ -14,7 +15,7 @@ export default function Header() {
           <Link href="/blog" className="hover:text-verniz-shine">Blog</Link>
         </nav>
         <a
-          href="#contato"
+          href={CONTATO.agendamentoUrl}
           className="rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors"
         >
           Agendar
