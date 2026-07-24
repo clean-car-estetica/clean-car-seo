@@ -5,8 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
-import { servicos, cidades } from "@/lib/data";
-import { getServicoPublico } from "@/lib/site-data";
+import { servicos } from "@/lib/data";
+import { getServicoPublico, getCidadesPublicas } from "@/lib/site-data";
 
 export const revalidate = 60;
 
@@ -34,7 +34,7 @@ export default async function ServicoPage({
   params: Promise<{ servico: string }>;
 }) {
   const { servico: servicoSlug } = await params;
-  const servico = await getServicoPublico(servicoSlug);
+  const [servico, cidades] = await Promise.all([getServicoPublico(servicoSlug), getCidadesPublicas()]);
   if (!servico) return notFound();
 
   return (

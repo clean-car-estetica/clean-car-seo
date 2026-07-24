@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { importarDadosPadrao, atualizarServico } from "./actions";
+import { importarDadosPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
 import ImageUploader from "@/components/ImageUploader";
 
 export default async function ConteudoPage() {
@@ -14,8 +14,8 @@ export default async function ConteudoPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-display font-bold text-3xl text-steel mb-1">Conteúdo</h1>
-          <p className="text-steel-line text-sm">Edite texto e imagem de cada serviço sem mexer em código.</p>
+          <h1 className="font-display font-bold text-3xl text-steel mb-1">Serviços</h1>
+          <p className="text-steel-line text-sm">Edite, crie ou remova serviços sem mexer em código.</p>
         </div>
         <form action={importarDadosPadrao}>
           <button
@@ -33,6 +33,18 @@ export default async function ConteudoPage() {
         </div>
       )}
 
+      <details className="bg-card border border-card-line rounded-2xl p-6 mb-8">
+        <summary className="font-display font-bold text-steel cursor-pointer">+ Criar novo serviço</summary>
+        <form action={criarServico} className="grid gap-3 max-w-xl mt-4">
+          <input name="nome" required placeholder="Nome do serviço" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
+          <input name="resumo" placeholder="Resumo curto" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
+          <textarea name="descricao" rows={2} placeholder="Descrição" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
+          <button type="submit" className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine">
+            Criar serviço
+          </button>
+        </form>
+      </details>
+
       {!error && (!servicos || servicos.length === 0) && (
         <div className="bg-card border border-card-line rounded-2xl p-6 text-steel-line text-sm">
           Nenhum serviço cadastrado ainda. Clique em <strong>Importar/atualizar dados padrão</strong> para trazer
@@ -42,48 +54,52 @@ export default async function ConteudoPage() {
 
       <div className="grid gap-5">
         {servicos?.map((s) => (
-          <form
-            key={s.slug}
-            action={atualizarServico}
-            className="bg-card border border-card-line rounded-2xl p-6 grid md:grid-cols-[160px_1fr] gap-5"
-          >
-            <input type="hidden" name="slug" value={s.slug} />
-            <img src={s.imagem_url} alt={s.nome} className="w-full h-32 object-cover rounded-xl" />
-            <div className="grid gap-3">
-              <input
-                name="nome"
-                defaultValue={s.nome}
-                className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel font-display font-bold"
-              />
-              <input
-                name="resumo"
-                defaultValue={s.resumo}
-                className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
-              />
-              <textarea
-                name="descricao"
-                defaultValue={s.descricao}
-                rows={2}
-                className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
-              />
-              <div className="grid grid-cols-[1fr_140px] gap-3 items-end">
-                <ImageUploader name="imagem_url" initialUrl={s.imagem_url} label="Foto do serviço" />
+          <div key={s.slug} className="bg-card border border-card-line rounded-2xl p-6">
+            <form action={atualizarServico} className="grid md:grid-cols-[160px_1fr] gap-5">
+              <input type="hidden" name="slug" value={s.slug} />
+              <img src={s.imagem_url} alt={s.nome} className="w-full h-32 object-cover rounded-xl" />
+              <div className="grid gap-3">
                 <input
-                  name="preco_desde"
-                  type="number"
-                  defaultValue={s.preco_desde ?? ""}
-                  placeholder="Preço"
+                  name="nome"
+                  defaultValue={s.nome}
+                  className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel font-display font-bold"
+                />
+                <input
+                  name="resumo"
+                  defaultValue={s.resumo}
                   className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
                 />
+                <textarea
+                  name="descricao"
+                  defaultValue={s.descricao}
+                  rows={2}
+                  className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+                />
+                <div className="grid grid-cols-[1fr_140px] gap-3 items-end">
+                  <ImageUploader name="imagem_url" initialUrl={s.imagem_url} label="Foto do serviço" />
+                  <input
+                    name="preco_desde"
+                    type="number"
+                    defaultValue={s.preco_desde ?? ""}
+                    placeholder="Preço"
+                    className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine"
+                >
+                  Salvar
+                </button>
               </div>
-              <button
-                type="submit"
-                className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine"
-              >
-                Salvar
+            </form>
+            <form action={excluirServico} className="mt-3 pt-3 border-t border-card-line">
+              <input type="hidden" name="slug" value={s.slug} />
+              <button type="submit" className="text-xs font-bold text-warn hover:underline">
+                Excluir este serviço
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
         ))}
       </div>
     </div>

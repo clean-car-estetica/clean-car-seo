@@ -5,21 +5,21 @@ import ServiceCard from "@/components/ServiceCard";
 import BeforeAfter from "@/components/BeforeAfter";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
-import { cidades } from "@/lib/data";
 import { getHeroContent } from "@/lib/site-content";
 import Processo from "@/components/Processo";
 import Produtos from "@/components/Produtos";
 import Faq from "@/components/Faq";
-import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos } from "@/lib/site-data";
+import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos, getCidadesPublicas } from "@/lib/site-data";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, faqs] = await Promise.all([
+  const [hero, servicos, transformacoes, faqs, cidades] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
     getFaqsPublicos(),
+    getCidadesPublicas(),
   ]);
 
   return (

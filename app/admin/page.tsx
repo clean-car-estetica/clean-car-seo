@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { cidades, servicos } from "@/lib/data";
+import { getCidadesPublicas, getServicosPublicos } from "@/lib/site-data";
 import { Eye, MessageCircle, CalendarCheck, FileText } from "lucide-react";
 
 function Card({ label, value, icon: Icon }: { label: string; value: number | string; icon: any }) {
@@ -52,6 +52,7 @@ export default async function Dashboard({
   const sp = await searchParams;
   const periodo = sp.periodo || "30d";
   const { inicio, fim } = calcularPeriodo(periodo, sp.inicio, sp.fim);
+  const [cidades, servicos] = await Promise.all([getCidadesPublicas(), getServicosPublicos()]);
 
   let erro: string | null = null;
   let porTipo: Record<string, number> = {};

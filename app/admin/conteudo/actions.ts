@@ -19,6 +19,7 @@ export async function importarDadosPadrao() {
     slug: c.slug,
     nome: c.nome,
     bairros: c.bairros,
+    sede: c.sede,
   }));
 
   const { error: e1 } = await supabaseAdmin.from("services").upsert(linhasServicos);
@@ -27,6 +28,34 @@ export async function importarDadosPadrao() {
   if (e2) throw new Error(e2.message);
 
   revalidatePath("/admin/conteudo");
+}
+
+export async function criarServico(formData: FormData) {
+  const nome = String(formData.get("nome"));
+  const slug = String(formData.get("nome"))
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  const resumo = String(formData.get("resumo") || "");
+  const descricao = String(formData.get("descricao") || "");
+  const imagem_url =
+    String(formData.get("imagem_url") || "") ||
+    "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80";
+
+  const { error } = await supabaseAdmin.from("services").insert({ slug, nome, resumo, descricao, imagem_url });
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/conteudo");
+  revalidatePath("/");
+}
+
+export async function excluirServico(formData: FormData) {
+  const slug = String(formData.get("slug"));
+  const { error } = await supabaseAdmin.from("services").delete().eq("slug", slug);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/conteudo");
+  revalidatePath("/");
 }
 
 export async function atualizarServico(formData: FormData) {

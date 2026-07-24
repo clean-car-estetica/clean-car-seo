@@ -124,3 +124,7 @@ create table if not exists faqs (
 );
 alter table faqs enable row level security;
 create policy "public read faqs" on faqs for select using (true);
+
+-- Fase 3 — cidades passam a ter um flag "sede" (loja física) e podem ser
+-- criadas/removidas pelo console, não só editadas.
+alter table cities add column if not exists sede boolean not null default false;

@@ -1,8 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { servicos, cidades } from "@/lib/data";
-import { getConteudoLocal } from "@/lib/content";
+import { getServicosPublicos, getCidadesPublicas, getConteudoLocalPublico } from "@/lib/site-data";
 import ImageUploader from "@/components/ImageUploader";
 import { salvarPaginaLocal } from "./actions";
 
@@ -12,10 +11,22 @@ export default async function PaginasLocaisPage({
   searchParams: Promise<{ servico?: string; cidade?: string }>;
 }) {
   const sp = await searchParams;
-  const servicoSlug = sp.servico || servicos[0].slug;
-  const cidadeSlug = sp.cidade || cidades[0].slug;
-  const servico = servicos.find((s) => s.slug === servicoSlug)!;
-  const cidade = cidades.find((c) => c.slug === cidadeSlug)!;
+  const [servicos, cidades] = await Promise.all([getServicosPublicos(), getCidadesPublicas()]);
+  const servicoSlug = sp.servico || servicos[0]?.slug;
+  const cidadeSlug = sp.cidade || cidades[0]?.slug;
+  const servico = servicos.find((s) => s.slug === servicoSlug);
+  const cidade = cidades.find((c) => c.slug === cidadeSlug);
+
+  if (!servico || !cidade) {
+    return (
+      <div>
+        <h1 className="font-display font-bold text-3xl text-steel mb-1">Páginas locais</h1>
+        <p className="text-steel-line text-sm">
+          Cadastre pelo menos um serviço (aba Serviços) e uma cidade (aba Cidades) primeiro.
+        </p>
+      </div>
+    );
+  }
 
   const { data: override } = await supabaseAdmin
     .from("local_pages_content")
@@ -24,7 +35,7 @@ export default async function PaginasLocaisPage({
     .eq("city_slug", cidadeSlug)
     .maybeSingle();
 
-  const template = getConteudoLocal(servico, cidade);
+  const template = await getConteudoLocalPublico(servico, cidade);
   const paragrafos = override?.paragrafos?.length ? override.paragrafos : template.paragrafos;
   const temPersonalizacao = Boolean(override?.paragrafos?.length);
 
@@ -64,7 +75,7 @@ export default async function PaginasLocaisPage({
 
         <ImageUploader
           name="imagem_url"
-          initialUrl={override?.imagem_url || servico.imagem}
+          initialUrl={override?.imagem_url || servico.imagem_url}
           label={`Imagem de topo (${servico.nome} em ${cidade.nome})`}
         />
 

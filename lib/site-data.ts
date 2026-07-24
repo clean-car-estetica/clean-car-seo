@@ -1,5 +1,27 @@
 import { supabasePublico } from "@/lib/supabase";
-import { servicos as servicosPadrao } from "@/lib/data";
+import { servicos as servicosPadrao, cidades as cidadesPadrao } from "@/lib/data";
+
+export type CidadeDB = {
+  slug: string;
+  nome: string;
+  bairros: string[];
+  sede: boolean;
+};
+
+export async function getCidadesPublicas(): Promise<CidadeDB[]> {
+  try {
+    const { data, error } = await supabasePublico.from("cities").select("*").order("nome");
+    if (error || !data || data.length === 0) throw error ?? new Error("vazio");
+    return data as CidadeDB[];
+  } catch {
+    return cidadesPadrao;
+  }
+}
+
+export async function getCidadePublica(slug: string): Promise<CidadeDB | null> {
+  const todas = await getCidadesPublicas();
+  return todas.find((c) => c.slug === slug) ?? null;
+}
 
 export type ServicoDB = {
   slug: string;

@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { servicos, cidades } from "@/lib/data";
-import { getServicoPublico, getConteudoLocalPublico } from "@/lib/site-data";
+import { getServicoPublico, getConteudoLocalPublico, getCidadesPublicas, getCidadePublica } from "@/lib/site-data";
 
 export const revalidate = 60;
 
@@ -20,7 +20,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { servico: servicoSlug, cidade: cidadeSlug } = await params;
   const servico = await getServicoPublico(servicoSlug);
-  const cidade = cidades.find((c) => c.slug === cidadeSlug);
+  const cidade = await getCidadePublica(cidadeSlug);
   if (!servico || !cidade) return {};
   return {
     title: `${servico.nome} em ${cidade.nome} | Clean Car`,
@@ -35,7 +35,7 @@ export default async function ServicoCidadePage({
 }) {
   const { servico: servicoSlug, cidade: cidadeSlug } = await params;
   const servico = await getServicoPublico(servicoSlug);
-  const cidade = cidades.find((c) => c.slug === cidadeSlug);
+  const cidade = await getCidadePublica(cidadeSlug);
   if (!servico || !cidade) return notFound();
 
   const conteudo = await getConteudoLocalPublico(servico, cidade);

@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
-import { servicos, cidades } from "@/lib/data";
 import { supabasePublico } from "@/lib/supabase";
+import { getServicosPublicos, getCidadesPublicas } from "@/lib/site-data";
 
 const BASE_URL = "https://clean-car-seo.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [servicos, cidades] = await Promise.all([getServicosPublicos(), getCidadesPublicas()]);
+
   const entradas: MetadataRoute.Sitemap = [
     { url: BASE_URL, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE_URL}/blog`, changeFrequency: "weekly", priority: 0.6 },
