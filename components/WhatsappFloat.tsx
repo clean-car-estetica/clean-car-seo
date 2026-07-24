@@ -1,9 +1,23 @@
+"use client";
+
 import { whatsappLink } from "@/lib/config";
+import { supabaseBrowser } from "@/lib/supabase-browser";
+import { usePathname } from "next/navigation";
 
 export default function WhatsappFloat() {
+  const pathname = usePathname();
+
+  function registrarClique() {
+    supabaseBrowser()
+      .from("events")
+      .insert({ event_type: "click_whatsapp", page_path: pathname })
+      .then(() => {});
+  }
+
   return (
     <a
       href={whatsappLink()}
+      onClick={registrarClique}
       target="_blank"
       rel="noopener noreferrer"
       className="pulse-wa fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform"

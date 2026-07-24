@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CONTATO } from "@/lib/config";
+import AgendarButton from "@/components/AgendarButton";
 
 export default function Header() {
   return (
@@ -14,12 +14,9 @@ export default function Header() {
           <Link href="/servicos/higienizacao" className="hover:text-verniz-shine">Higienização</Link>
           <Link href="/blog" className="hover:text-verniz-shine">Blog</Link>
         </nav>
-        <a
-          href={CONTATO.agendamentoUrl}
-          className="rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors"
-        >
+        <AgendarButton className="rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors">
           Agendar
-        </a>
+        </AgendarButton>
       </div>
     </header>
   );

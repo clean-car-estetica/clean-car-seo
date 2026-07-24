@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
-import { CONTATO } from "@/lib/config";
+import AgendarButton from "@/components/AgendarButton";
 import { servicos, cidades } from "@/lib/data";
 
 export function generateStaticParams() {
@@ -54,12 +54,9 @@ export default function ServicoPage({
               {servico.duracao && <span>⏱ {servico.duracao}</span>}
               {servico.precoDesde && <span className="text-verniz-shine font-bold">A partir de R$ {servico.precoDesde}</span>}
             </div>
-            <a
-              href={CONTATO.agendamentoUrl}
-              className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors"
-            >
+            <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
               Agendar este serviço
-            </a>
+            </AgendarButton>
           </div>
         </section>
 
