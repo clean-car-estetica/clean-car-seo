@@ -128,3 +128,14 @@ create policy "public read faqs" on faqs for select using (true);
 -- Fase 3 — cidades passam a ter um flag "sede" (loja física) e podem ser
 -- criadas/removidas pelo console, não só editadas.
 alter table cities add column if not exists sede boolean not null default false;
+
+-- Fase 4 — respostas de NPS (satisfação do cliente)
+create table if not exists nps_respostas (
+  id bigint generated always as identity primary key,
+  nota int not null check (nota between 0 and 10),
+  comentario text,
+  service_slug text,
+  criado_em timestamptz not null default now()
+);
+alter table nps_respostas enable row level security;
+create policy "public insert nps" on nps_respostas for insert with check (true);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle, Phone, Building2, Menu, X } from "lucide-react";
+import { LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle, Phone, Building2, Smile, Menu, X } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -35,6 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/blog", label: "Blog", icon: Newspaper },
     { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
     { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
+    { href: "/admin/nps", label: "NPS", icon: Smile },
   ];
 
   const conteudoSidebar = (
