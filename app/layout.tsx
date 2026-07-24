@@ -32,6 +32,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "AutoWash",
               name: "Clean Car Estética Automotiva",
+              description:
+                "Estética automotiva em Mogi das Cruzes com produtos Vonixx: lavagem, polimento técnico, vitrificação e cristalização de vidros com hidrofobia e proteção contra chuva ácida.",
               image: "https://clean-car-seo.vercel.app/opengraph-image",
               telephone: "+5511912630375",
               url: "https://clean-car-seo.vercel.app",

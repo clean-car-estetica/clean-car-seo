@@ -8,6 +8,7 @@ import AgendarButton from "@/components/AgendarButton";
 import { cidades } from "@/lib/data";
 import { getHeroContent } from "@/lib/site-content";
 import Processo from "@/components/Processo";
+import Produtos from "@/components/Produtos";
 import Faq from "@/components/Faq";
 import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos } from "@/lib/site-data";
 
@@ -50,6 +51,7 @@ export default async function Home() {
         </section>
 
         <Processo />
+        <Produtos />
 
         {/* Antes e depois */}
         {transformacoes.length > 0 && (

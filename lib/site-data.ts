@@ -115,6 +115,12 @@ const faqsPadrao: FaqDB[] = [
     resposta:
       "Depende do serviço. Uma higienização geralmente leva algumas horas. Polimento e vitrificação pedem mais tempo de cura — no agendamento a gente já informa o prazo certo.",
   },
+  {
+    id: -4,
+    pergunta: "O que é hidrofobia e por que ela protege o carro?",
+    resposta:
+      "Hidrofobia é a propriedade que faz a água escorregar da pintura ou do vidro em vez de grudar. Com produtos Vonixx como Hidrox e Glasy, conseguimos essa repelência — o que reduz manchas de chuva ácida, facilita a limpeza e ajuda a manter a proteção da pintura por mais tempo.",
+  },
 ];
 
 export async function getFaqsPublicos(): Promise<FaqDB[]> {
