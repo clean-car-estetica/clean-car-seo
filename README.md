@@ -22,3 +22,6 @@ ou serviço ali já propaga para todas as páginas via `generateStaticParams`.
 npm install
 npm run dev
 ```
+
+## Deploy
+Deploy automático via Vercel a cada push na branch `main`.
