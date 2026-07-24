@@ -32,6 +32,7 @@ export type ServicoDB = {
   preco_desde: number | null;
   imagem_url: string;
   tag: string | null;
+  pontos_fidelidade: number;
 };
 
 export async function getServicosPublicos(): Promise<ServicoDB[]> {
@@ -50,6 +51,7 @@ export async function getServicosPublicos(): Promise<ServicoDB[]> {
       preco_desde: s.precoDesde ?? null,
       imagem_url: s.imagem,
       tag: s.tag ?? null,
+      pontos_fidelidade: 0,
     }));
   }
 }
@@ -118,20 +120,7 @@ export async function getConteudoLocalPublico(servico: ServicoDB, cidade: { slug
 
 export type DepoimentoDB = { id: number; autor: string; nota: number; texto: string };
 
-const depoimentosPadrao: DepoimentoDB[] = [
-  {
-    id: -1,
-    autor: "Cliente Google",
-    nota: 5,
-    texto: "Ficou impressionado com o nível de detalhe do serviço — o carro saiu impecável, muito além do esperado. Recomenda a equipe como referência em Mogi das Cruzes.",
-  },
-  {
-    id: -2,
-    autor: "Cliente Google",
-    nota: 5,
-    texto: "Elogiou a qualidade do trabalho entregue pela equipe.",
-  },
-];
+const depoimentosPadrao: DepoimentoDB[] = [];
 
 export async function getDepoimentosPublicos(): Promise<DepoimentoDB[]> {
   try {
@@ -140,6 +129,18 @@ export async function getDepoimentosPublicos(): Promise<DepoimentoDB[]> {
     return data as DepoimentoDB[];
   } catch {
     return depoimentosPadrao;
+  }
+}
+
+export type BeneficioDB = { id: number; nome: string; pontos_necessarios: number };
+
+export async function getBeneficiosPublicos(): Promise<BeneficioDB[]> {
+  try {
+    const { data, error } = await supabasePublico.from("beneficios").select("*").order("pontos_necessarios");
+    if (error) throw error;
+    return (data ?? []) as BeneficioDB[];
+  } catch {
+    return [];
   }
 }
 

@@ -176,3 +176,15 @@ create table if not exists promocoes (
 );
 alter table promocoes enable row level security;
 create policy "public read promocoes" on promocoes for select using (true);
+
+-- Fase 7 — programa de fidelidade: pontos por servico + niveis de beneficio
+alter table services add column if not exists pontos_fidelidade int not null default 0;
+
+create table if not exists beneficios (
+  id bigint generated always as identity primary key,
+  nome text not null,
+  pontos_necessarios int not null,
+  ordem int not null default 0
+);
+alter table beneficios enable row level security;
+create policy "public read beneficios" on beneficios for select using (true);

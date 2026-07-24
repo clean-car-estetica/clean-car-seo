@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  /* Estúdio — fundo escuro, referência ao ambiente do box de detalhamento */
-  --carbon: #0a0a0d;
-  --carbon-soft: #131318;
-  --card: #16161c;
-  --card-line: #26262f;
+  /* Estúdio — fundo azul marinho */
+  --carbon: #07115a;
+  --carbon-soft: #0a1670;
+  --card: #0d1a7d;
+  --card-line: #253aa5;
   /* Cristal — ciano de vitrificação/cerâmica, cor de assinatura */
   --verniz: #22d3ee;
   --verniz-shine: #67e8f9;
@@ -15,7 +15,7 @@
   --steel: #e8eaed;
   --steel-line: #9aa0ab;
   --ink: #eef0f3;
-  --paper: #0a0a0d;
+  --paper: #07115a;
   --ok: #34d399;
   --warn: #fb7185;
 }

@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/#servicos", label: "Serviços e preços" },
   { href: "/#faq", label: "FAQ" },
   { href: "/#indicacao", label: "Indique e ganhe" },
+  { href: "/beneficios", label: "Benefícios" },
   { href: "/#contato", label: "Contato" },
   { href: "/blog", label: "Blog" },
 ];
@@ -74,7 +75,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2">{iconesSociais}</div>
           <AgendarButton className="hidden sm:inline-block rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors whitespace-nowrap">
-            Cadastro / Agendar
+            Agendar
           </AgendarButton>
           <button
             onClick={() => setAberto(!aberto)}
@@ -95,7 +96,7 @@ export default function Header() {
           ))}
           <div className="flex items-center gap-2 py-1">{iconesSociais}</div>
           <AgendarButton className="sm:hidden inline-block text-center rounded-full bg-verniz text-carbon font-display font-bold px-5 py-3 text-sm tracking-wide hover:bg-verniz-shine transition-colors">
-            Cadastro / Agendar
+            Agendar
           </AgendarButton>
         </nav>
       )}
