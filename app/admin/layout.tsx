@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle, Phone, Building2, Smile, Menu, X } from "lucide-react";
+import { LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle, Phone, Building2, Smile, Inbox, MessageSquareQuote, Menu, X } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -27,6 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const links = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/leads", label: "Leads", icon: Inbox },
     { href: "/admin/home", label: "Home", icon: Home },
     { href: "/admin/contato", label: "Contato", icon: Phone },
     { href: "/admin/conteudo", label: "Serviços", icon: ImageIcon },
@@ -34,6 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/paginas-locais", label: "Páginas locais", icon: MapPin },
     { href: "/admin/blog", label: "Blog", icon: Newspaper },
     { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
+    { href: "/admin/depoimentos", label: "Depoimentos", icon: MessageSquareQuote },
     { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
     { href: "/admin/nps", label: "NPS", icon: Smile },
   ];

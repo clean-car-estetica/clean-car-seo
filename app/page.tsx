@@ -9,17 +9,20 @@ import { getHeroContent } from "@/lib/site-content";
 import Processo from "@/components/Processo";
 import Produtos from "@/components/Produtos";
 import Faq from "@/components/Faq";
-import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos, getCidadesPublicas } from "@/lib/site-data";
+import Indicacao from "@/components/Indicacao";
+import Depoimentos from "@/components/Depoimentos";
+import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos, getCidadesPublicas, getDepoimentosPublicos } from "@/lib/site-data";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, faqs, cidades] = await Promise.all([
+  const [hero, servicos, transformacoes, faqs, cidades, depoimentos] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
     getFaqsPublicos(),
     getCidadesPublicas(),
+    getDepoimentosPublicos(),
   ]);
 
   return (
@@ -121,6 +124,9 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        <Depoimentos itens={depoimentos} />
+        <Indicacao />
 
         <Faq itens={faqs} />
       </main>

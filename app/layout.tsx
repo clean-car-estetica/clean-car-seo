@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
+import CupomPopup from "@/components/CupomPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
 import { getContatoContent } from "@/lib/site-content";
 
@@ -66,6 +67,7 @@ export default async function RootLayout({
         <ContatoProvider contato={contato}>
           <PageviewTracker />
           {children}
+          <CupomPopup />
         </ContatoProvider>
       </body>
     </html>

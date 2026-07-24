@@ -116,6 +116,33 @@ export async function getConteudoLocalPublico(servico: ServicoDB, cidade: { slug
   return { paragrafos: template.paragrafos, imagemOverride: null as string | null };
 }
 
+export type DepoimentoDB = { id: number; autor: string; nota: number; texto: string };
+
+const depoimentosPadrao: DepoimentoDB[] = [
+  {
+    id: -1,
+    autor: "Cliente Google",
+    nota: 5,
+    texto: "Ficou impressionado com o nível de detalhe do serviço — o carro saiu impecável, muito além do esperado. Recomenda a equipe como referência em Mogi das Cruzes.",
+  },
+  {
+    id: -2,
+    autor: "Cliente Google",
+    nota: 5,
+    texto: "Elogiou a qualidade do trabalho entregue pela equipe.",
+  },
+];
+
+export async function getDepoimentosPublicos(): Promise<DepoimentoDB[]> {
+  try {
+    const { data, error } = await supabasePublico.from("depoimentos").select("*").order("ordem");
+    if (error || !data || data.length === 0) throw error ?? new Error("vazio");
+    return data as DepoimentoDB[];
+  } catch {
+    return depoimentosPadrao;
+  }
+}
+
 export type FaqDB = { id: number; pergunta: string; resposta: string };
 
 const faqsPadrao: FaqDB[] = [

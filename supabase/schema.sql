@@ -139,3 +139,29 @@ create table if not exists nps_respostas (
 );
 alter table nps_respostas enable row level security;
 create policy "public insert nps" on nps_respostas for insert with check (true);
+
+-- Fase 5 — captação de leads (cupom primeira visita, indicacao, orcamento rapido)
+create table if not exists leads (
+  id bigint generated always as identity primary key,
+  tipo text not null check (tipo in ('cupom_primeira_visita', 'indicacao', 'orcamento')),
+  nome text not null,
+  whatsapp text not null,
+  servico_slug text,
+  mensagem text,
+  codigo_indicacao text,
+  atendido boolean not null default false,
+  criado_em timestamptz not null default now()
+);
+alter table leads enable row level security;
+create policy "public insert leads" on leads for insert with check (true);
+
+-- Fase 5 — depoimentos (avaliações copiadas manualmente do Google, editável pelo console)
+create table if not exists depoimentos (
+  id bigint generated always as identity primary key,
+  autor text not null default 'Cliente Clean Car',
+  nota int not null default 5 check (nota between 1 and 5),
+  texto text not null,
+  ordem int not null default 0
+);
+alter table depoimentos enable row level security;
+create policy "public read depoimentos" on depoimentos for select using (true);
