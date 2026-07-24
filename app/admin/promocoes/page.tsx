@@ -3,7 +3,19 @@ export const dynamic = "force-dynamic";
 import { getPromocoes } from "@/lib/site-content";
 import { salvarPromocao } from "./actions";
 
-function FormPromo({ chave, titulo, promo }: { chave: string; titulo: string; promo: { titulo: string; texto: string; regras: string } }) {
+function FormPromo({
+  chave,
+  titulo,
+  promo,
+  labelTexto = "Benefício (texto principal)",
+  labelRegras = "Regras (letra miúda)",
+}: {
+  chave: string;
+  titulo: string;
+  promo: { titulo: string; texto: string; regras: string };
+  labelTexto?: string;
+  labelRegras?: string;
+}) {
   return (
     <form action={salvarPromocao} className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
       <input type="hidden" name="chave" value={chave} />
@@ -13,11 +25,11 @@ function FormPromo({ chave, titulo, promo }: { chave: string; titulo: string; pr
         <input name="titulo" defaultValue={promo.titulo} className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
       </div>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Benefício (texto principal)</label>
+        <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">{labelTexto}</label>
         <textarea name="texto" defaultValue={promo.texto} rows={2} className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
       </div>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Regras (letra miúda)</label>
+        <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">{labelRegras}</label>
         <textarea name="regras" defaultValue={promo.regras} rows={3} className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
       </div>
       <button type="submit" className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine">
@@ -39,7 +51,13 @@ export default async function PromocoesAdminPage() {
       </p>
       <div className="grid gap-6 max-w-2xl">
         <FormPromo chave="cupom" titulo="Cupom de primeira visita" promo={promocoes.cupom} />
-        <FormPromo chave="indicacao" titulo="Indique e Ganhe" promo={promocoes.indicacao} />
+        <FormPromo
+          chave="indicacao"
+          titulo="Indique e Ganhe"
+          promo={promocoes.indicacao}
+          labelTexto="Mensagem pra quem já é cliente (indicador)"
+          labelRegras="Mensagem pra quem recebeu um código (indicado)"
+        />
       </div>
     </div>
   );
