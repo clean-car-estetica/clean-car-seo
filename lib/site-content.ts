@@ -11,8 +11,8 @@ export const PROMOCOES_PADRAO: Record<"cupom" | "indicacao", Promocao> = {
   },
   indicacao: {
     titulo: "Indique um amigo",
-    texto: "Já é cliente e tem um código de indicação? Cadastre aqui e a gente confirma seu benefício.",
-    regras: "Consulte as regras vigentes do programa Indique e Ganhe com a equipe Clean Car.",
+    texto: "Indique um amigo pra Clean Car: ele ganha 10 pontos de fidelidade, já usáveis no primeiro serviço, e você ganha 20 pontos assim que o serviço dele for concluído.",
+    regras: "Pontos de fidelidade Clean Car. O indicado usa os 10 pontos já no primeiro serviço; o indicador recebe os 20 pontos após a conclusão do serviço do indicado.",
   },
 };
 
