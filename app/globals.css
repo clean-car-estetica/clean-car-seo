@@ -2,10 +2,10 @@
 
 :root {
   /* Estúdio — fundo azul marinho */
-  --carbon: #07115a;
-  --carbon-soft: #0a1670;
-  --card: #0d1a7d;
-  --card-line: #253aa5;
+  --carbon: #040d41;
+  --carbon-soft: #071454;
+  --card: #0a1a63;
+  --card-line: #1f3182;
   /* Cristal — ciano de vitrificação/cerâmica, cor de assinatura */
   --verniz: #22d3ee;
   --verniz-shine: #67e8f9;
@@ -15,7 +15,7 @@
   --steel: #e8eaed;
   --steel-line: #9aa0ab;
   --ink: #eef0f3;
-  --paper: #07115a;
+  --paper: #040d41;
   --ok: #34d399;
   --warn: #fb7185;
 }
