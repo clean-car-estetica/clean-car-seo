@@ -40,11 +40,11 @@ export default function BeforeAfter({
         >
           <MoveHorizontal size={18} />
         </div>
-        <span className="absolute top-3 left-3 text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full bg-ok/15 text-ok border border-ok/30">
-          {afterLabel}
-        </span>
-        <span className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full bg-warn/15 text-warn border border-warn/30">
+        <span className="absolute top-3 left-3 text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full bg-warn/15 text-warn border border-warn/30">
           {beforeLabel}
+        </span>
+        <span className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full bg-ok/15 text-ok border border-ok/30">
+          {afterLabel}
         </span>
         <input
           type="range"
