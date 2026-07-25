@@ -23,6 +23,12 @@ export default function ImageUploader({
     const file = e.target.files?.[0];
     if (!file) return;
     setErro(null);
+
+    if (file.size > 8 * 1024 * 1024) {
+      setErro("Essa foto tem mais de 8MB — tente uma versão um pouco mais leve (a maioria dos celulares permite escolher qualidade menor ao exportar).");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     startTransition(async () => {
