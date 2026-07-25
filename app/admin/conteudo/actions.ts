@@ -14,6 +14,7 @@ export async function importarDadosPadrao() {
     preco_desde: s.precoDesde ?? null,
     imagem_url: s.imagem,
     tag: s.tag ?? null,
+    ordem: s.ordem,
   }));
   const linhasCidades = cidadesPadrao.map((c) => ({
     slug: c.slug,
@@ -44,8 +45,9 @@ export async function criarServico(formData: FormData) {
     String(formData.get("imagem_url") || "") ||
     "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80";
   const pontos_fidelidade = Number(formData.get("pontos_fidelidade") || 0);
+  const ordem = Number(formData.get("ordem") || 0);
 
-  const { error } = await supabaseAdmin.from("services").insert({ slug, nome, resumo, descricao, imagem_url, pontos_fidelidade });
+  const { error } = await supabaseAdmin.from("services").insert({ slug, nome, resumo, descricao, imagem_url, pontos_fidelidade, ordem });
   if (error) throw new Error(error.message);
   revalidatePath("/admin/conteudo");
   revalidatePath("/");
@@ -68,10 +70,11 @@ export async function atualizarServico(formData: FormData) {
   const precoRaw = formData.get("preco_desde");
   const preco_desde = precoRaw ? Number(precoRaw) : null;
   const pontos_fidelidade = Number(formData.get("pontos_fidelidade") || 0);
+  const ordem = Number(formData.get("ordem") || 0);
 
   const { error } = await supabaseAdmin
     .from("services")
-    .update({ nome, resumo, descricao, imagem_url, preco_desde, pontos_fidelidade, updated_at: new Date().toISOString() })
+    .update({ nome, resumo, descricao, imagem_url, preco_desde, pontos_fidelidade, ordem, updated_at: new Date().toISOString() })
     .eq("slug", slug);
 
   if (error) throw new Error(error.message);

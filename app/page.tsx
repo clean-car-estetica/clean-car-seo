@@ -10,19 +10,21 @@ import Processo from "@/components/Processo";
 import Produtos from "@/components/Produtos";
 import Faq from "@/components/Faq";
 import Indicacao from "@/components/Indicacao";
+import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
-import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos, getCidadesPublicas, getDepoimentosPublicos } from "@/lib/site-data";
+import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos } from "@/lib/site-data";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, faqs, cidades, depoimentos] = await Promise.all([
+  const [hero, servicos, transformacoes, faqs, cidades, depoimentos, planos] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
     getFaqsPublicos(),
     getCidadesPublicas(),
     getDepoimentosPublicos(),
+    getPlanosPublicos(),
   ]);
 
   return (
@@ -101,6 +103,8 @@ export default async function Home() {
             ))}
           </div>
         </section>
+
+        <Planos itens={planos} />
 
         {/* Cidades */}
         <section className="bg-carbon-soft py-20 border-y border-card-line">

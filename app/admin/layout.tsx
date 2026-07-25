@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
-  Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, Menu, X,
+  Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Menu, X,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -53,6 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     {
       titulo: "Programa e promoções",
       links: [
+        { href: "/admin/planos", label: "Planos mensais", icon: CreditCard },
         { href: "/admin/promocoes", label: "Promoções", icon: Percent },
         { href: "/admin/beneficios", label: "Benefícios", icon: Award },
       ],

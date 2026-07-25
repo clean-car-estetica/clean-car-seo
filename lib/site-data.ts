@@ -33,26 +33,30 @@ export type ServicoDB = {
   imagem_url: string;
   tag: string | null;
   pontos_fidelidade: number;
+  ordem: number;
 };
 
 export async function getServicosPublicos(): Promise<ServicoDB[]> {
   try {
-    const { data, error } = await supabasePublico.from("services").select("*").order("nome");
+    const { data, error } = await supabasePublico.from("services").select("*").order("ordem");
     if (error || !data || data.length === 0) throw error ?? new Error("vazio");
     return data as ServicoDB[];
   } catch {
     // Fallback: dados fixos do código, usados até a tabela ser populada no console
-    return servicosPadrao.map((s) => ({
-      slug: s.slug,
-      nome: s.nome,
-      resumo: s.resumo,
-      descricao: s.descricao,
-      duracao: s.duracao ?? null,
-      preco_desde: s.precoDesde ?? null,
-      imagem_url: s.imagem,
-      tag: s.tag ?? null,
-      pontos_fidelidade: 0,
-    }));
+    return [...servicosPadrao]
+      .sort((a, b) => a.ordem - b.ordem)
+      .map((s) => ({
+        slug: s.slug,
+        nome: s.nome,
+        resumo: s.resumo,
+        descricao: s.descricao,
+        duracao: s.duracao ?? null,
+        preco_desde: s.precoDesde ?? null,
+        imagem_url: s.imagem,
+        tag: s.tag ?? null,
+        pontos_fidelidade: 0,
+        ordem: s.ordem,
+      }));
   }
 }
 
@@ -97,6 +101,7 @@ export async function getConteudoLocalPublico(servico: ServicoDB, cidade: { slug
       precoDesde: servico.preco_desde ?? undefined,
       imagem: servico.imagem_url,
       tag: servico.tag ?? undefined,
+      ordem: 0,
     },
     cidade as any
   );
@@ -114,6 +119,25 @@ export async function getDepoimentosPublicos(): Promise<DepoimentoDB[]> {
     return data as DepoimentoDB[];
   } catch {
     return depoimentosPadrao;
+  }
+}
+
+export type PlanoDB = {
+  id: number;
+  nome: string;
+  preco: number;
+  descricao: string;
+  itens: string[];
+  destaque: boolean;
+};
+
+export async function getPlanosPublicos(): Promise<PlanoDB[]> {
+  try {
+    const { data, error } = await supabasePublico.from("planos").select("*").order("ordem");
+    if (error) throw error;
+    return (data ?? []) as PlanoDB[];
+  } catch {
+    return [];
   }
 }
 

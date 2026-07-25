@@ -188,3 +188,19 @@ create table if not exists beneficios (
 );
 alter table beneficios enable row level security;
 create policy "public read beneficios" on beneficios for select using (true);
+
+-- Fase 8 — planos mensais (assinatura) editaveis pelo console
+create table if not exists planos (
+  id bigint generated always as identity primary key,
+  nome text not null,
+  preco numeric not null,
+  descricao text not null,
+  itens text[] not null default '{}',
+  destaque boolean not null default false,
+  ordem int not null default 0
+);
+alter table planos enable row level security;
+create policy "public read planos" on planos for select using (true);
+
+-- Ordenacao manual dos servicos (para dar destaque a lavagem/higienizacao)
+alter table services add column if not exists ordem int not null default 0;

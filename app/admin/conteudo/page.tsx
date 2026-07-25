@@ -40,6 +40,7 @@ export default async function ConteudoPage() {
           <input name="resumo" placeholder="Resumo curto" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
           <textarea name="descricao" rows={2} placeholder="Descrição" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
           <input name="pontos_fidelidade" type="number" placeholder="Pontos de fidelidade" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm w-48" />
+          <input name="ordem" type="number" placeholder="Ordem de exibição (menor = aparece primeiro)" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm w-64" />
           <button type="submit" className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine">
             Criar serviço
           </button>
@@ -86,14 +87,25 @@ export default async function ConteudoPage() {
                     className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Pontos de fidelidade</label>
-                  <input
-                    name="pontos_fidelidade"
-                    type="number"
-                    defaultValue={s.pontos_fidelidade ?? 0}
-                    className="w-40 px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Pontos de fidelidade</label>
+                    <input
+                      name="pontos_fidelidade"
+                      type="number"
+                      defaultValue={s.pontos_fidelidade ?? 0}
+                      className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Ordem (menor = primeiro)</label>
+                    <input
+                      name="ordem"
+                      type="number"
+                      defaultValue={s.ordem ?? 0}
+                      className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+                    />
+                  </div>
                 </div>
                 <button
                   type="submit"
