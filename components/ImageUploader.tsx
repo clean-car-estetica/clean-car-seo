@@ -8,10 +8,12 @@ export default function ImageUploader({
   name,
   initialUrl,
   label = "Imagem",
+  onUrlChange,
 }: {
   name: string;
   initialUrl?: string;
   label?: string;
+  onUrlChange?: (url: string) => void;
 }) {
   const [url, setUrl] = useState(initialUrl ?? "");
   const [pendente, startTransition] = useTransition();
@@ -27,6 +29,7 @@ export default function ImageUploader({
       try {
         const novaUrl = await uploadImagem(formData);
         setUrl(novaUrl);
+        onUrlChange?.(novaUrl);
       } catch (err: any) {
         setErro(err?.message ?? "Falha no upload.");
       }
