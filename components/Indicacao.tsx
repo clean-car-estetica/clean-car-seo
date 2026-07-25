@@ -2,10 +2,12 @@
 
 import { Share2, Gift } from "lucide-react";
 import { usePromocoes } from "@/components/PromoProvider";
+import { useContato } from "@/components/ContatoProvider";
 import AgendarButton from "@/components/AgendarButton";
 
 export default function Indicacao() {
   const { indicacao } = usePromocoes();
+  const contato = useContato();
 
   return (
     <section id="indicacao" className="mx-auto max-w-4xl px-6 py-20">
@@ -21,7 +23,7 @@ export default function Indicacao() {
           <Share2 className="text-verniz-shine mb-3" size={24} />
           <h3 className="font-display font-bold text-lg text-steel mb-2">Já sou cliente</h3>
           <p className="text-sm text-steel-line leading-relaxed mb-5">{indicacao.texto}</p>
-          <AgendarButton className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2.5 text-sm hover:bg-verniz-shine transition-colors">
+          <AgendarButton href={contato.codigoIndicacaoUrl} className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2.5 text-sm hover:bg-verniz-shine transition-colors">
             Ver meu código
           </AgendarButton>
         </div>

@@ -67,6 +67,14 @@ export default async function ContatoAdminPage() {
           />
         </div>
         <div>
+          <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Link "ver meu código" (Indique e Ganhe)</label>
+          <input
+            name="codigoIndicacaoUrl"
+            defaultValue={contato.codigoIndicacaoUrl}
+            className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+          />
+        </div>
+        <div>
           <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Link do Google (Maps/avaliações)</label>
           <input
             name="googleUrl"

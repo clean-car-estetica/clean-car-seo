@@ -10,6 +10,7 @@ export async function salvarContato(formData: FormData) {
     instagram: String(formData.get("instagram")).replace(/^@/, ""),
     instagramUrl: String(formData.get("instagramUrl")),
     agendamentoUrl: String(formData.get("agendamentoUrl")),
+    codigoIndicacaoUrl: String(formData.get("codigoIndicacaoUrl")),
     googleUrl: String(formData.get("googleUrl")),
     endereco: String(formData.get("endereco")),
   };

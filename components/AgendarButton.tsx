@@ -5,7 +5,15 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 import { usePathname } from "next/navigation";
 import { parseRota } from "@/lib/track";
 
-export default function AgendarButton({ className, children }: { className?: string; children: React.ReactNode }) {
+export default function AgendarButton({
+  className,
+  children,
+  href,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  href?: string;
+}) {
   const pathname = usePathname();
   const contato = useContato();
 
@@ -18,7 +26,7 @@ export default function AgendarButton({ className, children }: { className?: str
   }
 
   return (
-    <a href={contato.agendamentoUrl} onClick={registrarClique} className={className}>
+    <a href={href ?? contato.agendamentoUrl} onClick={registrarClique} className={className}>
       {children}
     </a>
   );
