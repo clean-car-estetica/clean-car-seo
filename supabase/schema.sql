@@ -204,3 +204,6 @@ create policy "public read planos" on planos for select using (true);
 
 -- Ordenacao manual dos servicos (para dar destaque a lavagem/higienizacao)
 alter table services add column if not exists ordem int not null default 0;
+
+-- Fase 9 — atribuicao de origem do trafego (de onde veio o clique)
+alter table events add column if not exists origem text;

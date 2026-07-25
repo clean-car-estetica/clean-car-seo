@@ -59,12 +59,13 @@ export default async function Dashboard({
   let topPaginas: { page_path: string; total: number }[] = [];
   let porCidade: Record<string, { visitas: number; whatsapp: number; agendar: number }> = {};
   let porServico: Record<string, { visitas: number; whatsapp: number; agendar: number }> = {};
+  let porOrigem: Record<string, { visitas: number; whatsapp: number; agendar: number }> = {};
   let recentes: { created_at: string; event_type: string; page_path: string; service_slug: string | null; city_slug: string | null }[] = [];
 
   try {
     const { data, error } = await supabaseAdmin
       .from("events")
-      .select("event_type, page_path, city_slug, service_slug, created_at")
+      .select("event_type, page_path, city_slug, service_slug, origem, created_at")
       .gte("created_at", inicio.toISOString())
       .lte("created_at", fim.toISOString())
       .order("created_at", { ascending: false });
@@ -85,6 +86,12 @@ export default async function Dashboard({
       if (row.event_type === "pageview") porServico[servicoKey].visitas++;
       if (row.event_type === "click_whatsapp") porServico[servicoKey].whatsapp++;
       if (row.event_type === "click_agendar") porServico[servicoKey].agendar++;
+
+      const origemKey = row.origem ?? "Desconhecida";
+      if (!porOrigem[origemKey]) porOrigem[origemKey] = { visitas: 0, whatsapp: 0, agendar: 0 };
+      if (row.event_type === "pageview") porOrigem[origemKey].visitas++;
+      if (row.event_type === "click_whatsapp") porOrigem[origemKey].whatsapp++;
+      if (row.event_type === "click_agendar") porOrigem[origemKey].agendar++;
     }
 
     recentes = (data ?? []).slice(0, 30);
@@ -153,6 +160,36 @@ export default async function Dashboard({
         <Card label="Cliques WhatsApp" value={porTipo["click_whatsapp"] ?? 0} icon={MessageCircle} />
         <Card label="Cliques Agendar" value={porTipo["click_agendar"] ?? 0} icon={CalendarCheck} />
         <Card label="Formulários enviados" value={porTipo["form_submit"] ?? 0} icon={FileText} />
+      </div>
+
+      <div className="bg-card border border-card-line rounded-2xl p-6 mb-6">
+        <h2 className="font-display font-bold text-lg text-steel mb-4">Por origem (de onde veio o clique)</h2>
+        {Object.keys(porOrigem).length === 0 ? (
+          <p className="text-steel-line text-sm">Sem dados neste período.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-steel-line text-xs uppercase tracking-wide">
+                <th className="pb-2">Origem</th>
+                <th className="pb-2 text-right">Visitas</th>
+                <th className="pb-2 text-right">WhatsApp</th>
+                <th className="pb-2 text-right">Agendar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(porOrigem)
+                .sort((a, b) => b[1].visitas - a[1].visitas)
+                .map(([origem, v]) => (
+                  <tr key={origem} className="border-t border-card-line">
+                    <td className="py-2 text-steel-line">{origem}</td>
+                    <td className="py-2 text-right text-steel">{v.visitas}</td>
+                    <td className="py-2 text-right text-steel">{v.whatsapp}</td>
+                    <td className="py-2 text-right text-steel">{v.agendar}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2 mb-6">

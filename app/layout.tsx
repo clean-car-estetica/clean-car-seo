@@ -7,12 +7,25 @@ import { PromoProvider } from "@/components/PromoProvider";
 import { getContatoContent, getPromocoes } from "@/lib/site-content";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://clean-car-seo.vercel.app"),
   title: {
     default: "Clean Car Estética Automotiva",
     template: "%s | Clean Car Estética Automotiva",
   },
   description:
     "Lavagem, polimento, vitrificação e higienização automotiva em Mogi das Cruzes e região.",
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Clean Car Estética Automotiva",
+    title: "Clean Car Estética Automotiva",
+    description: "Lavagem, polimento, vitrificação e higienização automotiva em Mogi das Cruzes e região.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Clean Car Estética Automotiva",
+    description: "Lavagem, polimento, vitrificação e higienização automotiva em Mogi das Cruzes e região.",
+  },
 };
 
 export default async function RootLayout({

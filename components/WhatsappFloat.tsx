@@ -4,7 +4,7 @@ import { whatsappLink } from "@/lib/config";
 import { useContato } from "@/components/ContatoProvider";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { usePathname } from "next/navigation";
-import { parseRota } from "@/lib/track";
+import { parseRota, obterOrigem } from "@/lib/track";
 
 export default function WhatsappFloat() {
   const pathname = usePathname();
@@ -12,9 +12,10 @@ export default function WhatsappFloat() {
 
   function registrarClique() {
     const { service_slug, city_slug } = parseRota(pathname);
+    const origem = obterOrigem();
     supabaseBrowser()
       .from("events")
-      .insert({ event_type: "click_whatsapp", page_path: pathname, service_slug, city_slug })
+      .insert({ event_type: "click_whatsapp", page_path: pathname, service_slug, city_slug, origem })
       .then(() => {});
   }
 
