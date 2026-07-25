@@ -69,22 +69,7 @@ export type Transformacao = {
   imagem_depois: string;
 };
 
-const transformacoesPadrao: Transformacao[] = [
-  {
-    id: -1,
-    titulo: "Correção de verniz e espelhamento",
-    descricao: "Eliminamos hologramas e micro-riscos causados por lavagens incorretas, revelando o brilho real da pintura.",
-    imagem_antes: "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=700&q=80",
-    imagem_depois: "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: -2,
-    titulo: "Recuperação de plásticos e frisos",
-    descricao: "Acabamentos ressecados pelo sol voltam à cor original com revitalizadores de alta durabilidade.",
-    imagem_antes: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=80",
-    imagem_depois: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=700&q=80",
-  },
-];
+const transformacoesPadrao: Transformacao[] = [];
 
 export async function getConteudoLocalPublico(servico: ServicoDB, cidade: { slug: string; bairros: string[]; sede: boolean }) {
   try {
