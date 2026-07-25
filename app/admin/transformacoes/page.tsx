@@ -42,6 +42,12 @@ export default async function TransformacoesAdminPage() {
         </p>
       )}
 
+      {!error && itens && itens.length > 0 && (
+        <h2 className="font-display font-bold text-lg text-steel mb-4">
+          Itens cadastrados ({itens.length}) — clique nos campos abaixo pra editar
+        </h2>
+      )}
+
       <div className="grid gap-5">
         {itens?.map((t) => (
           <div key={t.id} className="bg-card border border-card-line rounded-2xl p-6">
