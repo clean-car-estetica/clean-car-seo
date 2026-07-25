@@ -8,20 +8,18 @@ import AgendarButton from "@/components/AgendarButton";
 import { getHeroContent } from "@/lib/site-content";
 import Processo from "@/components/Processo";
 import Produtos from "@/components/Produtos";
-import Faq from "@/components/Faq";
 import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
-import { getServicosPublicos, getTransformacoesPublicas, getFaqsPublicos, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos } from "@/lib/site-data";
+import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos } from "@/lib/site-data";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, faqs, cidades, depoimentos, planos] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
-    getFaqsPublicos(),
     getCidadesPublicas(),
     getDepoimentosPublicos(),
     getPlanosPublicos(),
@@ -132,7 +130,23 @@ export default async function Home() {
         <Depoimentos itens={depoimentos} />
         <Indicacao />
 
-        <Faq itens={faqs} />
+        {/* Prévia do FAQ — lista completa está em /faq */}
+        <section id="faq" className="bg-carbon-soft border-y border-card-line py-16 text-center">
+          <div className="mx-auto max-w-2xl px-6">
+            <h2 className="font-display font-bold text-2xl md:text-3xl text-steel mb-3">
+              Dúvidas <span className="text-verniz-shine">frequentes</span>
+            </h2>
+            <p className="text-steel-line mb-6">
+              Vitrificação, polimento, hidrofobia, prazos — tiramos as principais dúvidas.
+            </p>
+            <Link
+              href="/faq"
+              className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 hover:bg-verniz-shine transition-colors"
+            >
+              Ver todas as perguntas
+            </Link>
+          </div>
+        </section>
       </main>
       <Footer />
       <WhatsappFloat />
