@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { servicos as servicosPadrao, cidades as cidadesPadrao } from "@/lib/data";
 
 export async function importarDadosPadrao() {
+  // Só insere serviços que AINDA NÃO existem — nunca sobrescreve o que você já personalizou.
   const linhasServicos = servicosPadrao.map((s) => ({
     slug: s.slug,
     nome: s.nome,
@@ -23,12 +24,26 @@ export async function importarDadosPadrao() {
     sede: c.sede,
   }));
 
-  const { error: e1 } = await supabaseAdmin.from("services").upsert(linhasServicos);
+  const { error: e1 } = await supabaseAdmin
+    .from("services")
+    .upsert(linhasServicos, { onConflict: "slug", ignoreDuplicates: true });
   if (e1) throw new Error(e1.message);
-  const { error: e2 } = await supabaseAdmin.from("cities").upsert(linhasCidades);
+  const { error: e2 } = await supabaseAdmin
+    .from("cities")
+    .upsert(linhasCidades, { onConflict: "slug", ignoreDuplicates: true });
   if (e2) throw new Error(e2.message);
 
   revalidatePath("/admin/conteudo");
+}
+
+export async function atualizarOrdemPadrao() {
+  // Atualiza SÓ o campo "ordem" de cada serviço, sem tocar em imagem, texto ou preço.
+  for (const s of servicosPadrao) {
+    const { error } = await supabaseAdmin.from("services").update({ ordem: s.ordem }).eq("slug", s.slug);
+    if (error) throw new Error(error.message);
+  }
+  revalidatePath("/admin/conteudo");
+  revalidatePath("/");
 }
 
 export async function criarServico(formData: FormData) {

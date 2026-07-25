@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { importarDadosPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
+import { importarDadosPadrao, atualizarOrdemPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
 import ImageUploader from "@/components/ImageUploader";
 
 export default async function ConteudoPage() {
@@ -17,14 +17,24 @@ export default async function ConteudoPage() {
           <h1 className="font-display font-bold text-3xl text-steel mb-1">Serviços</h1>
           <p className="text-steel-line text-sm">Edite, crie ou remova serviços sem mexer em código.</p>
         </div>
-        <form action={importarDadosPadrao}>
-          <button
-            type="submit"
-            className="rounded-full bg-card border border-card-line px-4 py-2 text-sm font-bold text-steel-line hover:border-verniz hover:text-verniz-shine"
-          >
-            Importar/atualizar dados padrão
-          </button>
-        </form>
+        <div className="flex gap-2">
+          <form action={atualizarOrdemPadrao}>
+            <button
+              type="submit"
+              className="rounded-full bg-verniz text-carbon px-4 py-2 text-sm font-bold hover:bg-verniz-shine"
+            >
+              Aplicar nova ordem de exibição
+            </button>
+          </form>
+          <form action={importarDadosPadrao}>
+            <button
+              type="submit"
+              className="rounded-full bg-card border border-card-line px-4 py-2 text-sm font-bold text-steel-line hover:border-verniz hover:text-verniz-shine"
+            >
+              Importar serviços que faltam
+            </button>
+          </form>
+        </div>
       </div>
 
       {error && (
@@ -49,7 +59,7 @@ export default async function ConteudoPage() {
 
       {!error && (!servicos || servicos.length === 0) && (
         <div className="bg-card border border-card-line rounded-2xl p-6 text-steel-line text-sm">
-          Nenhum serviço cadastrado ainda. Clique em <strong>Importar/atualizar dados padrão</strong> para trazer
+          Nenhum serviço cadastrado ainda. Clique em <strong>Importar serviços que faltam</strong> para trazer
           os 13 serviços que já estão no site.
         </div>
       )}
