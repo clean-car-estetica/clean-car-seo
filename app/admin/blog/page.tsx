@@ -48,7 +48,7 @@ export default async function BlogAdminPage({
             className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
           />
         </div>
-        <ImageUploader name="imagem_url" initialUrl={editando?.imagem_url ?? ""} label="Imagem de capa" />
+        <ImageUploader name="imagem_url" initialUrl={editando?.imagem_url ?? ""} label="Imagem de capa" aspect={16 / 9} specTexto="1200x675px (proporção 16:9)" />
         <div>
           <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Status</label>
           <select

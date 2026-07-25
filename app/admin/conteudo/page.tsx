@@ -77,7 +77,7 @@ export default async function ConteudoPage() {
                   className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
                 />
                 <div className="grid grid-cols-[1fr_140px] gap-3 items-end">
-                  <ImageUploader name="imagem_url" initialUrl={s.imagem_url} label="Foto do serviço" />
+                  <ImageUploader name="imagem_url" initialUrl={s.imagem_url} label="Foto do serviço" aspect={3 / 2} specTexto="1200x800px (proporção 3:2) — aparece em card e como banner da página do serviço" />
                   <input
                     name="preco_desde"
                     type="number"

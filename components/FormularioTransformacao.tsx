@@ -51,8 +51,8 @@ export default function FormularioTransformacao({ item, textoBotao }: { item: It
       <input name="titulo" required defaultValue={item.titulo} placeholder="Título" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
       <textarea name="descricao" required rows={2} defaultValue={item.descricao} placeholder="Descrição curta" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
       <div className="grid sm:grid-cols-2 gap-4">
-        <ImageUploader name="imagem_antes_upload" initialUrl={item.imagem_antes} label="Foto de ANTES" onUrlChange={setImagemAntes} />
-        <ImageUploader name="imagem_depois_upload" initialUrl={item.imagem_depois} label="Foto de DEPOIS" onUrlChange={setImagemDepois} />
+        <ImageUploader name="imagem_antes_upload" initialUrl={item.imagem_antes} label="Foto de ANTES" aspect={4 / 3} specTexto="1000x750px (proporção 4:3)" onUrlChange={setImagemAntes} />
+        <ImageUploader name="imagem_depois_upload" initialUrl={item.imagem_depois} label="Foto de DEPOIS" aspect={4 / 3} specTexto="1000x750px (proporção 4:3)" onUrlChange={setImagemDepois} />
       </div>
       <input name="ordem" type="number" defaultValue={item.ordem} placeholder="Ordem" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm w-32" />
 

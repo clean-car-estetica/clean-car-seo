@@ -48,7 +48,7 @@ export default async function HomeAdminPage() {
             className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
           />
         </div>
-        <ImageUploader name="imagem_url" initialUrl={hero.imagem_url} label="Imagem de fundo do topo" />
+        <ImageUploader name="imagem_url" initialUrl={hero.imagem_url} label="Imagem de fundo do topo" aspect={21 / 9} specTexto="1600x685px (proporção 21:9, bem larga) — fica atrás do texto, prefira fotos com espaço vazio à esquerda" />
         <button
           type="submit"
           className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine mt-2"
