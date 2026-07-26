@@ -7,6 +7,10 @@ export const CONTATO_PADRAO = {
   codigoIndicacaoUrl: "https://www.gbr-sistemas.tec.br/codigo?e=cleancaresteticaautomotiva",
   googleUrl: "https://www.google.com/maps/place/?q=place_id:ChIJMZEnptZ3zpQR1y0wizguiwM",
   endereco: "Rua Prefeito Sebastião Cascardo, 438 - Jardim Universo, Mogi das Cruzes - SP, 08740-450",
+  horarioSemana: "Segunda a sexta: 9h às 18h",
+  horarioSabado: "Sábado: 9h às 17h",
+  observacaoHorario: "Feriados e feriados prolongados sujeitos a alteração",
+  formasPagamento: "",
 };
 
 export type Contato = typeof CONTATO_PADRAO;

@@ -13,6 +13,10 @@ export async function salvarContato(formData: FormData) {
     codigoIndicacaoUrl: String(formData.get("codigoIndicacaoUrl")),
     googleUrl: String(formData.get("googleUrl")),
     endereco: String(formData.get("endereco")),
+    horarioSemana: String(formData.get("horarioSemana")),
+    horarioSabado: String(formData.get("horarioSabado")),
+    observacaoHorario: String(formData.get("observacaoHorario")),
+    formasPagamento: String(formData.get("formasPagamento") || ""),
   };
 
   const { error } = await supabaseAdmin

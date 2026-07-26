@@ -25,6 +25,41 @@ export default async function ContatoAdminPage() {
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
+            <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Horário — semana</label>
+            <input
+              name="horarioSemana"
+              defaultValue={contato.horarioSemana}
+              className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Horário — sábado</label>
+            <input
+              name="horarioSabado"
+              defaultValue={contato.horarioSabado}
+              className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Observação de horário (feriados etc.)</label>
+          <input
+            name="observacaoHorario"
+            defaultValue={contato.observacaoHorario}
+            className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Formas de pagamento</label>
+          <input
+            name="formasPagamento"
+            defaultValue={contato.formasPagamento}
+            placeholder="Ex: Pix, dinheiro, cartão de crédito/débito"
+            className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+          />
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
             <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">WhatsApp (só números, com DDI)</label>
             <input
               name="whatsapp"
