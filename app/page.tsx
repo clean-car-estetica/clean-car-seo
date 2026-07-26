@@ -11,13 +11,14 @@ import Produtos from "@/components/Produtos";
 import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
-import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista } from "@/lib/site-data";
+import Faq from "@/components/Faq";
+import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
 import { getTextosGerais } from "@/lib/site-content";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -27,6 +28,7 @@ export default async function Home() {
     getProcessoPassos(),
     getProdutosLista(),
     getTextosGerais(),
+    getFaqsPublicos(),
   ]);
 
   return (
@@ -134,23 +136,20 @@ export default async function Home() {
         <Depoimentos itens={depoimentos} />
         <Indicacao />
 
-        {/* Prévia do FAQ — lista completa está em /faq */}
-        <section id="faq" className="bg-carbon-soft border-y border-card-line py-16 text-center">
-          <div className="mx-auto max-w-2xl px-6">
-            <h2 className="font-display font-bold text-2xl md:text-3xl text-steel mb-3">
-              Dúvidas <span className="text-verniz-shine">frequentes</span>
-            </h2>
-            <p className="text-steel-line mb-6">
-              Vitrificação, polimento, hidrofobia, prazos — tiramos as principais dúvidas.
-            </p>
-            <Link
-              href="/faq"
-              className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 hover:bg-verniz-shine transition-colors"
-            >
-              Ver todas as perguntas
-            </Link>
-          </div>
-        </section>
+        {/* Prévia do FAQ — 3 primeiras perguntas, lista completa em /faq */}
+        {faqs.length > 0 && (
+          <Faq
+            itens={faqs.slice(0, 3)}
+            rodape={
+              <Link
+                href="/faq"
+                className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 hover:bg-verniz-shine transition-colors"
+              >
+                Ver todas as perguntas
+              </Link>
+            }
+          />
+        )}
       </main>
       <Footer />
       <WhatsappFloat />
