@@ -207,3 +207,22 @@ alter table services add column if not exists ordem int not null default 0;
 
 -- Fase 9 — atribuicao de origem do trafego (de onde veio o clique)
 alter table events add column if not exists origem text;
+
+-- Fase 10 — 100% console-editable: tema de cores, metadados do site,
+-- passos do processo e lista de produtos.
+create table if not exists processo_passos (
+  id bigint generated always as identity primary key,
+  titulo text not null,
+  texto text not null,
+  ordem int not null default 0
+);
+alter table processo_passos enable row level security;
+create policy "public read processo_passos" on processo_passos for select using (true);
+
+create table if not exists produtos_lista (
+  id bigint generated always as identity primary key,
+  nome text not null,
+  ordem int not null default 0
+);
+alter table produtos_lista enable row level security;
+create policy "public read produtos_lista" on produtos_lista for select using (true);

@@ -1,11 +1,5 @@
-const PRODUTOS = [
-  "V-Floc", "V-Mol", "Sintra", "Delet", "Alumax", "Acidus", "Foam Gloss",
-  "Pretinho Spray", "Hydrox", "Tok Final", "Impermeabilizante",
-  "Revitalizador de Plásticos", "VLight Faróis", "Kit Polimento",
-  "Bactran", "Vexus", "Focus", "Glaco", "Vitrificador",
-];
-
-export default function Produtos() {
+export default function Produtos({ produtos }: { produtos: string[] }) {
+  if (produtos.length === 0) return null;
   return (
     <section className="bg-carbon-soft border-y border-card-line py-16">
       <div className="mx-auto max-w-6xl px-6 text-center">
@@ -17,7 +11,7 @@ export default function Produtos() {
           aplicados por técnicos treinados.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
-          {PRODUTOS.map((p) => (
+          {produtos.map((p) => (
             <span
               key={p}
               className="px-4 py-2 rounded-full bg-card border border-card-line text-sm font-display font-bold text-steel-line"

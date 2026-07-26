@@ -4,46 +4,41 @@ import PageviewTracker from "@/components/PageviewTracker";
 import CupomPopup from "@/components/CupomPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
 import { PromoProvider } from "@/components/PromoProvider";
-import { getContatoContent, getPromocoes } from "@/lib/site-content";
+import { getContatoContent, getPromocoes, getTema, getMetadados } from "@/lib/site-content";
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://clean-car-seo.vercel.app"),
-  title: {
-    default: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
-    template: "%s | Clean Car Estética Automotiva",
-  },
-  description:
-    "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
-  keywords: [
-    "lava rapido Mogi das Cruzes", "lava-rápido Mogi das Cruzes", "lava car Mogi das Cruzes",
-    "estetica automotiva Mogi das Cruzes", "estética automotiva Mogi das Cruzes",
-    "limpeza de carro Mogi das Cruzes", "lavar carro Mogi das Cruzes", "lavagem de carro Mogi das Cruzes",
-    "proteção de pintura Mogi das Cruzes", "descontaminação de pintura Mogi das Cruzes",
-    "limpeza de carpete Mogi das Cruzes", "limpeza de sofá Mogi das Cruzes", "limpeza de estofado Mogi das Cruzes",
-    "higienização Mogi das Cruzes", "higienização de banco Mogi das Cruzes", "higienização de estofado Mogi das Cruzes",
-    "Alto Tietê", "Suzano", "Poá", "Ferraz de Vasconcelos", "Itaquaquecetuba", "Guararema",
-  ],
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: "pt_BR",
-    siteName: "Clean Car Estética Automotiva",
-    title: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
-    description: "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
-    description: "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const meta = await getMetadados();
+  const palavrasChave = meta.palavrasChave.split(",").map((p) => p.trim()).filter(Boolean);
+  return {
+    metadataBase: new URL("https://clean-car-seo.vercel.app"),
+    title: {
+      default: meta.titulo,
+      template: "%s | Clean Car Estética Automotiva",
+    },
+    description: meta.descricao,
+    keywords: palavrasChave,
+    robots: { index: true, follow: true },
+    openGraph: {
+      type: "website",
+      locale: "pt_BR",
+      siteName: "Clean Car Estética Automotiva",
+      title: meta.titulo,
+      description: meta.descricao,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta.titulo,
+      description: meta.descricao,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [contato, promocoes] = await Promise.all([getContatoContent(), getPromocoes()]);
+  const [contato, promocoes, tema, meta] = await Promise.all([getContatoContent(), getPromocoes(), getTema(), getMetadados()]);
 
   return (
     <html lang="pt-BR" className="h-full">
@@ -61,10 +56,9 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "AutoRepair",
               name: "Clean Car Estética Automotiva",
-              description:
-                "Lavagem profissional, higienização, polimento, vitrificação e restauração automotiva em Mogi das Cruzes e Alto Tietê. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
+              description: meta.descricao,
               image: "https://clean-car-seo.vercel.app/opengraph-image",
-              telephone: "(11) 91263-0375",
+              telephone: contato.whatsapp,
               url: "https://clean-car-seo.vercel.app/",
               address: {
                 "@type": "PostalAddress",
@@ -102,6 +96,16 @@ export default async function RootLayout({
             }),
           }}
         />
+        <style>{`:root {
+          --carbon: ${tema.carbon};
+          --carbon-soft: ${tema.carbonSoft};
+          --card: ${tema.card};
+          --card-line: ${tema.cardLine};
+          --verniz: ${tema.verniz};
+          --verniz-shine: ${tema.vernizShine};
+          --cera: ${tema.cera};
+          --paper: ${tema.carbon};
+        }`}</style>
       </head>
       <body className="min-h-full flex flex-col bg-paper text-ink">
         <ContatoProvider contato={contato}>

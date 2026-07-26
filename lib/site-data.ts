@@ -153,6 +153,43 @@ export async function getBeneficiosPublicos(): Promise<BeneficioDB[]> {
   }
 }
 
+export type PassoDB = { id: number; titulo: string; texto: string };
+
+const processoPadrao: PassoDB[] = [
+  { id: -1, titulo: "Você escolhe como entregar", texto: "Traz o carro até o estúdio ou contrata o leva-e-trás — buscamos e devolvemos onde for melhor pra você." },
+  { id: -2, titulo: "Pré-lavagem técnica", texto: "Soltamos a sujeira mais grossa antes de qualquer contato direto na pintura, reduzindo o risco de microrriscos." },
+  { id: -3, titulo: "Shampoo neutro + luvas próprias", texto: "Aplicação com luvas específicas para lavagem automotiva — o cuidado que protege o verniz do seu carro." },
+  { id: -4, titulo: "Higienização com sanitizante", texto: "Limpeza interna que cuida da saúde de quem dirige, não só da aparência do carro." },
+  { id: -5, titulo: "Produtos Vonixx do início ao fim", texto: "Química de ponta em cada etapa, do básico ao polimento e vitrificação." },
+];
+
+export async function getProcessoPassos(): Promise<PassoDB[]> {
+  try {
+    const { data, error } = await supabasePublico.from("processo_passos").select("*").order("ordem");
+    if (error || !data || data.length === 0) throw error ?? new Error("vazio");
+    return data as PassoDB[];
+  } catch {
+    return processoPadrao;
+  }
+}
+
+const produtosPadrao = [
+  "V-Floc", "V-Mol", "Sintra", "Delet", "Alumax", "Acidus", "Foam Gloss",
+  "Pretinho Spray", "Hydrox", "Tok Final", "Impermeabilizante",
+  "Revitalizador de Plásticos", "VLight Faróis", "Kit Polimento",
+  "Bactran", "Vexus", "Focus", "Glaco", "Vitrificador",
+];
+
+export async function getProdutosLista(): Promise<string[]> {
+  try {
+    const { data, error } = await supabasePublico.from("produtos_lista").select("nome").order("ordem");
+    if (error || !data || data.length === 0) throw error ?? new Error("vazio");
+    return data.map((d) => d.nome);
+  } catch {
+    return produtosPadrao;
+  }
+}
+
 export type FaqDB = { id: number; pergunta: string; resposta: string };
 
 const faqsPadrao: FaqDB[] = [

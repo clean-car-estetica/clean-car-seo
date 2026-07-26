@@ -32,6 +32,59 @@ export async function getPromocoes(): Promise<Record<"cupom" | "indicacao", Prom
   }
 }
 
+export type Tema = {
+  carbon: string;
+  carbonSoft: string;
+  card: string;
+  cardLine: string;
+  verniz: string;
+  vernizShine: string;
+  cera: string;
+};
+
+export const TEMA_PADRAO: Tema = {
+  carbon: "#03071e",
+  carbonSoft: "#050a28",
+  card: "#070d32",
+  cardLine: "#16205c",
+  verniz: "#22d3ee",
+  vernizShine: "#67e8f9",
+  cera: "#f2b544",
+};
+
+export async function getTema(): Promise<Tema> {
+  try {
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "tema").single();
+    if (!data?.data) return TEMA_PADRAO;
+    return { ...TEMA_PADRAO, ...(data.data as Partial<Tema>) };
+  } catch {
+    return TEMA_PADRAO;
+  }
+}
+
+export type Metadados = {
+  titulo: string;
+  descricao: string;
+  palavrasChave: string;
+};
+
+export const METADADOS_PADRAO: Metadados = {
+  titulo: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
+  descricao: "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
+  palavrasChave:
+    "lava rapido Mogi das Cruzes, lava-rápido Mogi das Cruzes, estetica automotiva Mogi das Cruzes, limpeza de carro Mogi das Cruzes, lavagem de carro Mogi das Cruzes, proteção de pintura Mogi das Cruzes, higienização Mogi das Cruzes, higienização de banco Mogi das Cruzes, Alto Tietê, Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba, Guararema",
+};
+
+export async function getMetadados(): Promise<Metadados> {
+  try {
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "metadados").single();
+    if (!data?.data) return METADADOS_PADRAO;
+    return { ...METADADOS_PADRAO, ...(data.data as Partial<Metadados>) };
+  } catch {
+    return METADADOS_PADRAO;
+  }
+}
+
 export async function getContatoContent(): Promise<Contato> {
   try {
     const { data } = await supabasePublico.from("site_content").select("data").eq("section", "contato").single();

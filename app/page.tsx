@@ -11,18 +11,20 @@ import Produtos from "@/components/Produtos";
 import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
-import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos } from "@/lib/site-data";
+import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista } from "@/lib/site-data";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
     getCidadesPublicas(),
     getDepoimentosPublicos(),
     getPlanosPublicos(),
+    getProcessoPassos(),
+    getProdutosLista(),
   ]);
 
   return (
@@ -53,8 +55,8 @@ export default async function Home() {
           </div>
         </section>
 
-        <Processo />
-        <Produtos />
+        <Processo passos={passos} />
+        <Produtos produtos={produtos} />
 
         {/* Antes e depois */}
         {transformacoes.length > 0 && (

@@ -6,7 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
-  Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2, Menu, X,
+  Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2,
+  Palette, FileText, Layers, PackageSearch, Menu, X,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -42,6 +43,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       titulo: "Conteúdo do site",
       links: [
         { href: "/admin/home", label: "Home", icon: Home },
+        { href: "/admin/processo", label: "Nosso processo", icon: Layers },
+        { href: "/admin/produtos", label: "Produtos", icon: PackageSearch },
         { href: "/admin/transformacoes", label: "Antes e depois", icon: GitCompare },
         { href: "/admin/conteudo", label: "Serviços", icon: ImageIcon },
         { href: "/admin/cidades", label: "Cidades", icon: Building2 },
@@ -63,6 +66,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       titulo: "Configurações",
       links: [
         { href: "/admin/contato", label: "Contato e links", icon: Phone },
+        { href: "/admin/tema", label: "Tema (cores)", icon: Palette },
+        { href: "/admin/metadados", label: "Metadados", icon: FileText },
         { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
       ],
     },
