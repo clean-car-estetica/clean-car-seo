@@ -192,6 +192,12 @@ const faqsPadrao: FaqDB[] = [
     resposta:
       "Sim, cobrimos falhas na execução técnica, desde que comunicadas em até 48h após a entrega do veículo. A garantia não cobre danos pré-existentes, desgaste natural, uso inadequado ou fatores externos ao serviço realizado.",
   },
+  {
+    id: -7,
+    pergunta: "Qual o horário de funcionamento?",
+    resposta:
+      "Segunda a sexta das 9h às 18h, e sábado das 9h às 17h. Em feriados e feriados prolongados, o horário pode ser alterado — confirme pelo WhatsApp antes de vir.",
+  },
 ];
 
 export async function getFaqsPublicos(): Promise<FaqDB[]> {
