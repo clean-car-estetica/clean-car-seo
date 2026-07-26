@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
-  Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Menu, X,
+  Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2, Menu, X,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -34,6 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       links: [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/leads", label: "Leads", icon: Inbox },
+        { href: "/admin/links", label: "Links de rastreamento", icon: Link2 },
         { href: "/admin/nps", label: "NPS", icon: Smile },
       ],
     },
