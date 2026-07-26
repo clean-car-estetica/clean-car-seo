@@ -85,6 +85,50 @@ export async function getMetadados(): Promise<Metadados> {
   }
 }
 
+export type TextosGerais = {
+  footerTagline: string;
+  footerLojaLabel: string;
+  homeCidadesTitulo: string;
+  homeCidadesSubtitulo: string;
+  homeServicosTitulo: string;
+  homeServicosSubtitulo: string;
+  navServicos: string;
+  navPlanos: string;
+  navFaq: string;
+  navIndicacao: string;
+  navBeneficios: string;
+  navContato: string;
+  navBlog: string;
+  navBotaoAgendar: string;
+};
+
+export const TEXTOS_PADRAO: TextosGerais = {
+  footerTagline: "Loja física em Mogi das Cruzes, atendendo também clientes da região do Alto Tietê. Química Vonixx, hora marcada.",
+  footerLojaLabel: "Loja",
+  homeCidadesTitulo: "Nossa loja fica em Mogi das Cruzes",
+  homeCidadesSubtitulo: "Recebemos também clientes de toda a região do Alto Tietê, sempre com hora marcada.",
+  homeServicosTitulo: "Catálogo de serviços",
+  homeServicosSubtitulo: "Química Vonixx, do dia a dia à proteção de longa duração.",
+  navServicos: "Serviços e preços",
+  navPlanos: "Planos",
+  navFaq: "FAQ",
+  navIndicacao: "Indique e ganhe",
+  navBeneficios: "Benefícios",
+  navContato: "Contato",
+  navBlog: "Blog",
+  navBotaoAgendar: "Agendar",
+};
+
+export async function getTextosGerais(): Promise<TextosGerais> {
+  try {
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "textos").single();
+    if (!data?.data) return TEXTOS_PADRAO;
+    return { ...TEXTOS_PADRAO, ...(data.data as Partial<TextosGerais>) };
+  } catch {
+    return TEXTOS_PADRAO;
+  }
+}
+
 export async function getContatoContent(): Promise<Contato> {
   try {
     const { data } = await supabasePublico.from("site_content").select("data").eq("section", "contato").single();
@@ -107,7 +151,7 @@ export const heroPadrao: HeroContent = {
   titulo_parte1: "Seu carro sai daqui com o",
   titulo_destaque: "brilho de zero-km.",
   subtitulo:
-    "Lavagem, polimento técnico e vitrificação cerâmica no nosso estúdio em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
+    "Lavagem, polimento técnico e vitrificação cerâmica na nossa loja em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
   badge_texto: "Produtos Vonixx · Química Premium",
   imagem_url: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1600&q=80",
 };

@@ -15,7 +15,7 @@ export function getConteudoLocal(servico: Service, cidade: Cidade) {
     const bairro = cidade.bairros[0];
     const paragrafos = [
       `Quem mora em ${cidade.nome}, principalmente perto de ${bairro}, já pode contar com a Clean Car para ${servico.nome.toLowerCase()} sem precisar rodar até outra cidade. ${servico.descricao}`,
-      `Nosso estúdio fica em ${cidade.nome} e atende toda a região${
+      `Nossa loja fica em ${cidade.nome} e atende toda a região${
         cidade.bairros.length > 1 ? `, incluindo ${cidade.bairros.slice(1).join(", ")}` : ""
       }. Aqui, cada carro passa pelo nosso processo técnico completo — pré-lavagem, produtos Vonixx e muito cuidado com cada detalhe — sempre com horário marcado.`,
       servico.duracao
@@ -29,8 +29,8 @@ export function getConteudoLocal(servico: Service, cidade: Cidade) {
 
   // Cidades vizinhas: não há loja no local, o cliente vem até Mogi das Cruzes.
   const paragrafos = [
-    `Muitos clientes de ${cidade.nome} escolhem a Clean Car para ${servico.nome.toLowerCase()} — o estúdio fica em Mogi das Cruzes, mas quem já veio de lá sabe que o resultado compensa o deslocamento. ${servico.descricao}`,
-    `Importante: a Clean Car não tem loja física em ${cidade.nome}. Recebemos moradores de ${cidade.nome} e região no nosso estúdio em Mogi das Cruzes, sempre com horário marcado — e se for mais prático, oferecemos o serviço de leva-e-trás, buscando e devolvendo seu carro.`,
+    `Muitos clientes de ${cidade.nome} escolhem a Clean Car para ${servico.nome.toLowerCase()} — a loja fica em Mogi das Cruzes, mas quem já veio de lá sabe que o resultado compensa o deslocamento. ${servico.descricao}`,
+    `Importante: a Clean Car não tem loja física em ${cidade.nome}. Recebemos moradores de ${cidade.nome} e região na nossa loja em Mogi das Cruzes, sempre com horário marcado — e se for mais prático, oferecemos o serviço de leva-e-trás, buscando e devolvendo seu carro.`,
     servico.duracao
       ? `O serviço de ${servico.nome.toLowerCase()} tem duração média de ${servico.duracao}${
           servico.precoDesde ? `, com valores a partir de R$ ${servico.precoDesde}` : ""

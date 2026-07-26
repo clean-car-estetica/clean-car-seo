@@ -4,7 +4,8 @@ import PageviewTracker from "@/components/PageviewTracker";
 import CupomPopup from "@/components/CupomPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
 import { PromoProvider } from "@/components/PromoProvider";
-import { getContatoContent, getPromocoes, getTema, getMetadados } from "@/lib/site-content";
+import { TextosProvider } from "@/components/TextosProvider";
+import { getContatoContent, getPromocoes, getTema, getMetadados, getTextosGerais } from "@/lib/site-content";
 
 export async function generateMetadata(): Promise<Metadata> {
   const meta = await getMetadados();
@@ -38,7 +39,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [contato, promocoes, tema, meta] = await Promise.all([getContatoContent(), getPromocoes(), getTema(), getMetadados()]);
+  const [contato, promocoes, tema, meta, textos] = await Promise.all([getContatoContent(), getPromocoes(), getTema(), getMetadados(), getTextosGerais()]);
 
   return (
     <html lang="pt-BR" className="h-full">
@@ -110,9 +111,11 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-paper text-ink">
         <ContatoProvider contato={contato}>
           <PromoProvider promocoes={promocoes}>
-            <PageviewTracker />
-            {children}
-            <CupomPopup />
+            <TextosProvider textos={textos}>
+              <PageviewTracker />
+              {children}
+              <CupomPopup />
+            </TextosProvider>
           </PromoProvider>
         </ContatoProvider>
       </body>

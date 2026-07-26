@@ -12,11 +12,12 @@ import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
 import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista } from "@/lib/site-data";
+import { getTextosGerais } from "@/lib/site-content";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -25,6 +26,7 @@ export default async function Home() {
     getPlanosPublicos(),
     getProcessoPassos(),
     getProdutosLista(),
+    getTextosGerais(),
   ]);
 
   return (
@@ -87,8 +89,8 @@ export default async function Home() {
 
         {/* Serviços */}
         <section id="servicos" className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">Catálogo de serviços</h2>
-          <p className="text-steel-line mb-10">Química Vonixx, do dia a dia à proteção de longa duração.</p>
+          <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">{textos.homeServicosTitulo}</h2>
+          <p className="text-steel-line mb-10">{textos.homeServicosSubtitulo}</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {servicos.map((s) => (
               <ServiceCard
@@ -110,10 +112,10 @@ export default async function Home() {
         <section className="bg-carbon-soft py-20 border-y border-card-line">
           <div className="mx-auto max-w-6xl px-6">
             <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">
-              Nosso estúdio fica em Mogi das Cruzes
+              {textos.homeCidadesTitulo}
             </h2>
             <p className="text-steel-line mb-10 max-w-xl">
-              Recebemos também clientes de toda a região do Alto Tietê, sempre com hora marcada.
+              {textos.homeCidadesSubtitulo}
             </p>
             <div className="flex flex-wrap gap-3">
               {cidades.map((c) => (

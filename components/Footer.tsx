@@ -2,9 +2,11 @@
 
 import { whatsappLink } from "@/lib/config";
 import { useContato } from "@/components/ContatoProvider";
+import { useTextos } from "@/components/TextosProvider";
 
 export default function Footer() {
   const contato = useContato();
+  const t = useTextos();
 
   return (
     <footer id="contato" className="bg-carbon-soft border-t border-card-line text-steel-line mt-auto">
@@ -12,12 +14,12 @@ export default function Footer() {
         <div>
           <div className="font-display font-extrabold text-xl text-steel">CLEAN <span className="text-verniz-shine">CAR</span></div>
           <p className="mt-3 text-sm leading-relaxed">
-            Estúdio físico em Mogi das Cruzes, atendendo também clientes da região do Alto Tietê. Química Vonixx, hora marcada.
+            {t.footerTagline}
           </p>
         </div>
         <div>
           <div className="font-display font-bold text-sm uppercase tracking-wide text-verniz-shine mb-3">
-            Estúdio
+            {t.footerLojaLabel}
           </div>
           <p className="text-sm leading-relaxed">{contato.endereco}</p>
           <p className="text-sm leading-relaxed text-steel-line/80 mt-1">
