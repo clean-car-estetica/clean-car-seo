@@ -9,22 +9,32 @@ import { getContatoContent, getPromocoes } from "@/lib/site-content";
 export const metadata: Metadata = {
   metadataBase: new URL("https://clean-car-seo.vercel.app"),
   title: {
-    default: "Clean Car Estética Automotiva",
+    default: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
     template: "%s | Clean Car Estética Automotiva",
   },
   description:
-    "Lavagem, polimento, vitrificação e higienização automotiva em Mogi das Cruzes e região.",
+    "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
+  keywords: [
+    "lava rapido Mogi das Cruzes", "lava-rápido Mogi das Cruzes", "lava car Mogi das Cruzes",
+    "estetica automotiva Mogi das Cruzes", "estética automotiva Mogi das Cruzes",
+    "limpeza de carro Mogi das Cruzes", "lavar carro Mogi das Cruzes", "lavagem de carro Mogi das Cruzes",
+    "proteção de pintura Mogi das Cruzes", "descontaminação de pintura Mogi das Cruzes",
+    "limpeza de carpete Mogi das Cruzes", "limpeza de sofá Mogi das Cruzes", "limpeza de estofado Mogi das Cruzes",
+    "higienização Mogi das Cruzes", "higienização de banco Mogi das Cruzes", "higienização de estofado Mogi das Cruzes",
+    "Alto Tietê", "Suzano", "Poá", "Ferraz de Vasconcelos", "Itaquaquecetuba", "Guararema",
+  ],
+  robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     locale: "pt_BR",
     siteName: "Clean Car Estética Automotiva",
-    title: "Clean Car Estética Automotiva",
-    description: "Lavagem, polimento, vitrificação e higienização automotiva em Mogi das Cruzes e região.",
+    title: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
+    description: "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Clean Car Estética Automotiva",
-    description: "Lavagem, polimento, vitrificação e higienização automotiva em Mogi das Cruzes e região.",
+    title: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
+    description: "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
   },
 };
 
@@ -49,13 +59,13 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "AutoWash",
+              "@type": "AutoRepair",
               name: "Clean Car Estética Automotiva",
               description:
-                "Estética automotiva em Mogi das Cruzes com produtos Vonixx: lavagem, polimento técnico, vitrificação e cristalização de vidros com hidrofobia e proteção contra chuva ácida.",
+                "Lavagem profissional, higienização, polimento, vitrificação e restauração automotiva em Mogi das Cruzes e Alto Tietê. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
               image: "https://clean-car-seo.vercel.app/opengraph-image",
-              telephone: `+${contato.whatsapp}`,
-              url: "https://clean-car-seo.vercel.app",
+              telephone: "(11) 91263-0375",
+              url: "https://clean-car-seo.vercel.app/",
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Rua Prefeito Sebastião Cascardo, 438 - Jardim Universo",
@@ -66,10 +76,12 @@ export default async function RootLayout({
               },
               areaServed: [
                 "Mogi das Cruzes",
+                "Alto Tietê",
                 "Suzano",
                 "Poá",
                 "Ferraz de Vasconcelos",
                 "Itaquaquecetuba",
+                "Guararema",
               ],
               sameAs: [contato.instagramUrl, contato.googleUrl],
               priceRange: "R$",

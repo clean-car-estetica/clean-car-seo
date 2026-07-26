@@ -56,9 +56,12 @@ export default async function ServicoPage({
             </h1>
             <p className="mt-6 text-lg text-steel-line max-w-2xl leading-relaxed">{servico.descricao}</p>
             <div className="mt-8 flex gap-6 font-display text-sm text-steel-line">
-              {servico.duracao && <span>⏱ {servico.duracao}</span>}
+              {servico.duracao && <span>⏱ A partir de {servico.duracao}</span>}
               {servico.preco_desde && <span className="text-verniz-shine font-bold">A partir de R$ {servico.preco_desde}</span>}
             </div>
+            <p className="mt-3 text-xs text-steel-line/70 max-w-xl font-sans">
+              Avaliamos o veículo antes de iniciar e informamos o tempo total definitivo — sem surpresas.
+            </p>
             <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
               Agendar este serviço
             </AgendarButton>

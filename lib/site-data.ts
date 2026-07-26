@@ -180,6 +180,18 @@ const faqsPadrao: FaqDB[] = [
     resposta:
       "Hidrofobia é a propriedade que faz a água escorregar da pintura ou do vidro em vez de grudar. Com produtos Vonixx como Hidrox e Glasy, conseguimos essa repelência — o que reduz manchas de chuva ácida, facilita a limpeza e ajuda a manter a proteção da pintura por mais tempo.",
   },
+  {
+    id: -5,
+    pergunta: "O tempo informado no site é exato?",
+    resposta:
+      "O tempo mostrado em cada serviço é o mínimo. Avaliamos o veículo antes de iniciar e informamos o tempo total definitivo — sem surpresas. Veículos em estado mais crítico podem levar um pouco mais.",
+  },
+  {
+    id: -6,
+    pergunta: "Vocês dão garantia do serviço?",
+    resposta:
+      "Sim, cobrimos falhas na execução técnica, desde que comunicadas em até 48h após a entrega do veículo. A garantia não cobre danos pré-existentes, desgaste natural, uso inadequado ou fatores externos ao serviço realizado.",
+  },
 ];
 
 export async function getFaqsPublicos(): Promise<FaqDB[]> {
