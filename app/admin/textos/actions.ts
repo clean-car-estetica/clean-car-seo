@@ -26,6 +26,11 @@ export async function salvarTextos(formData: FormData) {
     beneficiosSubtitulo: String(formData.get("beneficiosSubtitulo")),
     orcamentoTitulo: String(formData.get("orcamentoTitulo")),
     orcamentoSubtitulo: String(formData.get("orcamentoSubtitulo")),
+    avaliarTitulo: String(formData.get("avaliarTitulo")),
+    avaliarSubtitulo: String(formData.get("avaliarSubtitulo")),
+    avaliarSucessoTitulo: String(formData.get("avaliarSucessoTitulo")),
+    labelNome: String(formData.get("labelNome")),
+    labelWhatsapp: String(formData.get("labelWhatsapp")),
   };
   const { error } = await supabaseAdmin
     .from("site_content")

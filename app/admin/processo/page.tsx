@@ -1,14 +1,23 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { salvarPasso, excluirPasso } from "./actions";
+import { salvarPasso, excluirPasso, importarPassosPadrao } from "./actions";
 
 export default async function ProcessoAdminPage() {
   const { data: passos, error } = await supabaseAdmin.from("processo_passos").select("*").order("ordem");
 
   return (
     <div>
-      <h1 className="font-display font-bold text-3xl text-steel mb-1">Nosso processo</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="font-display font-bold text-3xl text-steel">Nosso processo</h1>
+        {(!passos || passos.length === 0) && (
+          <form action={importarPassosPadrao}>
+            <button type="submit" className="rounded-full bg-card border border-card-line px-4 py-2 text-sm font-bold text-steel-line hover:border-verniz hover:text-verniz-shine">
+              Importar passos padrão pra editar
+            </button>
+          </form>
+        )}
+      </div>
       <p className="text-steel-line text-sm mb-6">Os passos mostrados na seção "Não é só uma lavagem" da home.</p>
 
       {error && (

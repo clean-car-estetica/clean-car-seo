@@ -155,7 +155,7 @@ export async function getBeneficiosPublicos(): Promise<BeneficioDB[]> {
 
 export type PassoDB = { id: number; titulo: string; texto: string };
 
-const processoPadrao: PassoDB[] = [
+export const processoPadrao: PassoDB[] = [
   { id: -1, titulo: "Você escolhe como entregar", texto: "Traz o carro até o estúdio ou contrata o leva-e-trás — buscamos e devolvemos onde for melhor pra você." },
   { id: -2, titulo: "Pré-lavagem técnica", texto: "Soltamos a sujeira mais grossa antes de qualquer contato direto na pintura, reduzindo o risco de microrriscos." },
   { id: -3, titulo: "Shampoo neutro + luvas próprias", texto: "Aplicação com luvas específicas para lavagem automotiva — o cuidado que protege o verniz do seu carro." },
@@ -173,7 +173,7 @@ export async function getProcessoPassos(): Promise<PassoDB[]> {
   }
 }
 
-const produtosPadrao = [
+export const produtosPadrao = [
   "V-Floc", "V-Mol", "Sintra", "Delet", "Alumax", "Acidus", "Foam Gloss",
   "Pretinho Spray", "Hydrox", "Tok Final", "Impermeabilizante",
   "Revitalizador de Plásticos", "VLight Faróis", "Kit Polimento",
@@ -192,7 +192,7 @@ export async function getProdutosLista(): Promise<string[]> {
 
 export type FaqDB = { id: number; pergunta: string; resposta: string };
 
-const faqsPadrao: FaqDB[] = [
+export const faqsPadrao: FaqDB[] = [
   {
     id: -1,
     pergunta: "A vitrificação protege contra riscos profundos?",

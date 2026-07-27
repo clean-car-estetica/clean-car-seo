@@ -2,6 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { faqsPadrao } from "@/lib/site-data";
+
+export async function importarFaqsPadrao() {
+  const { count } = await supabaseAdmin.from("faqs").select("*", { count: "exact", head: true });
+  if (count && count > 0) return;
+  const linhas = faqsPadrao.map((f, i) => ({ pergunta: f.pergunta, resposta: f.resposta, ordem: i }));
+  const { error } = await supabaseAdmin.from("faqs").insert(linhas);
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/admin/faq");
+}
 
 export async function salvarFaq(formData: FormData) {
   const idRaw = formData.get("id");

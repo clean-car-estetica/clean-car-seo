@@ -1,14 +1,23 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { salvarFaq, excluirFaq } from "./actions";
+import { salvarFaq, excluirFaq, importarFaqsPadrao } from "./actions";
 
 export default async function FaqAdminPage() {
   const { data: faqs } = await supabaseAdmin.from("faqs").select("*").order("ordem");
 
   return (
     <div>
-      <h1 className="font-display font-bold text-3xl text-steel mb-1">Dúvidas frequentes (FAQ)</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="font-display font-bold text-3xl text-steel">Dúvidas frequentes (FAQ)</h1>
+        {(!faqs || faqs.length === 0) && (
+          <form action={importarFaqsPadrao}>
+            <button type="submit" className="rounded-full bg-card border border-card-line px-4 py-2 text-sm font-bold text-steel-line hover:border-verniz hover:text-verniz-shine">
+              Importar perguntas padrão pra editar
+            </button>
+          </form>
+        )}
+      </div>
       <p className="text-steel-line text-sm mb-6">
         Aparece na home e também vira dado estruturado (FAQPage), que ajuda o Google e assistentes de IA
         a citar suas respostas diretamente.

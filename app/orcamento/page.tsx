@@ -50,14 +50,14 @@ export default function OrcamentoPage() {
                   required
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  placeholder="Seu nome"
+                  placeholder={textos.labelNome}
                   className="px-4 py-3 rounded-lg bg-card border border-card-line text-steel text-sm"
                 />
                 <input
                   required
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  placeholder="WhatsApp com DDD"
+                  placeholder={textos.labelWhatsapp}
                   className="px-4 py-3 rounded-lg bg-card border border-card-line text-steel text-sm"
                 />
                 <select

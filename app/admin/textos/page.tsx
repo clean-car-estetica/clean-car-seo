@@ -78,6 +78,19 @@ export default async function TextosAdminPage() {
           <Campo nome="orcamentoSubtitulo" defaultValue={t.orcamentoSubtitulo} label="Subtítulo" area />
         </div>
 
+        <div className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
+          <h2 className="font-display font-bold text-steel mb-1">Página de Avaliação (NPS)</h2>
+          <Campo nome="avaliarTitulo" defaultValue={t.avaliarTitulo} label="Título" />
+          <Campo nome="avaliarSubtitulo" defaultValue={t.avaliarSubtitulo} label="Subtítulo" area />
+          <Campo nome="avaliarSucessoTitulo" defaultValue={t.avaliarSucessoTitulo} label="Título após enviar" />
+        </div>
+
+        <div className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
+          <h2 className="font-display font-bold text-steel mb-1">Labels de formulário (usados em vários lugares)</h2>
+          <Campo nome="labelNome" defaultValue={t.labelNome} label="Campo de nome" />
+          <Campo nome="labelWhatsapp" defaultValue={t.labelWhatsapp} label="Campo de WhatsApp" />
+        </div>
+
         <button type="submit" className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine">
           Salvar textos
         </button>

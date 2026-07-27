@@ -2,6 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { processoPadrao } from "@/lib/site-data";
+
+export async function importarPassosPadrao() {
+  const { count } = await supabaseAdmin.from("processo_passos").select("*", { count: "exact", head: true });
+  if (count && count > 0) return;
+  const linhas = processoPadrao.map((p, i) => ({ titulo: p.titulo, texto: p.texto, ordem: i }));
+  const { error } = await supabaseAdmin.from("processo_passos").insert(linhas);
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/admin/processo");
+}
 
 export async function salvarPasso(formData: FormData) {
   const idRaw = formData.get("id");

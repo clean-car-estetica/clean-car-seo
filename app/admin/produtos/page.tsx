@@ -1,14 +1,23 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { adicionarProduto, excluirProduto } from "./actions";
+import { adicionarProduto, excluirProduto, importarProdutosPadrao } from "./actions";
 
 export default async function ProdutosAdminPage() {
   const { data: produtos, error } = await supabaseAdmin.from("produtos_lista").select("*").order("ordem");
 
   return (
     <div>
-      <h1 className="font-display font-bold text-3xl text-steel mb-1">Produtos que usamos</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="font-display font-bold text-3xl text-steel">Produtos que usamos</h1>
+        {(!produtos || produtos.length === 0) && (
+          <form action={importarProdutosPadrao}>
+            <button type="submit" className="rounded-full bg-card border border-card-line px-4 py-2 text-sm font-bold text-steel-line hover:border-verniz hover:text-verniz-shine">
+              Importar lista padrão pra editar
+            </button>
+          </form>
+        )}
+      </div>
       <p className="text-steel-line text-sm mb-6">Lista de nomes mostrada na home — sem explicar o uso, por segurança.</p>
 
       {error && (

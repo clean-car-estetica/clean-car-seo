@@ -107,6 +107,11 @@ export type TextosGerais = {
   beneficiosSubtitulo: string;
   orcamentoTitulo: string;
   orcamentoSubtitulo: string;
+  avaliarTitulo: string;
+  avaliarSubtitulo: string;
+  avaliarSucessoTitulo: string;
+  labelNome: string;
+  labelWhatsapp: string;
 };
 
 export const TEXTOS_PADRAO: TextosGerais = {
@@ -131,6 +136,11 @@ export const TEXTOS_PADRAO: TextosGerais = {
   beneficiosSubtitulo: "A cada serviço você acumula pontos de fidelidade. Troque por descontos ou serviços grátis.",
   orcamentoTitulo: "Peça seu orçamento",
   orcamentoSubtitulo: "Prefere não abrir o WhatsApp agora? Deixa seus dados que a gente te chama.",
+  avaliarTitulo: "Como foi seu atendimento?",
+  avaliarSubtitulo: "De 0 a 10, o quanto você recomendaria a Clean Car pra um amigo?",
+  avaliarSucessoTitulo: "Valeu pelo feedback! 🙌",
+  labelNome: "Seu nome",
+  labelWhatsapp: "WhatsApp com DDD",
 };
 
 export async function getTextosGerais(): Promise<TextosGerais> {

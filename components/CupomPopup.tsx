@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import { X, Gift } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { usePromocoes } from "@/components/PromoProvider";
+import { useTextos } from "@/components/TextosProvider";
 
 const CHAVE_LOCAL = "cleancar_cupom_fechado";
 
 export default function CupomPopup() {
   const pathname = usePathname();
   const { cupom } = usePromocoes();
+  const textos = useTextos();
   const [visivel, setVisivel] = useState(false);
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -63,14 +65,14 @@ export default function CupomPopup() {
                 required
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                placeholder="Seu nome"
+                placeholder={textos.labelNome}
                 className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
               />
               <input
                 required
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="WhatsApp com DDD"
+                placeholder={textos.labelWhatsapp}
                 className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
               />
               <button

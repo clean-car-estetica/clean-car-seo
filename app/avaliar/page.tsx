@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { useContato } from "@/components/ContatoProvider";
+import { useTextos } from "@/components/TextosProvider";
 
 export default function AvaliarPage() {
   const [nota, setNota] = useState<number | null>(null);
@@ -13,6 +14,7 @@ export default function AvaliarPage() {
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const contato = useContato();
+  const textos = useTextos();
 
   async function enviar() {
     if (nota === null) return;
@@ -29,7 +31,7 @@ export default function AvaliarPage() {
         <section className="mx-auto max-w-xl px-6 py-24">
           {enviado ? (
             <div className="text-center">
-              <h1 className="font-display font-extrabold text-3xl text-steel mb-4">Valeu pelo feedback! 🙌</h1>
+              <h1 className="font-display font-extrabold text-3xl text-steel mb-4">{textos.avaliarSucessoTitulo}</h1>
               <p className="text-steel-line">
                 Isso nos ajuda a manter o padrão de qualidade. Se quiser, deixe também uma avaliação no Google:
               </p>
@@ -44,9 +46,9 @@ export default function AvaliarPage() {
             </div>
           ) : (
             <>
-              <h1 className="font-display font-extrabold text-3xl text-steel mb-2">Como foi seu atendimento?</h1>
+              <h1 className="font-display font-extrabold text-3xl text-steel mb-2">{textos.avaliarTitulo}</h1>
               <p className="text-steel-line mb-8">
-                De 0 a 10, o quanto você recomendaria a Clean Car pra um amigo?
+                {textos.avaliarSubtitulo}
               </p>
               <div className="flex flex-wrap gap-2 mb-6">
                 {Array.from({ length: 11 }, (_, i) => i).map((n) => (
