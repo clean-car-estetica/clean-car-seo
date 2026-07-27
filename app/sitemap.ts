@@ -1,13 +1,45 @@
 import type { MetadataRoute } from "next";
 import { supabasePublico } from "@/lib/supabase";
 import { getServicosPublicos, getCidadesPublicas } from "@/lib/site-data";
+import { servicos as servicosPadrao, cidades as cidadesPadrao } from "@/lib/data";
 
 const BASE_URL = "https://clean-car-seo.vercel.app";
 
-export const revalidate = 300;
+// O sitemap precisa responder rápido e de forma confiável pro Google conseguir
+// lê-lo. Por isso cada consulta ao banco (serviços, cidades, posts do blog) tem
+// um limite curto de tempo: se o banco demorar, usamos os dados fixos do código
+// como reserva em vez de deixar o sitemap falhar por completo.
+export const revalidate = 3600;
+
+function comTimeout<T>(promessa: Promise<T>, ms: number, reserva: T): Promise<T> {
+  return Promise.race([
+    promessa,
+    new Promise<T>((resolve) => setTimeout(() => resolve(reserva), ms)),
+  ]);
+}
+
+async function buscarSlugsDeBlog(): Promise<string[]> {
+  try {
+    const controlador = new AbortController();
+    const timeout = setTimeout(() => controlador.abort(), 3000);
+    const { data } = await supabasePublico
+      .from("blog_posts")
+      .select("slug")
+      .eq("status", "publicado")
+      .abortSignal(controlador.signal);
+    clearTimeout(timeout);
+    return (data ?? []).map((p: { slug: string }) => p.slug);
+  } catch {
+    return [];
+  }
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [servicos, cidades] = await Promise.all([getServicosPublicos(), getCidadesPublicas()]);
+  const [servicos, cidades, slugsBlog] = await Promise.all([
+    comTimeout(getServicosPublicos(), 3000, servicosPadrao as any),
+    comTimeout(getCidadesPublicas(), 3000, cidadesPadrao as any),
+    buscarSlugsDeBlog(),
+  ]);
 
   const entradas: MetadataRoute.Sitemap = [
     { url: BASE_URL, changeFrequency: "weekly", priority: 1 },
@@ -25,13 +57,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  try {
-    const { data: posts } = await supabasePublico.from("blog_posts").select("slug").eq("status", "publicado");
-    for (const p of posts ?? []) {
-      entradas.push({ url: `${BASE_URL}/blog/${p.slug}`, changeFrequency: "monthly", priority: 0.5 });
-    }
-  } catch {
-    // sem posts ainda, tudo bem
+  for (const slug of slugsBlog) {
+    entradas.push({ url: `${BASE_URL}/blog/${slug}`, changeFrequency: "monthly", priority: 0.5 });
   }
 
   return entradas;
