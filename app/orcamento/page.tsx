@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { servicos } from "@/lib/data";
+import { useTextos } from "@/components/TextosProvider";
 
 export default function OrcamentoPage() {
   const [nome, setNome] = useState("");
@@ -14,6 +15,7 @@ export default function OrcamentoPage() {
   const [mensagem, setMensagem] = useState("");
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const textos = useTextos();
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -41,8 +43,8 @@ export default function OrcamentoPage() {
             </div>
           ) : (
             <>
-              <h1 className="font-display font-extrabold text-3xl text-steel mb-2">Peça seu orçamento</h1>
-              <p className="text-steel-line mb-8">Prefere não abrir o WhatsApp agora? Deixa seus dados que a gente te chama.</p>
+              <h1 className="font-display font-extrabold text-3xl text-steel mb-2">{textos.orcamentoTitulo}</h1>
+              <p className="text-steel-line mb-8">{textos.orcamentoSubtitulo}</p>
               <form onSubmit={enviar} className="grid gap-4">
                 <input
                   required

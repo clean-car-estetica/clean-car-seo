@@ -7,6 +7,7 @@ export async function salvarTextos(formData: FormData) {
   const dados = {
     footerTagline: String(formData.get("footerTagline")),
     footerLojaLabel: String(formData.get("footerLojaLabel")),
+    footerRecebemos: String(formData.get("footerRecebemos")),
     homeCidadesTitulo: String(formData.get("homeCidadesTitulo")),
     homeCidadesSubtitulo: String(formData.get("homeCidadesSubtitulo")),
     homeServicosTitulo: String(formData.get("homeServicosTitulo")),
@@ -19,6 +20,12 @@ export async function salvarTextos(formData: FormData) {
     navContato: String(formData.get("navContato")),
     navBlog: String(formData.get("navBlog")),
     navBotaoAgendar: String(formData.get("navBotaoAgendar")),
+    faqTitulo: String(formData.get("faqTitulo")),
+    faqSubtitulo: String(formData.get("faqSubtitulo")),
+    beneficiosTitulo: String(formData.get("beneficiosTitulo")),
+    beneficiosSubtitulo: String(formData.get("beneficiosSubtitulo")),
+    orcamentoTitulo: String(formData.get("orcamentoTitulo")),
+    orcamentoSubtitulo: String(formData.get("orcamentoSubtitulo")),
   };
   const { error } = await supabaseAdmin
     .from("site_content")

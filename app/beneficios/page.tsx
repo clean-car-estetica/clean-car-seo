@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import { getServicosPublicos, getBeneficiosPublicos } from "@/lib/site-data";
+import { getTextosGerais } from "@/lib/site-content";
 
 export const revalidate = 60;
 
@@ -11,7 +12,7 @@ export const metadata = {
 };
 
 export default async function BeneficiosPage() {
-  const [servicos, beneficios] = await Promise.all([getServicosPublicos(), getBeneficiosPublicos()]);
+  const [servicos, beneficios, textos] = await Promise.all([getServicosPublicos(), getBeneficiosPublicos(), getTextosGerais()]);
   const servicosComPontos = servicos.filter((s) => s.pontos_fidelidade > 0);
 
   return (
@@ -20,9 +21,9 @@ export default async function BeneficiosPage() {
       <main className="flex-1 pt-20">
         <section className="mx-auto max-w-4xl px-6 py-20">
           <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm mb-4">Fidelidade Clean Car</p>
-          <h1 className="font-display font-extrabold text-4xl md:text-5xl text-steel mb-4">Benefícios e pontos</h1>
+          <h1 className="font-display font-extrabold text-4xl md:text-5xl text-steel mb-4">{textos.beneficiosTitulo}</h1>
           <p className="text-steel-line mb-12 max-w-xl">
-            A cada serviço você acumula pontos de fidelidade. Troque por descontos ou serviços grátis.
+            {textos.beneficiosSubtitulo}
           </p>
 
           {servicosComPontos.length > 0 && (

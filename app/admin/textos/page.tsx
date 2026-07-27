@@ -45,6 +45,7 @@ export default async function TextosAdminPage() {
           <h2 className="font-display font-bold text-steel mb-1">Rodapé</h2>
           <Campo nome="footerTagline" defaultValue={t.footerTagline} label="Frase de apresentação" area />
           <Campo nome="footerLojaLabel" defaultValue={t.footerLojaLabel} label="Rótulo do bloco de endereço (ex: Loja, Unidade...)" />
+          <Campo nome="footerRecebemos" defaultValue={t.footerRecebemos} label="Frase 'recebemos clientes de...'" />
         </div>
 
         <div className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
@@ -57,6 +58,24 @@ export default async function TextosAdminPage() {
           <h2 className="font-display font-bold text-steel mb-1">Seção "Catálogo de serviços" (home)</h2>
           <Campo nome="homeServicosTitulo" defaultValue={t.homeServicosTitulo} label="Título" />
           <Campo nome="homeServicosSubtitulo" defaultValue={t.homeServicosSubtitulo} label="Subtítulo" area />
+        </div>
+
+        <div className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
+          <h2 className="font-display font-bold text-steel mb-1">Página de FAQ</h2>
+          <Campo nome="faqSubtitulo" defaultValue={t.faqSubtitulo} label="Selo pequeno (acima do título)" />
+          <Campo nome="faqTitulo" defaultValue={t.faqTitulo} label="Título" />
+        </div>
+
+        <div className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
+          <h2 className="font-display font-bold text-steel mb-1">Página de Benefícios</h2>
+          <Campo nome="beneficiosTitulo" defaultValue={t.beneficiosTitulo} label="Título" />
+          <Campo nome="beneficiosSubtitulo" defaultValue={t.beneficiosSubtitulo} label="Subtítulo" area />
+        </div>
+
+        <div className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
+          <h2 className="font-display font-bold text-steel mb-1">Página de Orçamento</h2>
+          <Campo nome="orcamentoTitulo" defaultValue={t.orcamentoTitulo} label="Título" />
+          <Campo nome="orcamentoSubtitulo" defaultValue={t.orcamentoSubtitulo} label="Subtítulo" area />
         </div>
 
         <button type="submit" className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine">

@@ -88,6 +88,7 @@ export async function getMetadados(): Promise<Metadados> {
 export type TextosGerais = {
   footerTagline: string;
   footerLojaLabel: string;
+  footerRecebemos: string;
   homeCidadesTitulo: string;
   homeCidadesSubtitulo: string;
   homeServicosTitulo: string;
@@ -100,11 +101,18 @@ export type TextosGerais = {
   navContato: string;
   navBlog: string;
   navBotaoAgendar: string;
+  faqTitulo: string;
+  faqSubtitulo: string;
+  beneficiosTitulo: string;
+  beneficiosSubtitulo: string;
+  orcamentoTitulo: string;
+  orcamentoSubtitulo: string;
 };
 
 export const TEXTOS_PADRAO: TextosGerais = {
   footerTagline: "Loja física em Mogi das Cruzes, atendendo também clientes da região do Alto Tietê. Química Vonixx, hora marcada.",
   footerLojaLabel: "Loja",
+  footerRecebemos: "Recebemos clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba",
   homeCidadesTitulo: "Nossa loja fica em Mogi das Cruzes",
   homeCidadesSubtitulo: "Recebemos também clientes de toda a região do Alto Tietê, sempre com hora marcada.",
   homeServicosTitulo: "Catálogo de serviços",
@@ -117,6 +125,12 @@ export const TEXTOS_PADRAO: TextosGerais = {
   navContato: "Contato",
   navBlog: "Blog",
   navBotaoAgendar: "Agendar",
+  faqTitulo: "Tudo que você precisa saber",
+  faqSubtitulo: "Dúvidas frequentes",
+  beneficiosTitulo: "Benefícios e pontos",
+  beneficiosSubtitulo: "A cada serviço você acumula pontos de fidelidade. Troque por descontos ou serviços grátis.",
+  orcamentoTitulo: "Peça seu orçamento",
+  orcamentoSubtitulo: "Prefere não abrir o WhatsApp agora? Deixa seus dados que a gente te chama.",
 };
 
 export async function getTextosGerais(): Promise<TextosGerais> {

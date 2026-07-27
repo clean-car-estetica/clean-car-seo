@@ -23,7 +23,7 @@ export default function Footer() {
           </div>
           <p className="text-sm leading-relaxed">{contato.endereco}</p>
           <p className="text-sm leading-relaxed text-steel-line/80 mt-1">
-            Recebemos clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba
+            {t.footerRecebemos}
           </p>
         </div>
         <div>
