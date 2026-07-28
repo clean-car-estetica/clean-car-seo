@@ -9,6 +9,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Benefícios e Fidelidade",
   description: "Programa de fidelidade Clean Car: acumule pontos e troque por descontos.",
+  alternates: { canonical: "https://clean-car-seo.vercel.app/beneficios" },
 };
 
 export default async function BeneficiosPage() {

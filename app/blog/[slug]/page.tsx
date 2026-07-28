@@ -22,7 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return {};
-  return { title: post.titulo, description: post.resumo };
+  return {
+    title: post.titulo,
+    description: post.resumo,
+    alternates: { canonical: `https://clean-car-seo.vercel.app/blog/${slug}` },
+  };
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {

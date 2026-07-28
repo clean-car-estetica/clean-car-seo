@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CupomPopup from "@/components/CupomPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
 import { PromoProvider } from "@/components/PromoProvider";
@@ -109,6 +110,7 @@ export default async function RootLayout({
         }`}</style>
       </head>
       <body className="min-h-full flex flex-col bg-paper text-ink">
+        <GoogleAnalytics />
         <ContatoProvider contato={contato}>
           <PromoProvider promocoes={promocoes}>
             <TextosProvider textos={textos}>

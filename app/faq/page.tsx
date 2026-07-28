@@ -10,6 +10,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Perguntas frequentes",
   description: "Tire suas dúvidas sobre lavagem, higienização, polimento e vitrificação na Clean Car.",
+  alternates: { canonical: "https://clean-car-seo.vercel.app/faq" },
 };
 
 export default async function FaqPage() {

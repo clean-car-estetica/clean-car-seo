@@ -25,6 +25,7 @@ export async function generateMetadata({
   return {
     title: `${servico.nome} em ${cidade.nome} | Clean Car`,
     description: `${servico.nome} em ${cidade.nome} e região. ${servico.resumo}`,
+    alternates: { canonical: `https://clean-car-seo.vercel.app/servicos/${servico.slug}/${cidade.slug}` },
   };
 }
 

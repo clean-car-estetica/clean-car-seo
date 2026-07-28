@@ -9,6 +9,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Blog",
   description: "Dicas de cuidado automotivo da Clean Car Estética Automotiva.",
+  alternates: { canonical: "https://clean-car-seo.vercel.app/blog" },
 };
 
 export default async function BlogIndex() {

@@ -17,6 +17,10 @@ import { getTextosGerais } from "@/lib/site-content";
 
 export const revalidate = 60;
 
+export const metadata = {
+  alternates: { canonical: "https://clean-car-seo.vercel.app/" },
+};
+
 export default async function Home() {
   const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs] = await Promise.all([
     getHeroContent(),

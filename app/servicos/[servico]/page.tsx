@@ -25,6 +25,7 @@ export async function generateMetadata({
   return {
     title: `${servico.nome} em Mogi das Cruzes e Região`,
     description: servico.descricao,
+    alternates: { canonical: `https://clean-car-seo.vercel.app/servicos/${servico.slug}` },
   };
 }
 
