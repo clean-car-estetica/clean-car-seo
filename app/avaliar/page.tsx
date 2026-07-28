@@ -36,7 +36,7 @@ export default function AvaliarPage() {
                 Isso nos ajuda a manter o padrão de qualidade. Se quiser, deixe também uma avaliação no Google:
               </p>
               <a
-                href={contato.googleUrl}
+                href={contato.googleReviewUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block mt-6 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 hover:bg-verniz-shine transition-colors"

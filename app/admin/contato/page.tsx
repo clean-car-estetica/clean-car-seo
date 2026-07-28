@@ -117,6 +117,14 @@ export default async function ContatoAdminPage() {
             className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
           />
         </div>
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Link direto pra deixar avaliação no Google</label>
+          <input
+            name="googleReviewUrl"
+            defaultValue={contato.googleReviewUrl}
+            className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+          />
+        </div>
         <button type="submit" className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine">
           Salvar
         </button>

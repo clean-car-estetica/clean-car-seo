@@ -12,6 +12,7 @@ export async function salvarContato(formData: FormData) {
     agendamentoUrl: String(formData.get("agendamentoUrl")),
     codigoIndicacaoUrl: String(formData.get("codigoIndicacaoUrl")),
     googleUrl: String(formData.get("googleUrl")),
+    googleReviewUrl: String(formData.get("googleReviewUrl")),
     endereco: String(formData.get("endereco")),
     horarioSemana: String(formData.get("horarioSemana")),
     horarioSabado: String(formData.get("horarioSabado")),
