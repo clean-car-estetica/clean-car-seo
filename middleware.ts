@@ -43,5 +43,13 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    /*
+     * Ignora o middleware para:
+     * - api (rotas de API)
+     * - _next/static e _next/image (arquivos compilados e imagens do Next.js)
+     * - sitemap.xml, sitemap, robots.txt, favicon.ico e imagens estáticas
+     */
+    "/((?!api|_next/static|_next/image|sitemap|sitemap\\.xml|robots\\.txt|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
