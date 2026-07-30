@@ -6,10 +6,17 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/"], // Garante o bloqueio de todo o painel admin
+        disallow: ["/admin/"],
       },
       {
-        userAgent: ["Google-Extended", "GPTBot"],
+        userAgent: [
+          "GPTBot",          // Treinamento OpenAI
+          "OAI-SearchBot",    // Pesquisa em tempo real do ChatGPT
+          "Google-Extended", // Treinamento Gemini / Google
+          "PerplexityBot",   // Motor de busca Perplexity AI
+          "ClaudeBot",       // IA Claude (Anthropic)
+          "CCBot",           // Common Crawl (base de dados para várias IAs)
+        ],
         allow: "/",
       },
     ],
