@@ -7,13 +7,23 @@ import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
   Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2,
-  Palette, FileText, Layers, PackageSearch, Type, Plug, Menu, X,
+  Palette, FileText, Layers, PackageSearch, Type, Plug, Menu, X, ChevronDown,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuAberto, setMenuAberto] = useState(false);
+  const [gruposFechados, setGruposFechados] = useState<Set<string>>(new Set());
+
+  function alternarGrupo(titulo: string) {
+    setGruposFechados((atual) => {
+      const novo = new Set(atual);
+      if (novo.has(titulo)) novo.delete(titulo);
+      else novo.add(titulo);
+      return novo;
+    });
+  }
 
   if (pathname === "/admin/login") {
     return <>{children}</>;
@@ -35,27 +45,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       links: [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/leads", label: "Leads", icon: Inbox },
-        { href: "/admin/links", label: "Links de rastreamento", icon: Link2 },
         { href: "/admin/nps", label: "NPS", icon: Smile },
+        { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
+        { href: "/admin/links", label: "Links de rastreamento", icon: Link2 },
       ],
     },
     {
-      titulo: "Conteúdo do site",
+      titulo: "Blocos da Home",
       links: [
-        { href: "/admin/home", label: "Home", icon: Home },
+        { href: "/admin/home", label: "Topo (hero)", icon: Home },
         { href: "/admin/processo", label: "Nosso processo", icon: Layers },
-        { href: "/admin/produtos", label: "Produtos", icon: PackageSearch },
+        { href: "/admin/produtos", label: "Produtos usados", icon: PackageSearch },
         { href: "/admin/transformacoes", label: "Antes e depois", icon: GitCompare },
+        { href: "/admin/depoimentos", label: "Depoimentos", icon: MessageSquareQuote },
+      ],
+    },
+    {
+      titulo: "Catálogo e páginas",
+      links: [
         { href: "/admin/conteudo", label: "Serviços", icon: ImageIcon },
         { href: "/admin/cidades", label: "Cidades", icon: Building2 },
         { href: "/admin/paginas-locais", label: "Páginas locais", icon: MapPin },
         { href: "/admin/blog", label: "Blog", icon: Newspaper },
         { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
-        { href: "/admin/depoimentos", label: "Depoimentos", icon: MessageSquareQuote },
       ],
     },
     {
-      titulo: "Programa e promoções",
+      titulo: "Fidelidade e promoções",
       links: [
         { href: "/admin/planos", label: "Planos mensais", icon: CreditCard },
         { href: "/admin/promocoes", label: "Promoções", icon: Percent },
@@ -70,7 +86,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin/metadados", label: "Metadados", icon: FileText },
         { href: "/admin/textos", label: "Textos do site", icon: Type },
         { href: "/admin/integracao-gbr", label: "Integração GBR SAS", icon: Plug },
-        { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
       ],
     },
   ];
@@ -81,31 +96,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         CLEAN <span className="text-verniz-shine">CAR</span>
         <div className="text-xs font-sans font-normal text-steel-line mt-1">Console</div>
       </div>
-      <nav className="flex flex-col gap-5 flex-1 overflow-y-auto">
-        {grupos.map((grupo) => (
-          <div key={grupo.titulo}>
-            <div className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-steel-line/60">
-              {grupo.titulo}
+      <nav className="flex flex-col gap-3 flex-1 overflow-y-auto">
+        {grupos.map((grupo) => {
+          const temPaginaAtiva = grupo.links.some((l) => l.href === pathname);
+          const fechado = gruposFechados.has(grupo.titulo) && !temPaginaAtiva;
+          return (
+            <div key={grupo.titulo}>
+              <button
+                onClick={() => alternarGrupo(grupo.titulo)}
+                className="w-full flex items-center justify-between px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-steel-line/60 hover:text-steel-line"
+              >
+                {grupo.titulo}
+                <ChevronDown size={14} className={`transition-transform ${fechado ? "-rotate-90" : ""}`} />
+              </button>
+              {!fechado && (
+                <div className="flex flex-col gap-1 mt-1">
+                  {grupo.links.map(({ href, label, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setMenuAberto(false)}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                        pathname === href
+                          ? "bg-verniz/10 text-verniz-shine"
+                          : "text-steel-line hover:bg-card hover:text-steel"
+                      }`}
+                    >
+                      <Icon size={18} />
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="flex flex-col gap-1">
-              {grupo.links.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMenuAberto(false)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
-                    pathname === href
-                      ? "bg-verniz/10 text-verniz-shine"
-                      : "text-steel-line hover:bg-card hover:text-steel"
-                  }`}
-                >
-                  <Icon size={18} />
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
       <button
         onClick={sair}
