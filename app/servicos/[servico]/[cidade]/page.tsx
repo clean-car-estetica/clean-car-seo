@@ -6,6 +6,7 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { servicos, cidades } from "@/lib/data";
 import { getServicoPublico, getConteudoLocalPublico, getCidadesPublicas, getCidadePublica } from "@/lib/site-data";
+import { slugify } from "@/lib/slug";
 
 export const revalidate = 60;
 
@@ -81,7 +82,21 @@ export default async function ServicoCidadePage({
             <h2 className="font-display font-bold text-lg mb-2 text-steel">
               Bairros atendidos em {cidade.nome}
             </h2>
-            <p className="text-sm text-steel-line">{cidade.bairros.join(", ")}</p>
+            {cidade.sede ? (
+              <div className="flex flex-wrap gap-2">
+                {cidade.bairros.map((b) => (
+                  <a
+                    key={b}
+                    href={`/servicos/${servico.slug}/${cidade.slug}/${slugify(b)}`}
+                    className="rounded-full bg-carbon border border-card-line px-3 py-1 text-xs text-steel-line hover:border-verniz hover:text-verniz-shine"
+                  >
+                    {b}
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-steel-line">{cidade.bairros.join(", ")}</p>
+            )}
           </div>
 
           <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
