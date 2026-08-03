@@ -7,7 +7,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
   Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2,
-  Palette, FileText, Layers, PackageSearch, Type, Plug, Menu, X, ChevronDown,
+  Palette, FileText, Layers, PackageSearch, Type, Plug, FilePlus2, Megaphone, Menu, X, ChevronDown,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -68,6 +68,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin/paginas-locais", label: "Páginas locais", icon: MapPin },
         { href: "/admin/blog", label: "Blog", icon: Newspaper },
         { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
+        { href: "/admin/paginas", label: "Páginas personalizadas", icon: FilePlus2 },
       ],
     },
     {
@@ -75,6 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       links: [
         { href: "/admin/planos", label: "Planos mensais", icon: CreditCard },
         { href: "/admin/promocoes", label: "Promoções", icon: Percent },
+        { href: "/admin/campanha", label: "Campanha (pop-up)", icon: Megaphone },
         { href: "/admin/beneficios", label: "Benefícios", icon: Award },
       ],
     },

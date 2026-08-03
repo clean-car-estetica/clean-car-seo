@@ -9,17 +9,26 @@ function FormPromo({
   promo,
   labelTexto = "Benefício (texto principal)",
   labelRegras = "Regras (letra miúda)",
+  mostrarPausa = false,
 }: {
   chave: string;
   titulo: string;
-  promo: { titulo: string; texto: string; regras: string };
+  promo: { titulo: string; texto: string; regras: string; ativo: boolean };
   labelTexto?: string;
   labelRegras?: string;
+  mostrarPausa?: boolean;
 }) {
   return (
     <form action={salvarPromocao} className="bg-card border border-card-line rounded-2xl p-6 grid gap-3">
       <input type="hidden" name="chave" value={chave} />
-      <h2 className="font-display font-bold text-lg text-steel">{titulo}</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="font-display font-bold text-lg text-steel">{titulo}</h2>
+        {mostrarPausa && (
+          <label className="flex items-center gap-2 text-xs text-steel-line">
+            <input type="checkbox" name="ativo" defaultChecked={promo.ativo} /> Pop-up ativo
+          </label>
+        )}
+      </div>
       <div>
         <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Título mostrado</label>
         <input name="titulo" defaultValue={promo.titulo} className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
@@ -50,7 +59,7 @@ export default async function PromocoesAdminPage() {
         Se a regra do GBR Sistemas mudar, atualize aqui também pra manter tudo igual.
       </p>
       <div className="grid gap-6 max-w-2xl">
-        <FormPromo chave="cupom" titulo="Cupom de primeira visita" promo={promocoes.cupom} />
+        <FormPromo chave="cupom" titulo="Cupom de primeira visita" promo={promocoes.cupom} mostrarPausa />
         <FormPromo
           chave="indicacao"
           titulo="Indique e Ganhe"

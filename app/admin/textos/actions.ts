@@ -20,6 +20,7 @@ export async function salvarTextos(formData: FormData) {
     navContato: String(formData.get("navContato")),
     navBlog: String(formData.get("navBlog")),
     navBotaoAgendar: String(formData.get("navBotaoAgendar")),
+    navMogi: String(formData.get("navMogi")),
     faqTitulo: String(formData.get("faqTitulo")),
     faqSubtitulo: String(formData.get("faqSubtitulo")),
     beneficiosTitulo: String(formData.get("beneficiosTitulo")),

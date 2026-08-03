@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/avaliar`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.4 },
     { url: `${BASE_URL}/blog`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 0.6 },
     { url: `${BASE_URL}/faq`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/mogi-das-cruzes`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.85 },
   ];
 
   for (const s of servicos) {

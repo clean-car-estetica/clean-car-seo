@@ -1,18 +1,20 @@
 import { supabasePublico } from "@/lib/supabase";
 import { CONTATO_PADRAO, type Contato } from "@/lib/config";
 
-export type Promocao = { titulo: string; texto: string; regras: string };
+export type Promocao = { titulo: string; texto: string; regras: string; ativo: boolean };
 
 export const PROMOCOES_PADRAO: Record<"cupom" | "indicacao", Promocao> = {
   cupom: {
     titulo: "Primeira vez na Clean Car?",
     texto: "Deixa seu contato e ganhe um desconto especial no primeiro serviço.",
     regras: "Válido para novos clientes, uma vez por CPF/veículo. Desconto informado no contato pelo WhatsApp.",
+    ativo: true,
   },
   indicacao: {
     titulo: "Indique e ganhe",
     texto: "Compartilhe seu código com um amigo. Assim que ele fizer o primeiro serviço, você ganha 20 pontos de fidelidade.",
     regras: "Informe o código de quem te indicou no seu primeiro agendamento e ganhe 10 pontos de fidelidade, já usáveis nesse primeiro serviço.",
+    ativo: true,
   },
 };
 
@@ -23,12 +25,52 @@ export async function getPromocoes(): Promise<Record<"cupom" | "indicacao", Prom
     const resultado = { ...PROMOCOES_PADRAO };
     for (const row of data ?? []) {
       if (row.chave === "cupom" || row.chave === "indicacao") {
-        resultado[row.chave as "cupom" | "indicacao"] = { titulo: row.titulo, texto: row.texto, regras: row.regras };
+        resultado[row.chave as "cupom" | "indicacao"] = {
+          titulo: row.titulo,
+          texto: row.texto,
+          regras: row.regras,
+          ativo: row.ativo ?? true,
+        };
       }
     }
     return resultado;
   } catch {
     return PROMOCOES_PADRAO;
+  }
+}
+
+export type Campanha = {
+  ativo: boolean;
+  titulo: string;
+  texto: string;
+  imagem_url: string | null;
+  texto_botao: string;
+  link_botao: string;
+};
+
+const CAMPANHA_PADRAO: Campanha = {
+  ativo: false,
+  titulo: "",
+  texto: "",
+  imagem_url: null,
+  texto_botao: "Saiba mais",
+  link_botao: "",
+};
+
+export async function getCampanha(): Promise<Campanha> {
+  try {
+    const { data } = await supabasePublico.from("campanha").select("*").eq("id", 1).maybeSingle();
+    if (!data) return CAMPANHA_PADRAO;
+    return {
+      ativo: data.ativo,
+      titulo: data.titulo,
+      texto: data.texto,
+      imagem_url: data.imagem_url,
+      texto_botao: data.texto_botao,
+      link_botao: data.link_botao,
+    };
+  } catch {
+    return CAMPANHA_PADRAO;
   }
 }
 
@@ -101,6 +143,7 @@ export type TextosGerais = {
   navContato: string;
   navBlog: string;
   navBotaoAgendar: string;
+  navMogi: string;
   faqTitulo: string;
   faqSubtitulo: string;
   beneficiosTitulo: string;
@@ -130,6 +173,7 @@ export const TEXTOS_PADRAO: TextosGerais = {
   navContato: "Contato",
   navBlog: "Blog",
   navBotaoAgendar: "Agendar",
+  navMogi: "Mogi das Cruzes",
   faqTitulo: "Tudo que você precisa saber",
   faqSubtitulo: "Dúvidas frequentes",
   beneficiosTitulo: "Benefícios e pontos",

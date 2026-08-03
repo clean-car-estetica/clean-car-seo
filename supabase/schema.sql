@@ -245,3 +245,36 @@ alter table gbr_integracao enable row level security;
 -- Fase 12 — termo de busca popular por servico, para SEO (nao altera o nome
 -- comercial do servico, so o titulo/descricao da pagina pro Google)
 alter table services add column if not exists termo_popular text;
+
+-- Fase 13 — paginas personalizadas: crie novas paginas pelo console sem
+-- precisar de codigo. Aparecem em /paginas/[slug].
+create table if not exists paginas_customizadas (
+  slug text primary key,
+  titulo text not null,
+  meta_descricao text not null default '',
+  conteudo text not null,
+  imagem_url text,
+  publicado boolean not null default false,
+  criado_em timestamptz not null default now()
+);
+alter table paginas_customizadas enable row level security;
+create policy "public read paginas publicadas" on paginas_customizadas for select using (publicado = true);
+
+-- Fase 14 — campanha promocional (pop-up configuravel, com pausa) e pausa
+-- do pop-up de cupom de 1a visita (reutiliza a tabela promocoes).
+create table if not exists campanha (
+  id int primary key default 1,
+  ativo boolean not null default false,
+  titulo text not null default '',
+  texto text not null default '',
+  imagem_url text,
+  texto_botao text not null default 'Saiba mais',
+  link_botao text not null default '',
+  atualizado_em timestamptz not null default now(),
+  constraint campanha_singleton check (id = 1)
+);
+alter table campanha enable row level security;
+create policy "public read campanha" on campanha for select using (true);
+
+-- Fase 14b — pausa do cupom de 1a visita
+alter table promocoes add column if not exists ativo boolean not null default true;

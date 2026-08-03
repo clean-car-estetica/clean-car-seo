@@ -3,10 +3,11 @@ import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CupomPopup from "@/components/CupomPopup";
+import CampanhaPopup from "@/components/CampanhaPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
 import { PromoProvider } from "@/components/PromoProvider";
 import { TextosProvider } from "@/components/TextosProvider";
-import { getContatoContent, getPromocoes, getTema, getMetadados, getTextosGerais } from "@/lib/site-content";
+import { getContatoContent, getPromocoes, getTema, getMetadados, getTextosGerais, getCampanha } from "@/lib/site-content";
 
 export async function generateMetadata(): Promise<Metadata> {
   const meta = await getMetadados();
@@ -40,7 +41,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [contato, promocoes, tema, meta, textos] = await Promise.all([getContatoContent(), getPromocoes(), getTema(), getMetadados(), getTextosGerais()]);
+  const [contato, promocoes, tema, meta, textos, campanha] = await Promise.all([getContatoContent(), getPromocoes(), getTema(), getMetadados(), getTextosGerais(), getCampanha()]);
 
   return (
     <html lang="pt-BR" className="h-full">
@@ -116,7 +117,7 @@ export default async function RootLayout({
             <TextosProvider textos={textos}>
               <PageviewTracker />
               {children}
-              <CupomPopup />
+              {campanha.ativo ? <CampanhaPopup campanha={campanha} /> : <CupomPopup />}
             </TextosProvider>
           </PromoProvider>
         </ContatoProvider>

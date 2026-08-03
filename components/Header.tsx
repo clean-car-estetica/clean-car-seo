@@ -32,6 +32,7 @@ export default function Header() {
   const t = useTextos();
 
   const LINKS = [
+    { href: "/mogi-das-cruzes", label: t.navMogi },
     { href: "/#servicos", label: t.navServicos },
     { href: "/#planos", label: t.navPlanos },
     { href: "/faq", label: t.navFaq },

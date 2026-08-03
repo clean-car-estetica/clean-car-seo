@@ -21,6 +21,7 @@ export default function CupomPopup() {
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
+    if (!cupom.ativo) return;
     if (pathname.startsWith("/admin") || pathname === "/avaliar" || pathname === "/orcamento") return;
     if (sessionStorage.getItem(CHAVE_LOCAL)) return;
     const t = setTimeout(() => setVisivel(true), 12000);

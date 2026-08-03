@@ -38,6 +38,7 @@ export default async function TextosAdminPage() {
             <Campo nome="navContato" defaultValue={t.navContato} label="Link: Contato" />
             <Campo nome="navBlog" defaultValue={t.navBlog} label="Link: Blog" />
             <Campo nome="navBotaoAgendar" defaultValue={t.navBotaoAgendar} label="Botão principal" />
+            <Campo nome="navMogi" defaultValue={t.navMogi} label="Link: Mogi das Cruzes (hub)" />
           </div>
         </div>
 
