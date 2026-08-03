@@ -241,3 +241,7 @@ create table if not exists gbr_integracao (
 alter table gbr_integracao enable row level security;
 -- Nenhuma policy de select/insert/update criada de propósito: fica bloqueado
 -- pra qualquer chave que não seja a service_role.
+
+-- Fase 12 — termo de busca popular por servico, para SEO (nao altera o nome
+-- comercial do servico, so o titulo/descricao da pagina pro Google)
+alter table services add column if not exists termo_popular text;

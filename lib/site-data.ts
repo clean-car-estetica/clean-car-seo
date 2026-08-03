@@ -34,6 +34,7 @@ export type ServicoDB = {
   tag: string | null;
   pontos_fidelidade: number;
   ordem: number;
+  termo_popular: string | null;
 };
 
 export async function getServicosPublicos(): Promise<ServicoDB[]> {
@@ -56,6 +57,7 @@ export async function getServicosPublicos(): Promise<ServicoDB[]> {
         tag: s.tag ?? null,
         pontos_fidelidade: 0,
         ordem: s.ordem,
+        termo_popular: s.termoPopular ?? null,
       }));
   }
 }

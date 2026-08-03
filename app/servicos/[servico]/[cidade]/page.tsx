@@ -22,9 +22,14 @@ export async function generateMetadata({
   const servico = await getServicoPublico(servicoSlug);
   const cidade = await getCidadePublica(cidadeSlug);
   if (!servico || !cidade) return {};
+  const tituloBase = servico.termo_popular || servico.nome;
+  const titulo =
+    tituloBase === servico.nome
+      ? `${servico.nome} em ${cidade.nome} | Clean Car`
+      : `${tituloBase} em ${cidade.nome} | ${servico.nome} - Clean Car`;
   return {
-    title: `${servico.nome} em ${cidade.nome} | Clean Car`,
-    description: `${servico.nome} em ${cidade.nome} e região. ${servico.resumo}`,
+    title: titulo,
+    description: `${tituloBase} em ${cidade.nome} e região. ${servico.resumo}`,
     alternates: { canonical: `https://clean-car-seo.vercel.app/servicos/${servico.slug}/${cidade.slug}` },
   };
 }
@@ -57,8 +62,11 @@ export default async function ServicoCidadePage({
               {cidade.nome} · Alto Tietê
             </p>
             <h1 className="font-display font-extrabold text-4xl md:text-6xl leading-tight">
-              {servico.nome} em {cidade.nome}
+              {servico.termo_popular || servico.nome} em {cidade.nome}
             </h1>
+            {servico.termo_popular && (
+              <p className="mt-2 text-steel-line text-sm">Serviço: {servico.nome}</p>
+            )}
           </div>
         </section>
 

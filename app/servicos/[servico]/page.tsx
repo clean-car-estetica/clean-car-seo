@@ -22,9 +22,14 @@ export async function generateMetadata({
   const { servico: servicoSlug } = await params;
   const servico = await getServicoPublico(servicoSlug);
   if (!servico) return {};
+  const tituloBase = servico.termo_popular || servico.nome;
+  const titulo =
+    tituloBase === servico.nome
+      ? `${servico.nome} em Mogi das Cruzes e Região`
+      : `${tituloBase} em Mogi das Cruzes e Região | ${servico.nome}`;
   return {
-    title: `${servico.nome} em Mogi das Cruzes e Região`,
-    description: servico.descricao,
+    title: titulo,
+    description: `${tituloBase} em Mogi das Cruzes: ${servico.descricao}`,
     alternates: { canonical: `https://clean-car-seo.vercel.app/servicos/${servico.slug}` },
   };
 }
@@ -53,8 +58,11 @@ export default async function ServicoPage({
               Serviço Clean Car {servico.tag ? `· ${servico.tag}` : ""}
             </p>
             <h1 className="font-display font-extrabold text-4xl md:text-6xl leading-tight">
-              {servico.nome}
+              {servico.termo_popular || servico.nome}
             </h1>
+            {servico.termo_popular && (
+              <p className="mt-1 text-steel-line text-sm">Serviço: {servico.nome}</p>
+            )}
             <p className="mt-6 text-lg text-steel-line max-w-2xl leading-relaxed">{servico.descricao}</p>
             <div className="mt-8 flex gap-6 font-display text-sm text-steel-line">
               {servico.duracao && <span>⏱ A partir de {servico.duracao}</span>}

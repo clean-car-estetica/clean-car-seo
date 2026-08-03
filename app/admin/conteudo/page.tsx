@@ -50,6 +50,7 @@ export default async function ConteudoPage() {
           <input name="resumo" placeholder="Resumo curto" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
           <textarea name="descricao" rows={2} placeholder="Descrição" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
           <input name="pontos_fidelidade" type="number" placeholder="Pontos de fidelidade" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm w-48" />
+          <input name="termo_popular" placeholder="Termo popular de busca (ex: Lavagem de Carro)" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
           <input name="ordem" type="number" placeholder="Ordem de exibição (menor = aparece primeiro)" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm w-64" />
           <button type="submit" className="justify-self-start rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2 text-sm hover:bg-verniz-shine">
             Criar serviço
@@ -116,6 +117,15 @@ export default async function ConteudoPage() {
                       className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
                     />
                   </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Termo popular de busca (título/SEO)</label>
+                  <input
+                    name="termo_popular"
+                    defaultValue={s.termo_popular ?? ""}
+                    placeholder="Ex: Lavagem de Carro"
+                    className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+                  />
                 </div>
                 <button
                   type="submit"
