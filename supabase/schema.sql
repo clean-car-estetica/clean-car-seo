@@ -226,3 +226,18 @@ create table if not exists produtos_lista (
 );
 alter table produtos_lista enable row level security;
 create policy "public read produtos_lista" on produtos_lista for select using (true);
+
+-- Fase 11 — integracao com a API do sistema GBR SAS. SEM policy de leitura
+-- publica (RLS habilitado, zero policies) -- so o service_role (console admin)
+-- consegue ler/escrever aqui. Nunca exponha isso pela chave anon.
+create table if not exists gbr_integracao (
+  id int primary key default 1,
+  api_url text not null default '',
+  api_key text not null default '',
+  ativo boolean not null default false,
+  atualizado_em timestamptz not null default now(),
+  constraint singleton check (id = 1)
+);
+alter table gbr_integracao enable row level security;
+-- Nenhuma policy de select/insert/update criada de propósito: fica bloqueado
+-- pra qualquer chave que não seja a service_role.

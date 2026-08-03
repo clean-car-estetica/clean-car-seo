@@ -7,7 +7,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
   Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2,
-  Palette, FileText, Layers, PackageSearch, Type, Menu, X,
+  Palette, FileText, Layers, PackageSearch, Type, Plug, Menu, X,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -69,6 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin/tema", label: "Tema (cores)", icon: Palette },
         { href: "/admin/metadados", label: "Metadados", icon: FileText },
         { href: "/admin/textos", label: "Textos do site", icon: Type },
+        { href: "/admin/integracao-gbr", label: "Integração GBR SAS", icon: Plug },
         { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
       ],
     },
