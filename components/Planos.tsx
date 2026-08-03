@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 import type { PlanoDB } from "@/lib/site-data";
-import AgendarButton from "@/components/AgendarButton";
+import AssinarPlanoButton from "@/components/AssinarPlanoButton";
 
 export default function Planos({ itens }: { itens: PlanoDB[] }) {
   if (itens.length === 0) return null;
@@ -43,9 +43,11 @@ export default function Planos({ itens }: { itens: PlanoDB[] }) {
                   ))}
                 </ul>
               )}
-              <AgendarButton className="inline-block mt-6 w-full text-center rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2.5 text-sm hover:bg-verniz-shine transition-colors">
-                Assinar
-              </AgendarButton>
+              <AssinarPlanoButton
+                nomePlano={p.nome}
+                preco={p.preco}
+                className="inline-block mt-6 w-full text-center rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2.5 text-sm hover:bg-verniz-shine transition-colors"
+              />
             </div>
           ))}
         </div>
