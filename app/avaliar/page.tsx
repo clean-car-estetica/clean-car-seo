@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { useContato } from "@/components/ContatoProvider";
+import { gtagEvent } from "@/lib/gtag";
 import { useTextos } from "@/components/TextosProvider";
 
 export default function AvaliarPage() {
@@ -22,6 +23,7 @@ export default function AvaliarPage() {
     await supabaseBrowser().from("nps_respostas").insert({ nota, comentario: comentario || null });
     setEnviando(false);
     setEnviado(true);
+    gtagEvent("form_submit", { tipo: "nps", nota });
   }
 
   return (

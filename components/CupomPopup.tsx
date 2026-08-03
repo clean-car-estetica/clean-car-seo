@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { X, Gift } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { gtagEvent } from "@/lib/gtag";
 import { usePromocoes } from "@/components/PromoProvider";
 import { useTextos } from "@/components/TextosProvider";
 
@@ -37,6 +38,7 @@ export default function CupomPopup() {
     await supabaseBrowser().from("leads").insert({ tipo: "cupom_primeira_visita", nome, whatsapp });
     setEnviando(false);
     setEnviado(true);
+    gtagEvent("form_submit", { tipo: "cupom_primeira_visita" });
     sessionStorage.setItem(CHAVE_LOCAL, "1");
   }
 

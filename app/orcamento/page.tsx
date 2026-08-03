@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { servicos } from "@/lib/data";
+import { gtagEvent } from "@/lib/gtag";
 import { useTextos } from "@/components/TextosProvider";
 
 export default function OrcamentoPage() {
@@ -29,6 +30,7 @@ export default function OrcamentoPage() {
     });
     setEnviando(false);
     setEnviado(true);
+    gtagEvent("form_submit", { tipo: "orcamento", servico });
   }
 
   return (

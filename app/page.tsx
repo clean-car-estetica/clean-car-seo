@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import ServiceCard from "@/components/ServiceCard";
 import BeforeAfter from "@/components/BeforeAfter";
 import WhatsappFloat from "@/components/WhatsappFloat";
+import WhatsappCTA from "@/components/WhatsappCTA";
 import AgendarButton from "@/components/AgendarButton";
 import { getHeroContent } from "@/lib/site-content";
 import Processo from "@/components/Processo";
@@ -46,20 +47,23 @@ export default async function Home() {
             backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.95)), url('${hero.imagem_url}')`,
           }}
         >
-          <div className="mx-auto max-w-6xl px-6 py-28 md:py-36">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-36">
             <span className="inline-flex items-center gap-2 rounded-full bg-cera/10 border border-cera/30 px-4 py-2">
               <span className="w-2 h-2 rounded-full bg-cera" />
               <span className="text-xs font-display font-bold tracking-wide text-cera uppercase">
                 {hero.badge_texto}
               </span>
             </span>
-            <h1 className="font-display font-extrabold text-5xl md:text-7xl leading-[0.95] max-w-3xl mt-6">
+            <h1 className="font-display font-extrabold text-4xl sm:text-5xl md:text-7xl leading-[0.95] max-w-3xl mt-6">
               {hero.titulo_parte1} <span className="text-verniz-shine glow-text">{hero.titulo_destaque}</span>
             </h1>
             <p className="mt-6 max-w-xl text-steel-line text-lg leading-relaxed">{hero.subtitulo}</p>
-            <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
-              Agendar horário
-            </AgendarButton>
+            <div className="flex flex-wrap gap-3 mt-8">
+              <AgendarButton className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
+                Agendar horário
+              </AgendarButton>
+              <WhatsappCTA />
+            </div>
           </div>
         </section>
 
