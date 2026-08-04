@@ -77,6 +77,28 @@ export default async function ServicoPage({
           </div>
         </section>
 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              serviceType: servico.termo_popular || servico.nome,
+              name: servico.nome,
+              description: servico.descricao,
+              provider: {
+                "@type": "AutoRepair",
+                name: "Clean Car Estética Automotiva",
+                url: "https://clean-car-seo.vercel.app/",
+              },
+              areaServed: "Mogi das Cruzes e região",
+              ...(servico.preco_desde
+                ? { offers: { "@type": "Offer", price: servico.preco_desde, priceCurrency: "BRL" } }
+                : {}),
+            }),
+          }}
+        />
+
         <section className="mx-auto max-w-4xl px-6 py-16">
           <h2 className="font-display font-bold text-2xl mb-6 text-steel">
             {servico.nome} perto de você

@@ -77,6 +77,7 @@ export default async function PaginasLocaisPage({
           name="imagem_url"
           initialUrl={override?.imagem_url || servico.imagem_url}
           label={`Imagem de topo (${servico.nome} em ${cidade.nome})`}
+          nomeArquivo={`${servico.nome} ${cidade.nome}`}
         />
 
         {[0, 1, 2].map((i) => (

@@ -33,12 +33,13 @@ export default function Header() {
 
   const LINKS = [
     { href: "/mogi-das-cruzes", label: t.navMogi },
+    { href: "/sobre", label: t.navSobre },
     { href: "/#servicos", label: t.navServicos },
     { href: "/#planos", label: t.navPlanos },
     { href: "/faq", label: t.navFaq },
     { href: "/#indicacao", label: t.navIndicacao },
     { href: "/beneficios", label: t.navBeneficios },
-    { href: "/#contato", label: t.navContato },
+    { href: "/contato", label: t.navContato },
     { href: "/blog", label: t.navBlog },
   ];
 

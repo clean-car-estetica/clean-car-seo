@@ -13,6 +13,7 @@ export default function ImageUploader({
   aspect = 16 / 9,
   specTexto,
   onUrlChange,
+  nomeArquivo,
 }: {
   name: string;
   initialUrl?: string;
@@ -22,6 +23,8 @@ export default function ImageUploader({
   /** Texto de especificação mostrado abaixo do campo (ex: "1200x675px") */
   specTexto?: string;
   onUrlChange?: (url: string) => void;
+  /** Dica pro nome do arquivo (ex: "vitrificacao mogi das cruzes centro") — vira vitrificacao-mogi-das-cruzes-centro-xxxx.jpg em vez de nome genérico */
+  nomeArquivo?: string;
 }) {
   const [url, setUrl] = useState(initialUrl ?? "");
   const [pendente, startTransition] = useTransition();
@@ -68,6 +71,7 @@ export default function ImageUploader({
         const blob = await gerarImagemRecortada(imagemBruta, areaRecorte);
         const formData = new FormData();
         formData.append("file", new File([blob], "recorte.jpg", { type: "image/jpeg" }));
+        if (nomeArquivo) formData.append("nome_arquivo", nomeArquivo);
         const novaUrl = await uploadImagem(formData);
         setUrl(novaUrl);
         onUrlChange?.(novaUrl);

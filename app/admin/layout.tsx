@@ -7,7 +7,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
   Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2,
-  Palette, FileText, Layers, PackageSearch, Type, Plug, FilePlus2, Megaphone, UserSearch, Menu, X, ChevronDown,
+  Palette, FileText, Layers, PackageSearch, Type, Plug, FilePlus2, Megaphone, UserSearch, BookUser, Menu, X, ChevronDown,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -55,6 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       titulo: "Blocos da Home",
       links: [
         { href: "/admin/home", label: "Topo (hero)", icon: Home },
+        { href: "/admin/sobre", label: "Sobre Nós", icon: BookUser },
         { href: "/admin/processo", label: "Nosso processo", icon: Layers },
         { href: "/admin/produtos", label: "Produtos usados", icon: PackageSearch },
         { href: "/admin/transformacoes", label: "Antes e depois", icon: GitCompare },

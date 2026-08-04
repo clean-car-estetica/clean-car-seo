@@ -144,6 +144,7 @@ export type TextosGerais = {
   navBlog: string;
   navBotaoAgendar: string;
   navMogi: string;
+  navSobre: string;
   faqTitulo: string;
   faqSubtitulo: string;
   beneficiosTitulo: string;
@@ -174,6 +175,7 @@ export const TEXTOS_PADRAO: TextosGerais = {
   navBlog: "Blog",
   navBotaoAgendar: "Agendar",
   navMogi: "Mogi das Cruzes",
+  navSobre: "Sobre Nós",
   faqTitulo: "Tudo que você precisa saber",
   faqSubtitulo: "Dúvidas frequentes",
   beneficiosTitulo: "Benefícios e pontos",
@@ -194,6 +196,24 @@ export async function getTextosGerais(): Promise<TextosGerais> {
     return { ...TEXTOS_PADRAO, ...(data.data as Partial<TextosGerais>) };
   } catch {
     return TEXTOS_PADRAO;
+  }
+}
+
+export type Sobre = { titulo: string; texto: string };
+
+const SOBRE_PADRAO: Sobre = {
+  titulo: "Sobre a Clean Car",
+  texto:
+    "A Clean Car nasceu em Mogi das Cruzes com um objetivo simples: fazer o carro sair de lá parecendo novo, com o cuidado técnico que a lataria e o interior realmente merecem. Não trabalhamos só com lavagem — cuidamos de cada etapa, do pré-lavagem ao acabamento final, sempre com produtos Vonixx, o que hoje é referência de qualidade no mercado de estética automotiva.\n\nAtendemos clientes de Mogi das Cruzes e de toda a região do Alto Tietê (Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema), sempre com horário marcado — sem fila, sem surpresa no prazo. Quem prefere não se deslocar até nossa loja também pode contar com o serviço de leva-e-trás.\n\nMais do que deixar o carro limpo, nosso trabalho é proteger o investimento que ele representa: pintura, plásticos, estofados e vidros, tratados com a técnica certa pra durar.",
+};
+
+export async function getSobre(): Promise<Sobre> {
+  try {
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "sobre").single();
+    if (!data?.data) return SOBRE_PADRAO;
+    return { ...SOBRE_PADRAO, ...(data.data as Partial<Sobre>) };
+  } catch {
+    return SOBRE_PADRAO;
   }
 }
 

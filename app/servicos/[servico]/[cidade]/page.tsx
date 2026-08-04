@@ -103,6 +103,28 @@ export default async function ServicoCidadePage({
             Agendar em {cidade.nome}
           </AgendarButton>
         </section>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              serviceType: servico.termo_popular || servico.nome,
+              name: `${servico.nome} em ${cidade.nome}`,
+              description: `${servico.nome} em ${cidade.nome} e região. ${servico.resumo}`,
+              provider: {
+                "@type": "AutoRepair",
+                name: "Clean Car Estética Automotiva",
+                url: "https://clean-car-seo.vercel.app/",
+              },
+              areaServed: cidade.nome,
+              ...(servico.preco_desde
+                ? { offers: { "@type": "Offer", price: servico.preco_desde, priceCurrency: "BRL" } }
+                : {}),
+            }),
+          }}
+        />
       </main>
       <Footer />
       <WhatsappFloat />
