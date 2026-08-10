@@ -4,21 +4,17 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
-import { servicos, cidades } from "@/lib/data";
 import { getServicoPublico, getCidadePublica } from "@/lib/site-data";
 import { slugify } from "@/lib/slug";
 
 export const revalidate = 3600;
+export const dynamicParams = true;
 
-// Só a cidade-sede (Mogi das Cruzes) tem bairros configurados — essas páginas
-// existem só pra ela, com foco em "perto de mim" / busca de bairro.
-export function generateStaticParams() {
-  const sede = cidades.find((c) => c.sede);
-  if (!sede) return [];
-  return servicos.flatMap((s) =>
-    sede.bairros.map((bairro) => ({ servico: s.slug, cidade: sede.slug, bairro: slugify(bairro) }))
-  );
-}
+// Essas páginas (só existem pra Mogi das Cruzes, a cidade-sede) são geradas
+// sob demanda a cada visita, e ficam em cache por 1h — de propósito, sem
+// generateStaticParams. Gerar as 52 combinações no build estava dando 404
+// consistente nos últimos itens de cada grupo (bug da geração em lote da
+// Vercel, não do nosso código); renderizar por request contorna isso.
 
 async function resolver(servicoSlug: string, cidadeSlug: string, bairroSlug: string) {
   const [servico, cidade] = await Promise.all([getServicoPublico(servicoSlug), getCidadePublica(cidadeSlug)]);
