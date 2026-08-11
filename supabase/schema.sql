@@ -104,6 +104,7 @@ insert into storage.buckets (id, name, public)
 values ('imagens', 'imagens', true)
 on conflict (id) do nothing;
 
+drop policy if exists "public read imagens bucket" on storage.objects;
 create policy "public read imagens bucket"
 on storage.objects for select
 using (bucket_id = 'imagens');
