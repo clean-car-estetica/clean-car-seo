@@ -36,7 +36,7 @@ export const servicos: Service[] = [
 ];
 
 export const cidades: Cidade[] = [
-  { slug: "mogi-das-cruzes", nome: "Mogi das Cruzes", bairros: ["Centro", "Vila Oliveira", "Jundiapeba", "Braz Cubas"], sede: true },
+  { slug: "mogi-das-cruzes", nome: "Mogi das Cruzes", bairros: ["Centro", "Vila Oliveira", "Jundiapeba", "Bras Cubas"], sede: true },
   { slug: "suzano", nome: "Suzano", bairros: ["Centro", "Palmeiras", "Cidade Boa Vista"], sede: false },
   { slug: "poa", nome: "Poá", bairros: ["Centro", "Jardim Silvina"], sede: false },
   { slug: "ferraz-de-vasconcelos", nome: "Ferraz de Vasconcelos", bairros: ["Centro", "Jardim Vitória Régia"], sede: false },
