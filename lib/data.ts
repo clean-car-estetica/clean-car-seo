@@ -36,7 +36,21 @@ export const servicos: Service[] = [
 ];
 
 export const cidades: Cidade[] = [
-  { slug: "mogi-das-cruzes", nome: "Mogi das Cruzes", bairros: ["Centro", "Vila Oliveira", "Jundiapeba", "Bras Cubas"], sede: true },
+  {
+    slug: "mogi-das-cruzes",
+    nome: "Mogi das Cruzes",
+    bairros: [
+      "Centro", "Alto do Ipiranga", "Vila Oliveira", "Mogilar", "Socorro",
+      "Jardim das Academias", "Chácara Jafet", "Vila Industrial", "Vila Rubens",
+      "Vila Mobilian", "Nova Mogilar", "Loteamento Mogilar", "Jardim Rodeio",
+      "Vila Nova Socorro", "Vila Humaitá", "Vila Partenio", "Cézar de Souza",
+      "Jardim Rio Branco", "Vila Suíssa", "Jardim Bela Vista",
+      "Conjunto Habitacional Pedro Aly", "Jardim São Pedro", "Vila Nova Cintra",
+      "Brás Cubas", "Vila Cintra", "Jardim Aeroporto III", "Jardim Esperança",
+      "Vila Lavínia", "Vila Jundiaí", "Itapety",
+    ],
+    sede: true,
+  },
   { slug: "suzano", nome: "Suzano", bairros: ["Centro", "Palmeiras", "Cidade Boa Vista"], sede: false },
   { slug: "poa", nome: "Poá", bairros: ["Centro", "Jardim Silvina"], sede: false },
   { slug: "ferraz-de-vasconcelos", nome: "Ferraz de Vasconcelos", bairros: ["Centro", "Jardim Vitória Régia"], sede: false },
