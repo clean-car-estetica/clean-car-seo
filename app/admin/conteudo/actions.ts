@@ -89,10 +89,11 @@ export async function atualizarServico(formData: FormData) {
   const pontos_fidelidade = Number(formData.get("pontos_fidelidade") || 0);
   const ordem = Number(formData.get("ordem") || 0);
   const termo_popular = String(formData.get("termo_popular") || "") || null;
+  const ativo = formData.get("ativo") === "on";
 
   const { error } = await supabaseAdmin
     .from("services")
-    .update({ nome, resumo, descricao, imagem_url, preco_desde, pontos_fidelidade, ordem, termo_popular, updated_at: new Date().toISOString() })
+    .update({ nome, resumo, descricao, imagem_url, preco_desde, pontos_fidelidade, ordem, termo_popular, ativo, updated_at: new Date().toISOString() })
     .eq("slug", slug);
 
   if (error) throw new Error(error.message);

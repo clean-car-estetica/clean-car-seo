@@ -35,11 +35,12 @@ export type ServicoDB = {
   pontos_fidelidade: number;
   ordem: number;
   termo_popular: string | null;
+  ativo: boolean;
 };
 
 export async function getServicosPublicos(): Promise<ServicoDB[]> {
   try {
-    const { data, error } = await supabasePublico.from("services").select("*").order("ordem");
+    const { data, error } = await supabasePublico.from("services").select("*").eq("ativo", true).order("ordem");
     if (error || !data || data.length === 0) throw error ?? new Error("vazio");
     return data as ServicoDB[];
   } catch {
@@ -58,6 +59,7 @@ export async function getServicosPublicos(): Promise<ServicoDB[]> {
         pontos_fidelidade: 0,
         ordem: s.ordem,
         termo_popular: s.termoPopular ?? null,
+        ativo: true,
       }));
   }
 }

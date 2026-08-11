@@ -278,3 +278,6 @@ create policy "public read campanha" on campanha for select using (true);
 
 -- Fase 14b — pausa do cupom de 1a visita
 alter table promocoes add column if not exists ativo boolean not null default true;
+
+-- Fase 15 — pausar servico sem excluir (some do site, continua no console)
+alter table services add column if not exists ativo boolean not null default true;

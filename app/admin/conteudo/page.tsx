@@ -90,13 +90,16 @@ export default async function ConteudoPage() {
                 />
                 <div className="grid grid-cols-[1fr_140px] gap-3 items-end">
                   <ImageUploader name="imagem_url" initialUrl={s.imagem_url} label="Foto do serviço" aspect={3 / 2} specTexto="1200x800px (proporção 3:2) — aparece em card e como banner da página do serviço" nomeArquivo={s.nome} />
-                  <input
-                    name="preco_desde"
-                    type="number"
-                    defaultValue={s.preco_desde ?? ""}
-                    placeholder="Preço"
-                    className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
-                  />
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Preço "a partir de" (R$)</label>
+                    <input
+                      name="preco_desde"
+                      type="number"
+                      defaultValue={s.preco_desde ?? ""}
+                      placeholder="Ex: 89"
+                      className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+                    />
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -126,6 +129,14 @@ export default async function ConteudoPage() {
                     placeholder="Ex: Lavagem de Carro"
                     className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
                   />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-sm font-bold text-steel">
+                    <input type="checkbox" name="ativo" defaultChecked={s.ativo ?? true} /> Serviço ativo (visível no site)
+                  </label>
+                  {s.ativo === false && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-warn/15 text-warn">Pausado</span>
+                  )}
                 </div>
                 <button
                   type="submit"
