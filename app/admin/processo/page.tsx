@@ -38,16 +38,35 @@ export default async function ProcessoAdminPage() {
       <div className="grid gap-3">
         {passos?.map((p) => (
           <div key={p.id} className="bg-card border border-card-line rounded-xl p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="font-display font-bold text-steel">{p.titulo}</div>
-                <div className="text-sm text-steel-line mt-1">{p.texto}</div>
+            <form action={salvarPasso} className="grid gap-2">
+              <input type="hidden" name="id" value={p.id} />
+              <input
+                name="titulo"
+                defaultValue={p.titulo}
+                className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel font-display font-bold text-sm"
+              />
+              <textarea
+                name="texto"
+                defaultValue={p.texto}
+                rows={2}
+                className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel-line text-sm"
+              />
+              <div className="flex items-center gap-3">
+                <input
+                  name="ordem"
+                  type="number"
+                  defaultValue={p.ordem}
+                  className="w-24 px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
+                />
+                <button type="submit" className="rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm hover:bg-verniz-shine">
+                  Salvar
+                </button>
               </div>
-              <form action={excluirPasso}>
-                <input type="hidden" name="id" value={p.id} />
-                <button type="submit" className="text-xs font-bold text-warn hover:underline shrink-0">Excluir</button>
-              </form>
-            </div>
+            </form>
+            <form action={excluirPasso} className="mt-2 pt-2 border-t border-card-line">
+              <input type="hidden" name="id" value={p.id} />
+              <button type="submit" className="text-xs font-bold text-warn hover:underline shrink-0">Excluir</button>
+            </form>
           </div>
         ))}
         {(!passos || passos.length === 0) && <p className="text-steel-line text-sm">Nenhum ainda — usando os 5 padrão do site.</p>}
