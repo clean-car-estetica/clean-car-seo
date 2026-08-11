@@ -74,12 +74,17 @@ alter table blog_posts enable row level security;
 alter table events enable row level security;
 alter table keyword_rankings enable row level security;
 
+drop policy if exists "public read services" on services;
 create policy "public read services" on services for select using (true);
+drop policy if exists "public read cities" on cities;
 create policy "public read cities" on cities for select using (true);
+drop policy if exists "public read local content" on local_pages_content;
 create policy "public read local content" on local_pages_content for select using (true);
+drop policy if exists "public read published posts" on blog_posts;
 create policy "public read published posts" on blog_posts for select using (status = 'publicado');
 
 -- Qualquer visitante pode registrar um evento (mas não ler os eventos dos outros)
+drop policy if exists "public insert events" on events;
 create policy "public insert events" on events for insert with check (true);
 
 -- keyword_rankings não tem policy de leitura pública: só o console (service_role) acessa.
@@ -91,6 +96,7 @@ create table if not exists site_content (
   updated_at timestamptz not null default now()
 );
 alter table site_content enable row level security;
+drop policy if exists "public read site_content" on site_content;
 create policy "public read site_content" on site_content for select using (true);
 
 -- Bucket de imagens (upload feito pelo console via service_role)
@@ -112,6 +118,7 @@ create table if not exists transformacoes (
   ordem int not null default 0
 );
 alter table transformacoes enable row level security;
+drop policy if exists "public read transformacoes" on transformacoes;
 create policy "public read transformacoes" on transformacoes for select using (true);
 
 -- FAQ da home (editável pelo console), também usado como dado estruturado
@@ -123,6 +130,7 @@ create table if not exists faqs (
   ordem int not null default 0
 );
 alter table faqs enable row level security;
+drop policy if exists "public read faqs" on faqs;
 create policy "public read faqs" on faqs for select using (true);
 
 -- Fase 3 — cidades passam a ter um flag "sede" (loja física) e podem ser
@@ -138,6 +146,7 @@ create table if not exists nps_respostas (
   criado_em timestamptz not null default now()
 );
 alter table nps_respostas enable row level security;
+drop policy if exists "public insert nps" on nps_respostas;
 create policy "public insert nps" on nps_respostas for insert with check (true);
 
 -- Fase 5 — captação de leads (cupom primeira visita, indicacao, orcamento rapido)
@@ -153,6 +162,7 @@ create table if not exists leads (
   criado_em timestamptz not null default now()
 );
 alter table leads enable row level security;
+drop policy if exists "public insert leads" on leads;
 create policy "public insert leads" on leads for insert with check (true);
 
 -- Fase 5 — depoimentos (avaliações copiadas manualmente do Google, editável pelo console)
@@ -164,6 +174,7 @@ create table if not exists depoimentos (
   ordem int not null default 0
 );
 alter table depoimentos enable row level security;
+drop policy if exists "public read depoimentos" on depoimentos;
 create policy "public read depoimentos" on depoimentos for select using (true);
 
 -- Fase 6 — textos de promoções (cupom 1a visita, indique e ganhe) editaveis pelo console
@@ -175,6 +186,7 @@ create table if not exists promocoes (
   updated_at timestamptz not null default now()
 );
 alter table promocoes enable row level security;
+drop policy if exists "public read promocoes" on promocoes;
 create policy "public read promocoes" on promocoes for select using (true);
 
 -- Fase 7 — programa de fidelidade: pontos por servico + niveis de beneficio
@@ -187,6 +199,7 @@ create table if not exists beneficios (
   ordem int not null default 0
 );
 alter table beneficios enable row level security;
+drop policy if exists "public read beneficios" on beneficios;
 create policy "public read beneficios" on beneficios for select using (true);
 
 -- Fase 8 — planos mensais (assinatura) editaveis pelo console
@@ -200,6 +213,7 @@ create table if not exists planos (
   ordem int not null default 0
 );
 alter table planos enable row level security;
+drop policy if exists "public read planos" on planos;
 create policy "public read planos" on planos for select using (true);
 
 -- Ordenacao manual dos servicos (para dar destaque a lavagem/higienizacao)
@@ -217,6 +231,7 @@ create table if not exists processo_passos (
   ordem int not null default 0
 );
 alter table processo_passos enable row level security;
+drop policy if exists "public read processo_passos" on processo_passos;
 create policy "public read processo_passos" on processo_passos for select using (true);
 
 create table if not exists produtos_lista (
@@ -225,6 +240,7 @@ create table if not exists produtos_lista (
   ordem int not null default 0
 );
 alter table produtos_lista enable row level security;
+drop policy if exists "public read produtos_lista" on produtos_lista;
 create policy "public read produtos_lista" on produtos_lista for select using (true);
 
 -- Fase 11 — integracao com a API do sistema GBR SAS. SEM policy de leitura
@@ -258,6 +274,7 @@ create table if not exists paginas_customizadas (
   criado_em timestamptz not null default now()
 );
 alter table paginas_customizadas enable row level security;
+drop policy if exists "public read paginas publicadas" on paginas_customizadas;
 create policy "public read paginas publicadas" on paginas_customizadas for select using (publicado = true);
 
 -- Fase 14 — campanha promocional (pop-up configuravel, com pausa) e pausa
@@ -274,6 +291,7 @@ create table if not exists campanha (
   constraint campanha_singleton check (id = 1)
 );
 alter table campanha enable row level security;
+drop policy if exists "public read campanha" on campanha;
 create policy "public read campanha" on campanha for select using (true);
 
 -- Fase 14b — pausa do cupom de 1a visita
