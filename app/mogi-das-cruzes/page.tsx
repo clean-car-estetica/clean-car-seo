@@ -6,6 +6,7 @@ import AgendarButton from "@/components/AgendarButton";
 import Faq from "@/components/Faq";
 import { getServicosPublicos, getCidadesPublicas, getFaqsPublicos } from "@/lib/site-data";
 import { slugify } from "@/lib/slug";
+import { SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 
 export const revalidate = 3600;
 
@@ -49,15 +50,17 @@ export default async function MogiHubPage() {
         <section className="mx-auto max-w-4xl px-6 py-16">
           <h2 className="font-display font-bold text-2xl mb-6 text-steel">Nossos serviços em Mogi</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {servicos.map((s) => (
-              <Link
-                key={s.slug}
-                href={`/servicos/${s.slug}/mogi-das-cruzes`}
-                className="rounded-xl bg-card border border-card-line px-4 py-3 text-sm font-display font-bold text-steel-line hover:border-verniz hover:text-verniz-shine"
-              >
-                {s.termo_popular || s.nome}
-              </Link>
-            ))}
+            {servicos
+              .filter((s) => !SERVICOS_SEM_PAGINAS_LOCAIS.includes(s.slug))
+              .map((s) => (
+                <Link
+                  key={s.slug}
+                  href={`/servicos/${s.slug}/mogi-das-cruzes`}
+                  className="rounded-xl bg-card border border-card-line px-4 py-3 text-sm font-display font-bold text-steel-line hover:border-verniz hover:text-verniz-shine"
+                >
+                  {s.termo_popular || s.nome}
+                </Link>
+              ))}
           </div>
         </section>
 
