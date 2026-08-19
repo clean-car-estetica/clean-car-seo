@@ -35,6 +35,12 @@ export const servicos: Service[] = [
   { slug: "ducha", nome: "Ducha", resumo: "Lavagem rápida pra manter o padrão entre uma completa e outra.", descricao: "Uma lavagem rápida e prática, pensada pra quem já faz a manutenção completa com regularidade e só precisa tirar a poeira do dia a dia.", duracao: "30min", precoDesde: 40, imagem: "https://images.unsplash.com/photo-1541443131876-44b03de101c5?auto=format&fit=crop&w=800&q=80" , ordem: 6 },
 ];
 
+// Serviços que ficam só com a página geral (/servicos/slug) — sem páginas
+// locais por cidade/bairro. Usado pro Polimento: mantém o serviço cadastrado
+// e visível na home/orçamento, mas sem gerar as ~150 páginas de SEO local
+// pra ele (decisão de não empurrar esse serviço via SEO).
+export const SERVICOS_SEM_PAGINAS_LOCAIS: string[] = ["polimento"];
+
 export const cidades: Cidade[] = [
   {
     slug: "mogi-das-cruzes",

@@ -6,6 +6,7 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { getServicoPublico, getCidadePublica } from "@/lib/site-data";
 import { slugify } from "@/lib/slug";
+import { SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -17,6 +18,7 @@ export const dynamicParams = true;
 // Vercel, não do nosso código); renderizar por request contorna isso.
 
 async function resolver(servicoSlug: string, cidadeSlug: string, bairroSlug: string) {
+  if (SERVICOS_SEM_PAGINAS_LOCAIS.includes(servicoSlug)) return null;
   const [servico, cidade] = await Promise.all([getServicoPublico(servicoSlug), getCidadePublica(cidadeSlug)]);
   if (!servico || !cidade || !cidade.sede) return null;
   const bairroNome = cidade.bairros.find((b) => slugify(b) === bairroSlug);

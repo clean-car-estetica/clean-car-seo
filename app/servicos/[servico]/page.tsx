@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
-import { servicos } from "@/lib/data";
+import { servicos, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 import { getServicoPublico, getCidadesPublicas } from "@/lib/site-data";
 
 export const revalidate = 60;
@@ -40,7 +40,11 @@ export default async function ServicoPage({
   params: Promise<{ servico: string }>;
 }) {
   const { servico: servicoSlug } = await params;
-  const [servico, cidades] = await Promise.all([getServicoPublico(servicoSlug), getCidadesPublicas()]);
+  const semPaginasLocais = SERVICOS_SEM_PAGINAS_LOCAIS.includes(servicoSlug);
+  const [servico, cidades] = await Promise.all([
+    getServicoPublico(servicoSlug),
+    semPaginasLocais ? Promise.resolve([]) : getCidadesPublicas(),
+  ]);
   if (!servico) return notFound();
 
   return (
@@ -99,22 +103,24 @@ export default async function ServicoPage({
           }}
         />
 
-        <section className="mx-auto max-w-4xl px-6 py-16">
-          <h2 className="font-display font-bold text-2xl mb-6 text-steel">
-            {servico.nome} perto de você
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            {cidades.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/servicos/${servico.slug}/${c.slug}`}
-                className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-sm text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
-              >
-                {servico.nome} em {c.nome}
-              </Link>
-            ))}
-          </div>
-        </section>
+        {!semPaginasLocais && (
+          <section className="mx-auto max-w-4xl px-6 py-16">
+            <h2 className="font-display font-bold text-2xl mb-6 text-steel">
+              {servico.nome} perto de você
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {cidades.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/servicos/${servico.slug}/${c.slug}`}
+                  className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-sm text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
+                >
+                  {servico.nome} em {c.nome}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
       <Footer />
       <WhatsappFloat />

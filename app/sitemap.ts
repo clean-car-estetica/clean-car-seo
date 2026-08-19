@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { servicos, cidades } from "@/lib/data";
+import { servicos, cidades, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 import { slugify } from "@/lib/slug";
 
 const BASE_URL = "https://clean-car-seo.vercel.app";
@@ -28,6 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   for (const s of servicos) {
     entradas.push({ url: `${BASE_URL}/servicos/${s.slug}`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.8 });
+    if (SERVICOS_SEM_PAGINAS_LOCAIS.includes(s.slug)) continue;
     for (const c of cidades) {
       entradas.push({ url: `${BASE_URL}/servicos/${s.slug}/${c.slug}`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.7 });
       if (c.sede) {

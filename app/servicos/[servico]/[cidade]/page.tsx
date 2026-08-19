@@ -4,14 +4,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
-import { servicos, cidades } from "@/lib/data";
+import { servicos, cidades, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 import { getServicoPublico, getConteudoLocalPublico, getCidadesPublicas, getCidadePublica } from "@/lib/site-data";
 import { slugify } from "@/lib/slug";
 
 export const revalidate = 60;
 
 export function generateStaticParams() {
-  return servicos.flatMap((s) => cidades.map((c) => ({ servico: s.slug, cidade: c.slug })));
+  return servicos
+    .filter((s) => !SERVICOS_SEM_PAGINAS_LOCAIS.includes(s.slug))
+    .flatMap((s) => cidades.map((c) => ({ servico: s.slug, cidade: c.slug })));
 }
 
 export async function generateMetadata({
@@ -41,6 +43,7 @@ export default async function ServicoCidadePage({
   params: Promise<{ servico: string; cidade: string }>;
 }) {
   const { servico: servicoSlug, cidade: cidadeSlug } = await params;
+  if (SERVICOS_SEM_PAGINAS_LOCAIS.includes(servicoSlug)) return notFound();
   const servico = await getServicoPublico(servicoSlug);
   const cidade = await getCidadePublica(cidadeSlug);
   if (!servico || !cidade) return notFound();
