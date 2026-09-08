@@ -149,7 +149,7 @@ export default function AgendamentoForm({ servicosIniciais }: { servicosIniciais
           </p>
           <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Seu nome" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
           <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="WhatsApp com DDD" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
-          <input value={cep} onChange={(e) => setCep(e.target.value)} placeholder="CEP (se quiser Leva e Trás)" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
+          <input value={cep} onChange={(e) => setCep(e.target.value)} placeholder="CEP (opcional)" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
           <button
             disabled={!nome || !whatsapp || carregando}
             onClick={confirmarAgendamento}
