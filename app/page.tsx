@@ -79,7 +79,7 @@ export default async function Home() {
                   Arraste e veja a <span className="text-verniz-shine">transformação</span>
                 </h2>
                 <p className="mt-2 text-steel-line max-w-xl mx-auto">
-                  Resultados reais dos nossos serviços de polimento e vitrificação.
+                  Resultados reais dos nossos serviços de estética automotiva.
                 </p>
               </div>
               <div className="grid md:grid-cols-2 gap-6">

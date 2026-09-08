@@ -112,7 +112,7 @@ export type Metadados = {
 
 export const METADADOS_PADRAO: Metadados = {
   titulo: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
-  descricao: "Lavagem profissional, higienização, polimento, vitrificação e restauração. Produtos Vonixx, leva-e-trás e atendimento em toda região.",
+  descricao: "Lavagem profissional, higienização, vitrificação e restauração. Produtos Vonixx e atendimento em toda região.",
   palavrasChave:
     "lava rapido Mogi das Cruzes, lava-rápido Mogi das Cruzes, estetica automotiva Mogi das Cruzes, limpeza de carro Mogi das Cruzes, lavagem de carro Mogi das Cruzes, proteção de pintura Mogi das Cruzes, higienização Mogi das Cruzes, higienização de banco Mogi das Cruzes, Alto Tietê, Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba, Guararema",
 };
@@ -204,7 +204,7 @@ export type Sobre = { titulo: string; texto: string };
 const SOBRE_PADRAO: Sobre = {
   titulo: "Sobre a Clean Car",
   texto:
-    "A Clean Car nasceu em Mogi das Cruzes com um objetivo simples: fazer o carro sair de lá parecendo novo, com o cuidado técnico que a lataria e o interior realmente merecem. Não trabalhamos só com lavagem — cuidamos de cada etapa, do pré-lavagem ao acabamento final, sempre com produtos Vonixx, o que hoje é referência de qualidade no mercado de estética automotiva.\n\nAtendemos clientes de Mogi das Cruzes e de toda a região do Alto Tietê (Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema), sempre com horário marcado — sem fila, sem surpresa no prazo. Quem prefere não se deslocar até nossa loja também pode contar com o serviço de leva-e-trás.\n\nMais do que deixar o carro limpo, nosso trabalho é proteger o investimento que ele representa: pintura, plásticos, estofados e vidros, tratados com a técnica certa pra durar.",
+    "A Clean Car nasceu em Mogi das Cruzes com um objetivo simples: fazer o carro sair de lá parecendo novo, com o cuidado técnico que a lataria e o interior realmente merecem. Não trabalhamos só com lavagem — cuidamos de cada etapa, do pré-lavagem ao acabamento final, sempre com produtos Vonixx, o que hoje é referência de qualidade no mercado de estética automotiva.\n\nAtendemos clientes de Mogi das Cruzes e de toda a região do Alto Tietê (Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema), sempre com horário marcado — sem fila, sem surpresa no prazo.\n\nMais do que deixar o carro limpo, nosso trabalho é proteger o investimento que ele representa: pintura, plásticos, estofados e vidros, tratados com a técnica certa pra durar.",
 };
 
 export async function getSobre(): Promise<Sobre> {
@@ -239,7 +239,7 @@ export const heroPadrao: HeroContent = {
   titulo_parte1: "Seu carro sai daqui com o",
   titulo_destaque: "brilho de zero-km.",
   subtitulo:
-    "Lavagem, polimento técnico e vitrificação cerâmica na nossa loja em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
+    "Lavagem e vitrificação cerâmica na nossa loja em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
   badge_texto: "Produtos Vonixx · Química Premium",
   imagem_url: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1600&q=80",
 };
