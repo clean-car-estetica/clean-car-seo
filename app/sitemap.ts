@@ -6,7 +6,7 @@ const BASE_URL = "https://clean-car-seo.vercel.app";
 
 // Data de referência da "última modificação" das páginas do site.
 // Atualize quando fizer uma mudança grande de conteúdo.
-const ULTIMA_ATUALIZACAO = new Date("2026-08-03");
+const ULTIMA_ATUALIZACAO = new Date("2026-09-21");
 
 // Sitemap 100% estático (sem nenhuma consulta a banco de dados) — resposta
 // instantânea e confiável, sem risco de timeout na leitura do Google.

@@ -112,7 +112,7 @@ export type Metadados = {
 
 export const METADADOS_PADRAO: Metadados = {
   titulo: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
-  descricao: "Lavagem profissional, higienização, vitrificação e restauração. Produtos Vonixx e atendimento em toda região.",
+  descricao: "Lavagem profissional, higienização e restauração. Produtos Vonixx e atendimento em toda região.",
   palavrasChave:
     "lava rapido Mogi das Cruzes, lava-rápido Mogi das Cruzes, estetica automotiva Mogi das Cruzes, limpeza de carro Mogi das Cruzes, lavagem de carro Mogi das Cruzes, proteção de pintura Mogi das Cruzes, higienização Mogi das Cruzes, higienização de banco Mogi das Cruzes, Alto Tietê, Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba, Guararema",
 };
@@ -239,7 +239,7 @@ export const heroPadrao: HeroContent = {
   titulo_parte1: "Seu carro sai daqui com o",
   titulo_destaque: "brilho de zero-km.",
   subtitulo:
-    "Lavagem e vitrificação cerâmica na nossa loja em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
+    "Lavagem e higienização na nossa loja em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
   badge_texto: "Produtos Vonixx · Química Premium",
   imagem_url: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1600&q=80",
 };

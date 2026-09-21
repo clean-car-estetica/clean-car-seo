@@ -131,7 +131,7 @@ export default async function Home() {
               {cidades.map((c) => (
                 <Link
                   key={c.slug}
-                  href={`/servicos/vitrificacao/${c.slug}`}
+                  href={`/servicos/${servicos[0]?.slug ?? "lavagem-bronze"}/${c.slug}`}
                   className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-sm text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
                 >
                   {c.nome}

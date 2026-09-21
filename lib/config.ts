@@ -1,5 +1,5 @@
 export const CONTATO_PADRAO = {
-  whatsapp: "5511912630375",
+  whatsapp: "5511978554052",
   whatsappMsg: "Olá! Vim pelo site da Clean Car e gostaria de um orçamento.",
   instagram: "cleancar_est26",
   instagramUrl: "https://www.instagram.com/cleancar_est26/",

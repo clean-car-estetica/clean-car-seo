@@ -65,7 +65,6 @@ export default function LinksAdminPage() {
           <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Página de destino</label>
           <select value={pagina} onChange={(e) => setPagina(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm">
             <option value="/">Home</option>
-            <option value="/servicos/vitrificacao">Página de Vitrificação</option>
             <option value="/servicos/higienizacao">Página de Higienização</option>
             <option value="/blog">Blog</option>
             <option value="/beneficios">Benefícios</option>
