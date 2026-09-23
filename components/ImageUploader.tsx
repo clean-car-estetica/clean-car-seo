@@ -23,7 +23,7 @@ export default function ImageUploader({
   /** Texto de especificação mostrado abaixo do campo (ex: "1200x675px") */
   specTexto?: string;
   onUrlChange?: (url: string) => void;
-  /** Dica pro nome do arquivo (ex: "vitrificacao mogi das cruzes centro") — vira vitrificacao-mogi-das-cruzes-centro-xxxx.jpg em vez de nome genérico */
+  /** Dica pro nome do arquivo (ex: "lavagem mogi das cruzes centro") — vira lavagem-mogi-das-cruzes-centro-xxxx.jpg em vez de nome genérico */
   nomeArquivo?: string;
 }) {
   const [url, setUrl] = useState(initialUrl ?? "");

@@ -56,7 +56,7 @@ export async function getServicosPublicos(): Promise<ServicoDB[]> {
         preco_desde: s.precoDesde ?? null,
         imagem_url: s.imagem,
         tag: s.tag ?? null,
-        pontos_fidelidade: 0,
+        pontos_fidelidade: s.pontosFidelidade ?? 0,
         ordem: s.ordem,
         termo_popular: s.termoPopular ?? null,
         ativo: true,
@@ -164,7 +164,7 @@ export const processoPadrao: PassoDB[] = [
   { id: -2, titulo: "Pré-lavagem técnica", texto: "Soltamos a sujeira mais grossa antes de qualquer contato direto na pintura, reduzindo o risco de microrriscos." },
   { id: -3, titulo: "Shampoo neutro + luvas próprias", texto: "Aplicação com luvas específicas para lavagem automotiva — o cuidado que protege o verniz do seu carro." },
   { id: -4, titulo: "Higienização com sanitizante", texto: "Limpeza interna que cuida da saúde de quem dirige, não só da aparência do carro." },
-  { id: -5, titulo: "Produtos Vonixx do início ao fim", texto: "Química de ponta em cada etapa, do básico à vitrificação." },
+  { id: -5, titulo: "Produtos Vonixx do início ao fim", texto: "Química de ponta em cada etapa, da lavagem ao acabamento." },
 ];
 
 export async function getProcessoPassos(): Promise<PassoDB[]> {
@@ -181,7 +181,7 @@ export const produtosPadrao = [
   "V-Floc", "V-Mol", "Sintra", "Delet", "Alumax", "Acidus", "Foam Gloss",
   "Pretinho Spray", "Hydrox", "Tok Final", "Impermeabilizante",
   "Revitalizador de Plásticos", "VLight Faróis",
-  "Bactran", "Vexus", "Focus", "Glaco", "Vitrificador",
+  "Bactran", "Vexus", "Focus", "Glaco",
 ];
 
 export async function getProdutosLista(): Promise<string[]> {
@@ -198,16 +198,10 @@ export type FaqDB = { id: number; pergunta: string; resposta: string };
 
 export const faqsPadrao: FaqDB[] = [
   {
-    id: -1,
-    pergunta: "A vitrificação protege contra riscos profundos?",
-    resposta:
-      "Não. A vitrificação protege contra micro-riscos de lavagem, raios UV e sujeira do dia a dia, além de dar um brilho intenso. Riscos profundos (que chegam na tinta) ainda podem acontecer em caso de impacto forte.",
-  },
-  {
     id: -3,
     pergunta: "Preciso deixar o carro na loja o dia todo?",
     resposta:
-      "Depende do serviço. Uma higienização geralmente leva algumas horas. A vitrificação pede mais tempo de cura — no agendamento a gente já informa o prazo certo.",
+      "Depende do serviço. Uma lavagem leva de 45 minutos a algumas horas, e a Higienização Interna VIP pede o dia todo. No agendamento a gente já informa o prazo certo.",
   },
   {
     id: -4,

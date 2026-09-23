@@ -1,3 +1,4 @@
+import ObservacoesServicos from "@/components/ObservacoesServicos";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -72,9 +73,7 @@ export default async function ServicoPage({
               {servico.duracao && <span>⏱ A partir de {servico.duracao}</span>}
               {servico.preco_desde && <span className="text-verniz-shine font-bold">A partir de R$ {servico.preco_desde}</span>}
             </div>
-            <p className="mt-3 text-xs text-steel-line/70 max-w-xl font-sans">
-              Avaliamos o veículo antes de iniciar e informamos o tempo total definitivo — sem surpresas.
-            </p>
+            <ObservacoesServicos className="mt-4 max-w-xl font-sans" />
             <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
               Agendar este serviço
             </AgendarButton>

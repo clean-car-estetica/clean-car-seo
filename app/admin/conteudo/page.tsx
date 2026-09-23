@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { importarDadosPadrao, atualizarOrdemPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
+import { aplicarCatalogoNovo, importarDadosPadrao, atualizarOrdemPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
 import ImageUploader from "@/components/ImageUploader";
 
 export default async function ConteudoPage() {
@@ -17,7 +17,15 @@ export default async function ConteudoPage() {
           <h1 className="font-display font-bold text-3xl text-steel mb-1">Serviços</h1>
           <p className="text-steel-line text-sm">Edite, crie ou remova serviços sem mexer em código.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
+          <form action={aplicarCatalogoNovo}>
+            <button
+              type="submit"
+              className="rounded-full bg-verniz text-carbon px-4 py-2 text-sm font-bold hover:bg-verniz-shine"
+            >
+              Aplicar catálogo novo (14 serviços)
+            </button>
+          </form>
           <form action={atualizarOrdemPadrao}>
             <button
               type="submit"

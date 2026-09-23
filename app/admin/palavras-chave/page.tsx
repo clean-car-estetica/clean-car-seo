@@ -23,7 +23,7 @@ export default async function PalavrasChavePage() {
         <input
           name="keyword"
           required
-          placeholder="Ex: vitrificação em Suzano"
+          placeholder="Ex: lavagem de carro em Suzano"
           className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
         />
         <select name="city_slug" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm">

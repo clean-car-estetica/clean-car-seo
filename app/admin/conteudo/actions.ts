@@ -17,6 +17,7 @@ export async function importarDadosPadrao() {
     tag: s.tag ?? null,
     ordem: s.ordem,
     termo_popular: s.termoPopular ?? null,
+    pontos_fidelidade: s.pontosFidelidade ?? 0,
   }));
   const linhasCidades = cidadesPadrao.map((c) => ({
     slug: c.slug,
@@ -35,6 +36,42 @@ export async function importarDadosPadrao() {
   if (e2) throw new Error(e2.message);
 
   revalidatePath("/admin/conteudo");
+}
+
+// Serviços que saíram do catálogo: ficam ocultos (não são apagados) e os endereços antigos redirecionam.
+const SERVICOS_DESATIVADOS = ["vitrificacao", "ducha"];
+
+export async function aplicarCatalogoNovo() {
+  // Atualiza nome, textos, tempo, preço, pontos, ordem e tag dos serviços do catálogo.
+  // Mantém a IMAGEM que você já escolheu; serviços novos entram com uma imagem provisória.
+  const { data: existentes, error: e0 } = await supabaseAdmin.from("services").select("slug");
+  if (e0) throw new Error(e0.message);
+  const jaExiste = new Set((existentes ?? []).map((r) => r.slug as string));
+
+  for (const s of servicosPadrao) {
+    const campos = {
+      nome: s.nome,
+      resumo: s.resumo,
+      descricao: s.descricao,
+      duracao: s.duracao ?? null,
+      preco_desde: s.precoDesde ?? null,
+      tag: s.tag ?? null,
+      ordem: s.ordem,
+      termo_popular: s.termoPopular ?? null,
+      pontos_fidelidade: s.pontosFidelidade ?? 0,
+      ativo: true,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = jaExiste.has(s.slug)
+      ? await supabaseAdmin.from("services").update(campos).eq("slug", s.slug)
+      : await supabaseAdmin.from("services").insert({ slug: s.slug, imagem_url: s.imagem, ...campos });
+    if (error) throw new Error(`${s.slug}: ${error.message}`);
+  }
+
+  const { error: e2 } = await supabaseAdmin.from("services").update({ ativo: false }).in("slug", SERVICOS_DESATIVADOS);
+  if (e2) throw new Error(e2.message);
+
+  revalidatePath("/", "layout");
 }
 
 export async function atualizarOrdemPadrao() {

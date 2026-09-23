@@ -1,3 +1,4 @@
+import ObservacoesServicos from "@/components/ObservacoesServicos";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -114,6 +115,7 @@ export default async function Home() {
               />
             ))}
           </div>
+          <ObservacoesServicos className="mt-8 max-w-3xl" />
         </section>
 
         <Planos itens={planos} />
@@ -131,7 +133,7 @@ export default async function Home() {
               {cidades.map((c) => (
                 <Link
                   key={c.slug}
-                  href={`/servicos/vitrificacao/${c.slug}`}
+                  href={`/servicos/lavagem-bronze/${c.slug}`}
                   className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-sm text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
                 >
                   {c.nome}
