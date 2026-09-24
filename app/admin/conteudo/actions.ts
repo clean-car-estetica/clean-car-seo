@@ -41,37 +41,65 @@ export async function importarDadosPadrao() {
 // Serviços que saíram do catálogo: ficam ocultos (não são apagados) e os endereços antigos redirecionam.
 const SERVICOS_DESATIVADOS = ["vitrificacao", "ducha"];
 
-export async function aplicarCatalogoNovo() {
+export async function aplicarCatalogoNovo(
+  _estado: { ok: boolean; mensagem: string } | null
+): Promise<{ ok: boolean; mensagem: string }> {
   // Atualiza nome, textos, tempo, preço, pontos, ordem e tag dos serviços do catálogo.
   // Mantém a IMAGEM que você já escolheu; serviços novos entram com uma imagem provisória.
-  const { data: existentes, error: e0 } = await supabaseAdmin.from("services").select("slug");
-  if (e0) throw new Error(e0.message);
-  const jaExiste = new Set((existentes ?? []).map((r) => r.slug as string));
+  // Não lança erro: devolve uma mensagem para a tela mostrar o resultado real.
+  try {
+    const { data: existentes, error: e0 } = await supabaseAdmin.from("services").select("slug");
+    if (e0) throw new Error(`Não consegui ler a tabela services: ${e0.message}`);
+    const jaExiste = new Set((existentes ?? []).map((r) => r.slug as string));
 
-  for (const s of servicosPadrao) {
-    const campos = {
-      nome: s.nome,
-      resumo: s.resumo,
-      descricao: s.descricao,
-      duracao: s.duracao ?? null,
-      preco_desde: s.precoDesde ?? null,
-      tag: s.tag ?? null,
-      ordem: s.ordem,
-      termo_popular: s.termoPopular ?? null,
-      pontos_fidelidade: s.pontosFidelidade ?? 0,
-      ativo: true,
-      updated_at: new Date().toISOString(),
+    let atualizados = 0;
+    let criados = 0;
+    for (const s of servicosPadrao) {
+      const campos = {
+        nome: s.nome,
+        resumo: s.resumo,
+        descricao: s.descricao,
+        duracao: s.duracao ?? null,
+        preco_desde: s.precoDesde ?? null,
+        tag: s.tag ?? null,
+        ordem: s.ordem,
+        termo_popular: s.termoPopular ?? null,
+        pontos_fidelidade: s.pontosFidelidade ?? 0,
+        ativo: true,
+        updated_at: new Date().toISOString(),
+      };
+      if (jaExiste.has(s.slug)) {
+        const { data, error } = await supabaseAdmin.from("services").update(campos).eq("slug", s.slug).select("slug");
+        if (error) throw new Error(`${s.nome}: ${error.message}`);
+        atualizados += data?.length ?? 0;
+      } else {
+        const { error } = await supabaseAdmin.from("services").insert({ slug: s.slug, imagem_url: s.imagem, ...campos });
+        if (error) throw new Error(`${s.nome}: ${error.message}`);
+        criados += 1;
+      }
+    }
+
+    const { data: ocultos, error: e2 } = await supabaseAdmin
+      .from("services")
+      .update({ ativo: false })
+      .in("slug", SERVICOS_DESATIVADOS)
+      .select("slug");
+    if (e2) throw new Error(`Ocultar serviços antigos: ${e2.message}`);
+
+    const { count, error: e3 } = await supabaseAdmin
+      .from("services")
+      .select("slug", { count: "exact", head: true })
+      .eq("ativo", true);
+    if (e3) throw new Error(`Conferência final: ${e3.message}`);
+
+    revalidatePath("/", "layout");
+    return {
+      ok: true,
+      mensagem: `Pronto: ${atualizados} serviços atualizados, ${criados} criados, ${ocultos?.length ?? 0} ocultos. Agora há ${count ?? "?"} serviços ativos no site.`,
     };
-    const { error } = jaExiste.has(s.slug)
-      ? await supabaseAdmin.from("services").update(campos).eq("slug", s.slug)
-      : await supabaseAdmin.from("services").insert({ slug: s.slug, imagem_url: s.imagem, ...campos });
-    if (error) throw new Error(`${s.slug}: ${error.message}`);
+  } catch (e) {
+    return { ok: false, mensagem: `Não foi possível aplicar: ${e instanceof Error ? e.message : String(e)}` };
   }
-
-  const { error: e2 } = await supabaseAdmin.from("services").update({ ativo: false }).in("slug", SERVICOS_DESATIVADOS);
-  if (e2) throw new Error(e2.message);
-
-  revalidatePath("/", "layout");
 }
 
 export async function atualizarOrdemPadrao() {
