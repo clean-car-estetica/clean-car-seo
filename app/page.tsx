@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import ObservacoesServicos from "@/components/ObservacoesServicos";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -20,7 +21,7 @@ import { getTextosGerais } from "@/lib/site-content";
 export const revalidate = 60;
 
 export const metadata = {
-  alternates: { canonical: "https://clean-car-seo.vercel.app/" },
+  alternates: { canonical: `${SITE_URL}/` },
 };
 
 export default async function Home() {

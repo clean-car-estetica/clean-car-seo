@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
@@ -6,7 +7,6 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { servicos, cidades, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 import { getServicoPublico, getConteudoLocalPublico, getCidadesPublicas, getCidadePublica } from "@/lib/site-data";
-import { slugify } from "@/lib/slug";
 
 export const revalidate = 60;
 
@@ -26,6 +26,9 @@ export async function generateMetadata({
   const cidade = await getCidadePublica(cidadeSlug);
   if (!servico || !cidade) return {};
   const tituloBase = servico.termo_popular || servico.nome;
+  // Só indexa se a página tiver texto próprio cadastrado (Páginas locais);
+  // texto genérico repetido em todas as cidades o Google descarta.
+  const conteudo = await getConteudoLocalPublico(servico, cidade);
   const titulo =
     tituloBase === servico.nome
       ? `${servico.nome} em ${cidade.nome} | Clean Car`
@@ -33,7 +36,8 @@ export async function generateMetadata({
   return {
     title: titulo,
     description: `${tituloBase} em ${cidade.nome} e região. ${servico.resumo}`,
-    alternates: { canonical: `https://clean-car-seo.vercel.app/servicos/${servico.slug}/${cidade.slug}` },
+    alternates: { canonical: conteudo.proprio ? `${SITE_URL}/servicos/${servico.slug}/${cidade.slug}` : `${SITE_URL}/servicos/${servico.slug}` },
+    robots: conteudo.proprio ? undefined : { index: false, follow: true },
   };
 }
 
@@ -85,21 +89,7 @@ export default async function ServicoCidadePage({
             <h2 className="font-display font-bold text-lg mb-2 text-steel">
               Bairros atendidos em {cidade.nome}
             </h2>
-            {cidade.sede ? (
-              <div className="flex flex-wrap gap-2">
-                {cidade.bairros.map((b) => (
-                  <a
-                    key={b}
-                    href={`/servicos/${servico.slug}/${cidade.slug}/${slugify(b)}`}
-                    className="rounded-full bg-carbon border border-card-line px-3 py-1 text-xs text-steel-line hover:border-verniz hover:text-verniz-shine"
-                  >
-                    {b}
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-steel-line">{cidade.bairros.join(", ")}</p>
-            )}
+            <p className="text-sm text-steel-line">{cidade.bairros.join(", ")}</p>
           </div>
 
           <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
@@ -119,7 +109,7 @@ export default async function ServicoCidadePage({
               provider: {
                 "@type": "AutoRepair",
                 name: "Clean Car Estética Automotiva",
-                url: "https://clean-car-seo.vercel.app/",
+                url: `${SITE_URL}/`,
               },
               areaServed: cidade.nome,
               ...(servico.preco_desde

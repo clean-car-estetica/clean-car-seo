@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 // Extrai service_slug/city_slug de rotas como /servicos/[servico]/[cidade],
 // pra podermos filtrar KPIs por cidade e por serviço.
 export function parseRota(pathname: string): { service_slug: string | null; city_slug: string | null } {
@@ -17,7 +18,7 @@ function classificarReferrer(referrer: string): string {
     if (host.includes("whatsapp") || host.includes("wa.me")) return "WhatsApp";
     if (host.includes("bing")) return "Bing";
     if (host.includes("chatgpt") || host.includes("openai")) return "ChatGPT";
-    if (host === "clean-car-seo.vercel.app") return "Navegação interna";
+    if (host === "clean-car-seo.vercel.app" || host === new URL(SITE_URL).host) return "Navegação interna";
     return host;
   } catch {
     return "Direto";

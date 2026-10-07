@@ -1,9 +1,10 @@
 "use client";
+import { SITE_URL } from "@/lib/config";
 
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 
-const BASE_URL = "https://clean-car-seo.vercel.app";
+const BASE_URL = SITE_URL;
 
 const SUGESTOES = [
   { canal: "instagram", campanha: "" },

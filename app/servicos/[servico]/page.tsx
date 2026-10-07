@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import ObservacoesServicos from "@/components/ObservacoesServicos";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -31,7 +32,7 @@ export async function generateMetadata({
   return {
     title: titulo,
     description: `${tituloBase} em Mogi das Cruzes: ${servico.descricao}`,
-    alternates: { canonical: `https://clean-car-seo.vercel.app/servicos/${servico.slug}` },
+    alternates: { canonical: `${SITE_URL}/servicos/${servico.slug}` },
   };
 }
 
@@ -92,7 +93,7 @@ export default async function ServicoPage({
               provider: {
                 "@type": "AutoRepair",
                 name: "Clean Car Estética Automotiva",
-                url: "https://clean-car-seo.vercel.app/",
+                url: `${SITE_URL}/`,
               },
               areaServed: "Mogi das Cruzes e região",
               ...(servico.preco_desde

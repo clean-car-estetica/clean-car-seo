@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
@@ -10,7 +11,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Perguntas frequentes",
   description: "Tire suas dúvidas sobre lavagem, higienização e enceramento na Clean Car.",
-  alternates: { canonical: "https://clean-car-seo.vercel.app/faq" },
+  alternates: { canonical: `${SITE_URL}/faq` },
 };
 
 export default async function FaqPage() {

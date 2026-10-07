@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
@@ -9,7 +10,7 @@ export const revalidate = 3600;
 export const metadata = {
   title: "Sobre Nós",
   description: "Conheça a Clean Car Estética Automotiva: loja física em Mogi das Cruzes, produtos Vonixx e atendimento em toda a região do Alto Tietê.",
-  alternates: { canonical: "https://clean-car-seo.vercel.app/sobre" },
+  alternates: { canonical: `${SITE_URL}/sobre` },
 };
 
 export default async function SobrePage() {

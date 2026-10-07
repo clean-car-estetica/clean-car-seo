@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: pagina.titulo,
     description: pagina.meta_descricao || undefined,
-    alternates: { canonical: `https://clean-car-seo.vercel.app/paginas/${slug}` },
+    alternates: { canonical: `${SITE_URL}/paginas/${slug}` },
   };
 }
 

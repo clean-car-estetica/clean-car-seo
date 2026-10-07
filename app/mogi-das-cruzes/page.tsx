@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -5,7 +6,6 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import Faq from "@/components/Faq";
 import { getServicosPublicos, getCidadesPublicas, getFaqsPublicos } from "@/lib/site-data";
-import { slugify } from "@/lib/slug";
 import { SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 
 export const revalidate = 3600;
@@ -14,7 +14,7 @@ export const metadata = {
   title: "Estética Automotiva em Mogi das Cruzes | Clean Car",
   description:
     "Lavagem de carro, higienização, remoção de chuva ácida e recuperação de plásticos em Mogi das Cruzes. Loja física, produtos Vonixx, hora marcada.",
-  alternates: { canonical: "https://clean-car-seo.vercel.app/mogi-das-cruzes" },
+  alternates: { canonical: `${SITE_URL}/mogi-das-cruzes` },
 };
 
 export default async function MogiHubPage() {
@@ -72,13 +72,12 @@ export default async function MogiHubPage() {
               </h2>
               <div className="flex flex-wrap gap-2">
                 {mogi.bairros.map((b) => (
-                  <Link
+                  <span
                     key={b}
-                    href={`/servicos/lavagem-bronze/mogi-das-cruzes/${slugify(b)}`}
-                    className="rounded-full bg-card border border-card-line px-4 py-2 text-sm text-steel-line hover:border-verniz hover:text-verniz-shine"
+                    className="rounded-full bg-card border border-card-line px-4 py-2 text-sm text-steel-line"
                   >
                     {b}
-                  </Link>
+                  </span>
                 ))}
               </div>
             </div>

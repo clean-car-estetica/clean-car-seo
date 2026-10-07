@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
@@ -9,7 +10,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Benefícios e Fidelidade",
   description: "Programa de fidelidade Clean Car: acumule pontos e troque por descontos.",
-  alternates: { canonical: "https://clean-car-seo.vercel.app/beneficios" },
+  alternates: { canonical: `${SITE_URL}/beneficios` },
 };
 
 export default async function BeneficiosPage() {

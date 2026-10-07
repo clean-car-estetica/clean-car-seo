@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
@@ -13,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const meta = await getMetadados();
   const palavrasChave = meta.palavrasChave.split(",").map((p) => p.trim()).filter(Boolean);
   return {
-    metadataBase: new URL("https://clean-car-seo.vercel.app"),
+    metadataBase: new URL(SITE_URL),
     title: {
       default: meta.titulo,
       template: "%s | Clean Car Estética Automotiva",
@@ -60,9 +61,9 @@ export default async function RootLayout({
               "@type": "AutoRepair",
               name: "Clean Car Estética Automotiva",
               description: meta.descricao,
-              image: "https://clean-car-seo.vercel.app/opengraph-image",
+              image: `${SITE_URL}/opengraph-image`,
               telephone: contato.whatsapp,
-              url: "https://clean-car-seo.vercel.app/",
+              url: `${SITE_URL}/`,
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Rua Prefeito Sebastião Cascardo, 438 - Jardim Universo",

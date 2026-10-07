@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,7 +10,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Blog",
   description: "Dicas de cuidado automotivo da Clean Car Estética Automotiva.",
-  alternates: { canonical: "https://clean-car-seo.vercel.app/blog" },
+  alternates: { canonical: `${SITE_URL}/blog` },
 };
 
 export default async function BlogIndex() {

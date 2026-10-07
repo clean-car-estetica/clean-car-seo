@@ -89,7 +89,7 @@ export async function getConteudoLocalPublico(servico: ServicoDB, cidade: { slug
       .maybeSingle();
     if (error) throw error;
     if (data?.paragrafos?.length) {
-      return { paragrafos: data.paragrafos as string[], imagemOverride: data.imagem_url as string | null };
+      return { paragrafos: data.paragrafos as string[], imagemOverride: data.imagem_url as string | null, proprio: true };
     }
   } catch {
     // sem override — usa o template padrão abaixo
@@ -109,7 +109,7 @@ export async function getConteudoLocalPublico(servico: ServicoDB, cidade: { slug
     },
     cidade as any
   );
-  return { paragrafos: template.paragrafos, imagemOverride: null as string | null };
+  return { paragrafos: template.paragrafos, imagemOverride: null as string | null, proprio: false };
 }
 
 export type DepoimentoDB = { id: number; autor: string; nota: number; texto: string };
