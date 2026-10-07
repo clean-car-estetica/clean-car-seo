@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   // Serviços que saíram do catálogo: preserva o endereço antigo (e o Google) apontando para o mais próximo
   async redirects() {
     return [
+      // Domínio próprio (07/10/2026): o endereço antigo da Vercel manda tudo
+      // para cleancarestetica.com.br com 301, para o Google transferir o que
+      // já conhece. /admin, /api e /auth ficam de fora (login do painel).
+      {
+        source: "/:path((?!admin|api|auth).*)",
+        has: [{ type: "host", value: "clean-car-seo.vercel.app" }],
+        destination: "https://cleancarestetica.com.br/:path",
+        permanent: true,
+      },
       { source: "/servicos/vitrificacao", destination: "/servicos/enceramento-tecnico", permanent: true },
       { source: "/servicos/vitrificacao/:cidade", destination: "/servicos/enceramento-tecnico/:cidade", permanent: true },
       { source: "/servicos/vitrificacao/:cidade/:bairro", destination: "/servicos/enceramento-tecnico/:cidade/:bairro", permanent: true },

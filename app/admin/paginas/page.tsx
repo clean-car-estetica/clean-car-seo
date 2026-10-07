@@ -21,7 +21,7 @@ export default async function PaginasAdminPage({
         sem precisar mexer em código. Ela fica disponível em:
       </p>
       <p className="text-steel-line text-sm mb-6 font-mono bg-card border border-card-line rounded-lg px-3 py-2 inline-block">
-        clean-car-seo.vercel.app/paginas/<span className="text-verniz-shine">seu-titulo-vira-isso</span>
+        cleancarestetica.com.br/paginas/<span className="text-verniz-shine">seu-titulo-vira-isso</span>
       </p>
 
       <form action={salvarPagina} className="bg-card border border-card-line rounded-2xl p-6 grid gap-4 max-w-2xl mb-10">

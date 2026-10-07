@@ -1,7 +1,7 @@
-// Endereço público do site. Ao ligar o domínio próprio, basta definir
-// NEXT_PUBLIC_SITE_URL na Vercel (ex.: https://www.cleancarestetica.com.br)
-// — canonical, sitemap, robots e dados estruturados passam a usar ele.
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://clean-car-seo.vercel.app").replace(/\/$/, "");
+// Endereço público do site (domínio próprio desde 07/10/2026). Canonical,
+// sitemap, robots e dados estruturados usam ele. NEXT_PUBLIC_SITE_URL na
+// Vercel sobrescreve, se um dia precisar.
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://cleancarestetica.com.br").replace(/\/$/, "");
 
 export const CONTATO_PADRAO = {
   whatsapp: "5511912630375",

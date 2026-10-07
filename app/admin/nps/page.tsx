@@ -21,7 +21,7 @@ export default async function NpsAdminPage() {
       <h1 className="font-display font-bold text-3xl text-steel mb-1">NPS</h1>
       <p className="text-steel-line text-sm mb-6">
         Link pra compartilhar com clientes após o serviço:{" "}
-        <code className="px-1 bg-black/30 rounded">clean-car-seo.vercel.app/avaliar</code>
+        <code className="px-1 bg-black/30 rounded">cleancarestetica.com.br/avaliar</code>
       </p>
 
       {error && (
