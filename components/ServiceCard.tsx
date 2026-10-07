@@ -22,11 +22,17 @@ export default function ServiceCard({
       className="group rounded-2xl bg-card border border-card-line overflow-hidden hover:border-verniz/60 transition-colors"
     >
       <div className="relative h-56 overflow-hidden">
-        <img
-          src={image}
-          alt={nome}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+        {image ? (
+          <img
+            src={image}
+            alt={nome}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-card to-black">
+            <span className="font-display font-bold text-2xl text-steel-line/60 px-6 text-center">{nome}</span>
+          </div>
+        )}
         {tag && (
           <span className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full bg-black/70 backdrop-blur text-verniz-shine border border-verniz-glow">
             {tag}
