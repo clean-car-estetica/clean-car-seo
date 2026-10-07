@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import AgendarButton from "@/components/AgendarButton";
 import { useContato } from "@/components/ContatoProvider";
@@ -31,17 +32,32 @@ export default function Header() {
   const contato = useContato();
   const t = useTextos();
 
+  // 07/10/2026: topo enxuto — só o essencial na barra; o resto fica no menu
+  // do celular e no rodapé.
   const LINKS = [
-    { href: "/mogi-das-cruzes", label: t.navMogi },
-    { href: "/sobre", label: t.navSobre },
     { href: "/#servicos", label: t.navServicos },
     { href: "/#planos", label: t.navPlanos },
+    { href: "/sobre", label: t.navSobre },
+    { href: "/contato", label: t.navContato },
+  ];
+  const LINKS_MENU = [
+    ...LINKS,
+    { href: "/mogi-das-cruzes", label: t.navMogi },
     { href: "/faq", label: t.navFaq },
     { href: "/#indicacao", label: t.navIndicacao },
     { href: "/beneficios", label: t.navBeneficios },
-    { href: "/contato", label: t.navContato },
     { href: "/blog", label: t.navBlog },
   ];
+  const pathname = usePathname();
+  // Clicar na marca sempre leva ao início da página inicial, de qualquer página.
+  function irParaInicio(e: React.MouseEvent) {
+    setAberto(false);
+    if (pathname === "/") {
+      e.preventDefault();
+      window.history.replaceState(null, "", "/");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
 
   const iconesSociais = (
     <>
@@ -69,22 +85,29 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 w-full z-40 bg-carbon/85 backdrop-blur-md border-b border-card-line">
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between gap-4">
-        <Link href="/" className="font-display font-extrabold text-2xl tracking-tight text-steel shrink-0" onClick={() => setAberto(false)}>
-          CLEAN <span className="text-verniz-shine glow-text">CAR</span>
+        <Link
+          href="/"
+          onClick={irParaInicio}
+          aria-label="Clean Car — voltar ao início"
+          className="flex items-center gap-3 font-display font-extrabold text-2xl tracking-tight text-steel shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-verniz"
+        >
+          <img src="/logo-clean-car.png" alt="" width={44} height={44} className="w-11 h-11 rounded-full ring-2 ring-verniz/40" />
+          <span>
+            CLEAN <span className="text-verniz-shine glow-text">CAR</span>
+          </span>
         </Link>
-        <nav className="hidden lg:flex gap-5 font-display text-base tracking-wide text-steel-line">
+        <nav className="hidden lg:flex gap-7 font-display text-lg tracking-wide text-steel">
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="hover:text-verniz-shine">{l.label}</Link>
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2">{iconesSociais}</div>
-          <AgendarButton className="hidden sm:inline-block rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors whitespace-nowrap">
+                    <AgendarButton className="hidden sm:inline-block rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors whitespace-nowrap">
             {t.navBotaoAgendar}
           </AgendarButton>
           <button
             onClick={() => setAberto(!aberto)}
-            className="lg:hidden text-steel p-2 -mr-2"
+            className="text-steel p-2 -mr-2 lg:ml-1"
             aria-label={aberto ? "Fechar menu" : "Abrir menu"}
           >
             {aberto ? <X size={26} /> : <Menu size={26} />}
@@ -93,9 +116,9 @@ export default function Header() {
       </div>
 
       {aberto && (
-        <nav className="lg:hidden bg-carbon border-t border-card-line px-6 py-4 flex flex-col gap-4 font-display text-lg text-steel-line">
-          {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setAberto(false)} className="hover:text-verniz-shine">
+        <nav className="bg-carbon border-t border-card-line px-6 py-4 flex flex-col gap-4 lg:absolute lg:right-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:top-full lg:w-72 lg:rounded-b-2xl lg:border lg:shadow-2xl font-display text-lg text-steel-line">
+          {LINKS_MENU.map((l, i) => (
+            <Link key={l.href} href={l.href} onClick={() => setAberto(false)} className={`hover:text-verniz-shine ${i < LINKS.length ? "lg:hidden" : ""}`}>
               {l.label}
             </Link>
           ))}

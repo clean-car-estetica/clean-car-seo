@@ -13,7 +13,6 @@ import HeroMidia from "@/components/HeroMidia";
 import EscolhaLavagem from "@/components/EscolhaLavagem";
 import ServicosLista from "@/components/ServicosLista";
 import FaixaServicos from "@/components/FaixaServicos";
-import { getContatoContent } from "@/lib/site-content";
 import Produtos from "@/components/Produtos";
 import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
@@ -29,7 +28,7 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, contato] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -40,7 +39,6 @@ export default async function Home() {
     getProdutosLista(),
     getTextosGerais(),
     getFaqsPublicos(),
-    getContatoContent(),
   ]);
   const lavagens = ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"];
   const outros = servicos.filter((x) => !lavagens.includes(x.slug));
@@ -57,7 +55,7 @@ export default async function Home() {
             videoCelularUrl={hero.video_mobile_url}
             imagemUrl={hero.imagem_url}
           />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-t md:bg-gradient-to-r from-carbon via-carbon/75 to-carbon/10" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-t md:bg-gradient-to-r from-carbon via-carbon/60 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 h-32 -z-10 bg-gradient-to-t from-carbon to-transparent" />
           <div className="mx-auto w-full max-w-6xl px-6 pb-14 pt-32 md:py-24">
             <span className="inline-flex items-center gap-2 rounded-full bg-carbon/60 backdrop-blur border border-cera/30 px-4 py-2">
@@ -67,23 +65,13 @@ export default async function Home() {
             <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-8xl leading-[0.9] max-w-3xl mt-6 text-balance">
               {hero.titulo_parte1} <span className="text-verniz-shine glow-text">{hero.titulo_destaque}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-steel/85 text-lg leading-relaxed">{hero.subtitulo}</p>
+            <p className="mt-6 max-w-xl text-steel text-lg leading-relaxed">{hero.subtitulo}</p>
             <div className="flex flex-wrap gap-3 mt-8">
               <AgendarButton className="inline-block rounded-full bg-verniz text-carbon font-display font-bold text-lg px-8 py-3 hover:bg-verniz-shine transition-colors">
                 Agendar horário
               </AgendarButton>
               <WhatsappCTA />
             </div>
-            <dl className="mt-10 grid sm:grid-cols-2 gap-x-10 gap-y-3 max-w-2xl text-sm">
-              <div>
-                <dt className="text-steel-line">Onde fica</dt>
-                <dd className="text-steel">{contato.endereco}</dd>
-              </div>
-              <div>
-                <dt className="text-steel-line">Quando abre</dt>
-                <dd className="text-steel">{contato.horarioSemana}<br />{contato.horarioSabado}</dd>
-              </div>
-            </dl>
           </div>
         </section>
 

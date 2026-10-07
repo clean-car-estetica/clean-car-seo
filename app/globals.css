@@ -12,8 +12,8 @@
   --verniz-glow: rgba(34, 211, 238, 0.35);
   /* Selo — dourado/âmbar de produto premium (Vonixx) */
   --cera: #f2b544;
-  --steel: #e8eaed;
-  --steel-line: #9aa0ab;
+  --steel: #f4f6fa;
+  --steel-line: #b9c1cf;
   --ink: #eef0f3;
   --paper: #03071e;
   --ok: #34d399;
@@ -45,8 +45,11 @@ body {
 }
 
 .glow-text {
-  text-shadow: 0 0 20px var(--verniz-glow);
+  text-shadow: 0 0 24px var(--verniz-glow), 0 0 2px rgba(103, 232, 249, 0.6);
 }
+
+/* Fotos dos serviços: tira o estourado das fotos de banco claras */
+.foto-servico { filter: brightness(0.82) contrast(1.08) saturate(1.1); }
 
 .shine-sweep {
   position: relative;

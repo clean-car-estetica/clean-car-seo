@@ -28,7 +28,7 @@ export default function ServicosLista({ servicos, titulo, subtitulo }: { servico
                 className="group grid grid-cols-[4.5rem_minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center py-5 focus-visible:outline-2 focus-visible:outline-verniz"
               >
                 <span className="lg:hidden h-16 w-[4.5rem] rounded-lg overflow-hidden bg-card">
-                  {s.imagem_url && <img src={s.imagem_url} alt="" className="h-full w-full object-cover" loading="lazy" />}
+                  {s.imagem_url && <img src={s.imagem_url} alt="" className="foto-servico h-full w-full object-cover" loading="lazy" />}
                 </span>
                 <span className="min-w-0">
                   <span className={`block font-display font-bold text-xl md:text-2xl transition-colors ${i === ativo ? "lg:text-verniz-shine" : ""} text-steel group-hover:text-verniz-shine`}>
@@ -50,9 +50,9 @@ export default function ServicosLista({ servicos, titulo, subtitulo }: { servico
         </ul>
 
         <div className="hidden lg:block sticky top-28">
-          <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-card-line bg-card">
+          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-card-line bg-card">
             {foto ? (
-              <img key={foto} src={foto} alt={servicos[ativo].nome} className="painel-foto absolute inset-0 w-full h-full object-cover" />
+              <img key={foto} src={foto} alt={servicos[ativo].nome} className="painel-foto foto-servico absolute inset-0 w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center p-8 text-center font-display font-bold text-3xl text-steel-line/50">
                 {servicos[ativo].nome}
