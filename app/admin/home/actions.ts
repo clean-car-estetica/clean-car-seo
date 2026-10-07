@@ -10,6 +10,9 @@ export async function salvarHero(formData: FormData) {
     subtitulo: String(formData.get("subtitulo")),
     badge_texto: String(formData.get("badge_texto")),
     imagem_url: String(formData.get("imagem_url")),
+    tipo_midia: formData.get("tipo_midia") === "imagem" ? "imagem" : "video",
+    video_url: String(formData.get("video_url") || ""),
+    video_mobile_url: String(formData.get("video_mobile_url") || ""),
   };
 
   const { error } = await supabaseAdmin

@@ -1,4 +1,4 @@
-import { FOTO_HERO, fotoHero } from "@/lib/fotos";
+import { FOTO_HERO, fotoHero, VIDEO_HERO, VIDEO_HERO_CELULAR } from "@/lib/fotos";
 import { supabasePublico } from "@/lib/supabase";
 import { CONTATO_PADRAO, type Contato } from "@/lib/config";
 
@@ -234,6 +234,12 @@ export type HeroContent = {
   subtitulo: string;
   badge_texto: string;
   imagem_url: string;
+  /** "video" (padrão) ou "imagem" — escolhido no painel */
+  tipo_midia: "video" | "imagem";
+  /** Vídeo do computador (horizontal) */
+  video_url: string;
+  /** Vídeo do celular (vertical). Vazio = usa o do computador */
+  video_mobile_url: string;
 };
 
 export const heroPadrao: HeroContent = {
@@ -243,6 +249,9 @@ export const heroPadrao: HeroContent = {
     "Lavagem, higienização e enceramento na nossa loja em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
   badge_texto: "Produtos Vonixx · Química Premium",
   imagem_url: FOTO_HERO,
+  tipo_midia: "video",
+  video_url: VIDEO_HERO,
+  video_mobile_url: VIDEO_HERO_CELULAR,
 };
 
 export async function getHeroContent(): Promise<HeroContent> {

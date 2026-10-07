@@ -39,3 +39,8 @@ export function fotoServico(slug: string, url?: string | null): string {
 export function fotoHero(url?: string | null): string {
   return ehFotoAntiga(url) ? FOTO_HERO : (url as string);
 }
+
+// Vídeos do topo (Pexels, uso livre). Computador: horizontal; celular: vertical.
+export const VIDEO_HERO = "https://videos.pexels.com/video-files/6873500/6873500-hd_1280_720_25fps.mp4";
+export const VIDEO_HERO_CELULAR = "https://videos.pexels.com/video-files/32010548/13643197_1080_1920_30fps.mp4";
+export const POSTER_HERO = "https://images.pexels.com/videos/6873500/pexels-photo-6873500.jpeg?auto=compress&cs=tinysrgb&w=1600";

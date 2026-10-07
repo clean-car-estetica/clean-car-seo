@@ -3,13 +3,17 @@ import ObservacoesServicos from "@/components/ObservacoesServicos";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ServiceCard from "@/components/ServiceCard";
 import BeforeAfter from "@/components/BeforeAfter";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import WhatsappCTA from "@/components/WhatsappCTA";
 import AgendarButton from "@/components/AgendarButton";
 import { getHeroContent } from "@/lib/site-content";
-import Processo from "@/components/Processo";
+import ProcessoEtapas from "@/components/ProcessoEtapas";
+import HeroMidia from "@/components/HeroMidia";
+import EscolhaLavagem from "@/components/EscolhaLavagem";
+import ServicosLista from "@/components/ServicosLista";
+import FaixaServicos from "@/components/FaixaServicos";
+import { getContatoContent } from "@/lib/site-content";
 import Produtos from "@/components/Produtos";
 import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
@@ -25,7 +29,7 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, contato] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -36,41 +40,57 @@ export default async function Home() {
     getProdutosLista(),
     getTextosGerais(),
     getFaqsPublicos(),
+    getContatoContent(),
   ]);
+  const lavagens = ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"];
+  const outros = servicos.filter((x) => !lavagens.includes(x.slug));
 
   return (
     <>
       <Header />
       <main className="flex-1 pt-20">
-        {/* Hero */}
-        <section
-          className="shine-sweep bg-carbon text-steel bg-cover bg-center"
-          style={{
-            backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.95)), url('${hero.imagem_url}')`,
-          }}
-        >
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-36">
-            <span className="inline-flex items-center gap-2 rounded-full bg-cera/10 border border-cera/30 px-4 py-2">
+        {/* Topo: vídeo (ou foto) escolhido no painel, texto à esquerda */}
+        <section className="relative isolate min-h-[calc(100svh-5rem)] flex items-end md:items-center text-steel overflow-hidden">
+          <HeroMidia
+            tipo={hero.tipo_midia}
+            videoUrl={hero.video_url}
+            videoCelularUrl={hero.video_mobile_url}
+            imagemUrl={hero.imagem_url}
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-t md:bg-gradient-to-r from-carbon via-carbon/75 to-carbon/10" />
+          <div className="absolute inset-x-0 bottom-0 h-32 -z-10 bg-gradient-to-t from-carbon to-transparent" />
+          <div className="mx-auto w-full max-w-6xl px-6 pb-14 pt-32 md:py-24">
+            <span className="inline-flex items-center gap-2 rounded-full bg-carbon/60 backdrop-blur border border-cera/30 px-4 py-2">
               <span className="w-2 h-2 rounded-full bg-cera" />
-              <span className="text-xs font-display font-bold tracking-wide text-cera uppercase">
-                {hero.badge_texto}
-              </span>
+              <span className="text-xs font-display font-bold tracking-wide text-cera">{hero.badge_texto}</span>
             </span>
-            <h1 className="font-display font-extrabold text-4xl sm:text-5xl md:text-7xl leading-[0.95] max-w-3xl mt-6">
+            <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-8xl leading-[0.9] max-w-3xl mt-6 text-balance">
               {hero.titulo_parte1} <span className="text-verniz-shine glow-text">{hero.titulo_destaque}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-steel-line text-lg leading-relaxed">{hero.subtitulo}</p>
+            <p className="mt-6 max-w-xl text-steel/85 text-lg leading-relaxed">{hero.subtitulo}</p>
             <div className="flex flex-wrap gap-3 mt-8">
-              <AgendarButton className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
+              <AgendarButton className="inline-block rounded-full bg-verniz text-carbon font-display font-bold text-lg px-8 py-3 hover:bg-verniz-shine transition-colors">
                 Agendar horário
               </AgendarButton>
               <WhatsappCTA />
             </div>
+            <dl className="mt-10 grid sm:grid-cols-2 gap-x-10 gap-y-3 max-w-2xl text-sm">
+              <div>
+                <dt className="text-steel-line">Onde fica</dt>
+                <dd className="text-steel">{contato.endereco}</dd>
+              </div>
+              <div>
+                <dt className="text-steel-line">Quando abre</dt>
+                <dd className="text-steel">{contato.horarioSemana}<br />{contato.horarioSabado}</dd>
+              </div>
+            </dl>
           </div>
         </section>
 
-        <Processo passos={passos} />
-        <Produtos produtos={produtos} />
+        <FaixaServicos nomes={servicos.map((x) => x.nome)} />
+
+        <EscolhaLavagem servicos={servicos} />
+
 
         {/* Antes e depois */}
         {transformacoes.length > 0 && (
@@ -99,25 +119,14 @@ export default async function Home() {
           </section>
         )}
 
-        {/* Serviços */}
-        <section id="servicos" className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">{textos.homeServicosTitulo}</h2>
-          <p className="text-steel-line mb-10">{textos.homeServicosSubtitulo}</p>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {servicos.map((s) => (
-              <ServiceCard
-                key={s.slug}
-                slug={s.slug}
-                nome={s.nome}
-                resumo={s.resumo}
-                precoDesde={s.preco_desde ?? undefined}
-                image={s.imagem_url}
-                tag={s.tag ?? undefined}
-              />
-            ))}
-          </div>
-          <ObservacoesServicos className="mt-8 max-w-3xl" />
-        </section>
+        <ProcessoEtapas passos={passos} />
+
+        <ServicosLista servicos={outros} titulo={textos.homeServicosTitulo} subtitulo={textos.homeServicosSubtitulo} />
+        <div className="mx-auto max-w-6xl px-6 -mt-12 mb-16">
+          <ObservacoesServicos className="max-w-3xl" />
+        </div>
+
+        <Produtos produtos={produtos} />
 
         <Planos itens={planos} />
 
