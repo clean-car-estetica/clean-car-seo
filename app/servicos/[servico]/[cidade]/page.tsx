@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/lib/config";
+import { fotoServico } from "@/lib/fotos";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
@@ -53,7 +54,7 @@ export default async function ServicoCidadePage({
   if (!servico || !cidade) return notFound();
 
   const conteudo = await getConteudoLocalPublico(servico, cidade);
-  const imagemFundo = conteudo.imagemOverride || servico.imagem_url;
+  const imagemFundo = fotoServico(servico.slug, conteudo.imagemOverride || servico.imagem_url);
 
   return (
     <>

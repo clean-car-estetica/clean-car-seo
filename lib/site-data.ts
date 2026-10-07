@@ -1,5 +1,6 @@
 import { supabasePublico } from "@/lib/supabase";
 import { servicos as servicosPadrao, cidades as cidadesPadrao } from "@/lib/data";
+import { fotoServico } from "@/lib/fotos";
 
 export type CidadeDB = {
   slug: string;
@@ -42,7 +43,7 @@ export async function getServicosPublicos(): Promise<ServicoDB[]> {
   try {
     const { data, error } = await supabasePublico.from("services").select("*").eq("ativo", true).order("ordem");
     if (error || !data || data.length === 0) throw error ?? new Error("vazio");
-    return data as ServicoDB[];
+    return (data as ServicoDB[]).map((s) => ({ ...s, imagem_url: fotoServico(s.slug, s.imagem_url) }));
   } catch {
     // Fallback: dados fixos do código, usados até a tabela ser populada no console
     return [...servicosPadrao]
@@ -54,7 +55,7 @@ export async function getServicosPublicos(): Promise<ServicoDB[]> {
         descricao: s.descricao,
         duracao: s.duracao ?? null,
         preco_desde: s.precoDesde ?? null,
-        imagem_url: s.imagem,
+        imagem_url: fotoServico(s.slug, s.imagem),
         tag: s.tag ?? null,
         pontos_fidelidade: s.pontosFidelidade ?? 0,
         ordem: s.ordem,

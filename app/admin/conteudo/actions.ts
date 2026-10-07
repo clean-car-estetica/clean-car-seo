@@ -1,4 +1,5 @@
 "use server";
+import { FOTO_PADRAO } from "@/lib/fotos";
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -124,7 +125,7 @@ export async function criarServico(formData: FormData) {
   const descricao = String(formData.get("descricao") || "");
   const imagem_url =
     String(formData.get("imagem_url") || "") ||
-    "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80";
+    FOTO_PADRAO;
   const pontos_fidelidade = Number(formData.get("pontos_fidelidade") || 0);
   const ordem = Number(formData.get("ordem") || 0);
   const termo_popular = String(formData.get("termo_popular") || "") || null;

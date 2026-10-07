@@ -1,3 +1,4 @@
+import { FOTO_HERO, fotoHero } from "@/lib/fotos";
 import { supabasePublico } from "@/lib/supabase";
 import { CONTATO_PADRAO, type Contato } from "@/lib/config";
 
@@ -241,14 +242,15 @@ export const heroPadrao: HeroContent = {
   subtitulo:
     "Lavagem, higienização e enceramento na nossa loja em Mogi das Cruzes. Recebemos também clientes de Suzano, Poá, Ferraz de Vasconcelos e Itaquaquecetuba, sempre com hora marcada.",
   badge_texto: "Produtos Vonixx · Química Premium",
-  imagem_url: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1600&q=80",
+  imagem_url: FOTO_HERO,
 };
 
 export async function getHeroContent(): Promise<HeroContent> {
   try {
     const { data } = await supabasePublico.from("site_content").select("data").eq("section", "hero").single();
     if (!data?.data) return heroPadrao;
-    return { ...heroPadrao, ...(data.data as Partial<HeroContent>) };
+    const hero = { ...heroPadrao, ...(data.data as Partial<HeroContent>) };
+    return { ...hero, imagem_url: fotoHero(hero.imagem_url) };
   } catch {
     return heroPadrao;
   }
