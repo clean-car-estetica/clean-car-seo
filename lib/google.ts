@@ -102,6 +102,18 @@ async function postGoogle(url: string, corpo: unknown) {
 // ---------------------------------------------------------------- Search Console
 export type LinhaGSC = { keys: string[]; clicks: number; impressions: number; ctr: number; position: number };
 
+// Durante a mudança de endereço, o histórico ainda está na propriedade antiga
+// (clean-car-seo.vercel.app). O painel soma as duas; se a antiga não tiver
+// acesso liberado, é ignorada sem erro.
+const SITE_ANTIGO = "https://clean-car-seo.vercel.app/";
+
+async function consultarUmSite(site: string, corpo: Record<string, unknown>): Promise<LinhaGSC[]> {
+  return comCache(`gsc:${site}:${JSON.stringify(corpo)}`, 30, async () => {
+    const j = await postGoogle(`https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(site)}/searchAnalytics/query`, corpo);
+    return (j.rows ?? []) as LinhaGSC[];
+  });
+}
+
 export async function consultarSearchConsole(params: {
   inicio: string;
   fim: string;
@@ -109,17 +121,36 @@ export async function consultarSearchConsole(params: {
   limite?: number;
 }): Promise<LinhaGSC[]> {
   const site = googleConfigurado().site;
-  const corpo = {
-    startDate: params.inicio,
-    endDate: params.fim,
-    dimensions: params.dimensoes ?? [],
-    rowLimit: params.limite ?? 1000,
-    dataState: "all",
-  };
-  return comCache(`gsc:${JSON.stringify(corpo)}`, 30, async () => {
-    const j = await postGoogle(`https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(site)}/searchAnalytics/query`, corpo);
-    return (j.rows ?? []) as LinhaGSC[];
-  });
+  const dims = params.dimensoes ?? [];
+  const corpo = { startDate: params.inicio, endDate: params.fim, dimensions: dims, rowLimit: params.limite ?? 1000, dataState: "all" };
+  const [novo, antigo] = await Promise.all([
+    consultarUmSite(site, corpo),
+    consultarUmSite(SITE_ANTIGO, corpo).catch(() => [] as LinhaGSC[]),
+  ]);
+  if (antigo.length === 0) return novo;
+
+  // Soma por chave; páginas viram caminho (/servicos/...) para juntar os dois domínios
+  const iPagina = dims.indexOf("page");
+  const juntas = new Map<string, { keys: string[]; clicks: number; impressions: number; posPeso: number }>();
+  for (const r of [...novo, ...antigo]) {
+    const keys = r.keys ? [...r.keys] : [];
+    if (iPagina >= 0) keys[iPagina] = keys[iPagina].replace(/^https?:\/\/[^/]+/, "") || "/";
+    const k = keys.join("\u0001");
+    const atual = juntas.get(k) ?? { keys, clicks: 0, impressions: 0, posPeso: 0 };
+    atual.clicks += r.clicks;
+    atual.impressions += r.impressions;
+    atual.posPeso += r.position * r.impressions;
+    juntas.set(k, atual);
+  }
+  return [...juntas.values()]
+    .map((v) => ({
+      keys: v.keys,
+      clicks: v.clicks,
+      impressions: v.impressions,
+      ctr: v.impressions ? v.clicks / v.impressions : 0,
+      position: v.impressions ? v.posPeso / v.impressions : 0,
+    }))
+    .sort((x, y) => y.clicks - x.clicks || y.impressions - x.impressions);
 }
 
 // ---------------------------------------------------------------- Analytics 4
