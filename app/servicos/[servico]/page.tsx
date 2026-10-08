@@ -9,6 +9,7 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { servicos, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 import { getServicoPublico, getCidadesPublicas } from "@/lib/site-data";
+import Midia from "@/components/Midia";
 
 export const revalidate = 60;
 
@@ -53,12 +54,9 @@ export default async function ServicoPage({
     <>
       <Header />
       <main className="flex-1 pt-20">
-        <section
-          className="shine-sweep bg-carbon text-steel bg-cover bg-center"
-          style={{
-            backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.6), rgba(10,10,13,0.97)), url('${servico.imagem_url}')`,
-          }}
-        >
+        <section className="relative isolate overflow-hidden bg-carbon text-steel">
+          <Midia src={servico.imagem_url} className="foto-servico absolute inset-0 -z-10 w-full h-full object-cover" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-carbon/60 to-carbon" />
           <div className="mx-auto max-w-4xl px-6 py-24">
             <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm mb-4">
               Serviço Clean Car {servico.tag ? `· ${servico.tag}` : ""}

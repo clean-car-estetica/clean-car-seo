@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import AgendarButton from "@/components/AgendarButton";
 import type { ServicoDB } from "@/lib/site-data";
+import Midia from "@/components/Midia";
 
 // "Qual lavagem seu carro precisa?" — a pessoa diz o que quer e o pacote
 // certo aparece. Bronze, Prata e Ouro são níveis de cuidado, então o
@@ -61,7 +62,7 @@ export default function EscolhaLavagem({ servicos }: { servicos: ServicoDB[] }) 
           className="relative overflow-hidden rounded-2xl border border-card-line bg-card min-h-[420px] flex flex-col justify-end"
         >
           {s.imagem_url && (
-            <img key={s.slug} src={s.imagem_url} alt={s.nome} className="painel-foto foto-servico absolute inset-0 w-full h-full object-cover" />
+            <Midia key={s.slug} src={s.imagem_url} alt={s.nome} className="painel-foto foto-servico absolute inset-0 w-full h-full object-cover" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-carbon via-carbon/85 to-carbon/10" />
           <div className="relative p-6 md:p-8">

@@ -85,14 +85,16 @@ export type Tema = {
   cera: string;
 };
 
+// 08/10/2026: padrão "Escuro sóbrio" (quase preto, azul discreto). O painel
+// (/admin/tema) tem os prontos e permite trocar.
 export const TEMA_PADRAO: Tema = {
-  carbon: "#03071e",
-  carbonSoft: "#050a28",
-  card: "#070d32",
-  cardLine: "#16205c",
-  verniz: "#22d3ee",
-  vernizShine: "#67e8f9",
-  cera: "#f2b544",
+  carbon: "#05070c",
+  carbonSoft: "#0a0d14",
+  card: "#0f131c",
+  cardLine: "#1d2433",
+  verniz: "#2bb3cf",
+  vernizShine: "#6fd0e3",
+  cera: "#d9a441",
 };
 
 export async function getTema(): Promise<Tema> {

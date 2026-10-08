@@ -2,20 +2,20 @@
 
 :root {
   /* Estúdio — fundo azul marinho quase preto */
-  --carbon: #03071e;
-  --carbon-soft: #050a28;
-  --card: #070d32;
-  --card-line: #16205c;
+  --carbon: #05070c;
+  --carbon-soft: #0a0d14;
+  --card: #0f131c;
+  --card-line: #1d2433;
   /* Cristal — ciano de vitrificação/cerâmica, cor de assinatura */
-  --verniz: #22d3ee;
-  --verniz-shine: #67e8f9;
+  --verniz: #2bb3cf;
+  --verniz-shine: #6fd0e3;
   --verniz-glow: rgba(34, 211, 238, 0.35);
   /* Selo — dourado/âmbar de produto premium (Vonixx) */
-  --cera: #f2b544;
+  --cera: #d9a441;
   --steel: #f4f6fa;
   --steel-line: #b9c1cf;
   --ink: #eef0f3;
-  --paper: #03071e;
+  --paper: #05070c;
   --ok: #34d399;
   --warn: #fb7185;
 }
@@ -45,7 +45,7 @@ body {
 }
 
 .glow-text {
-  text-shadow: 0 0 24px var(--verniz-glow), 0 0 2px rgba(103, 232, 249, 0.6);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--verniz) 28%, transparent);
 }
 
 /* Fotos dos serviços: tira o estourado das fotos de banco claras */

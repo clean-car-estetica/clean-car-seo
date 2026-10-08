@@ -7,6 +7,7 @@ import type { Campanha } from "@/lib/site-content";
 import { gtagEvent } from "@/lib/gtag";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { parseRota, obterOrigem } from "@/lib/track";
+import Midia from "@/components/Midia";
 
 const CHAVE_LOCAL = "cleancar_campanha_fechada";
 
@@ -47,7 +48,7 @@ export default function CampanhaPopup({ campanha }: { campanha: Campanha }) {
           <X size={18} />
         </button>
         {campanha.imagem_url && (
-          <div className="h-40 bg-cover bg-center" style={{ backgroundImage: `url('${campanha.imagem_url}')` }} />
+          <Midia src={campanha.imagem_url} className="h-40 w-full object-cover" />
         )}
         <div className="p-6">
           <h3 className="font-display font-bold text-xl text-steel mb-2">{campanha.titulo}</h3>

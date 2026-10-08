@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { supabasePublico } from "@/lib/supabase";
+import Midia from "@/components/Midia";
 
 export const revalidate = 300;
 
@@ -40,12 +41,10 @@ export default async function PaginaCustomizada({ params }: { params: Promise<{ 
       <Header />
       <main className="flex-1 pt-20">
         {pagina.imagem_url && (
-          <div
-            className="h-64 bg-cover bg-center"
-            style={{
-              backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.3), rgba(10,10,13,0.9)), url('${pagina.imagem_url}')`,
-            }}
-          />
+          <div className="relative h-64 overflow-hidden">
+            <Midia src={pagina.imagem_url} className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-b from-carbon/30 to-carbon/90" />
+          </div>
         )}
         <section className="mx-auto max-w-2xl px-6 py-16">
           <h1 className="font-display font-extrabold text-3xl md:text-5xl text-steel mb-6">{pagina.titulo}</h1>

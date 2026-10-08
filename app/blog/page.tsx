@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import { supabasePublico } from "@/lib/supabase";
+import Midia from "@/components/Midia";
 
 export const revalidate = 60;
 
@@ -43,7 +44,7 @@ export default async function BlogIndex() {
               >
                 {p.imagem_url && (
                   <div className="h-40 overflow-hidden">
-                    <img src={p.imagem_url} alt={p.titulo} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <Midia src={p.imagem_url} alt={p.titulo} className="w-full h-full object-cover group-hover:scale-105 transition-transform" lazy />
                   </div>
                 )}
                 <div className="p-5">

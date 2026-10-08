@@ -2,8 +2,10 @@
 
 import { useState, useTransition, useCallback } from "react";
 import Cropper from "react-easy-crop";
-import { Upload, Check, X as XIcon } from "lucide-react";
-import { uploadImagem } from "@/app/admin/_actions/media";
+import { Upload, Check, X as XIcon, Film } from "lucide-react";
+import { uploadImagem, criarEnvioVideo } from "@/app/admin/_actions/media";
+import { supabasePublico } from "@/lib/supabase";
+import Midia, { ehVideo } from "@/components/Midia";
 import { gerarImagemRecortada, type AreaPixels } from "@/lib/crop-image";
 
 export default function ImageUploader({
@@ -52,6 +54,29 @@ export default function ImageUploader({
     e.target.value = "";
   }
 
+  // 08/10/2026: todo campo de imagem aceita vídeo também. Vídeo vai direto
+  // do navegador para o Storage (é grande demais para passar pelo servidor).
+  const [enviandoVideo, setEnviandoVideo] = useState(false);
+  async function handleVideo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setErro(null);
+    if (file.size > 50 * 1024 * 1024) { setErro("O vídeo tem mais de 50 MB. Corte para 10 a 20 segundos ou exporte em 720p."); return; }
+    setEnviandoVideo(true);
+    try {
+      const { caminho, token, publicUrl } = await criarEnvioVideo(file.name);
+      const { error } = await supabasePublico.storage.from("imagens").uploadToSignedUrl(caminho, token, file, { contentType: file.type || "video/mp4" });
+      if (error) throw new Error(error.message);
+      setUrl(publicUrl);
+      onUrlChange?.(publicUrl);
+    } catch (err: any) {
+      setErro("Não consegui enviar o vídeo: " + (err?.message ?? err) + ". Você pode colar o link do vídeo no campo abaixo.");
+    } finally {
+      setEnviandoVideo(false);
+    }
+  }
+
   const aoMudarArea = useCallback((_: unknown, areaPixels: AreaPixels) => {
     setAreaRecorte(areaPixels);
   }, []);
@@ -90,15 +115,35 @@ export default function ImageUploader({
       <div className="flex items-center gap-3">
         {url && (
           <div className="w-20 h-20 rounded-lg border border-card-line overflow-hidden shrink-0">
-            <img src={url} alt="" className="w-full h-full object-cover" />
+            <Midia src={url} className="w-full h-full object-cover" />
           </div>
         )}
-        <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel-line text-sm cursor-pointer hover:border-verniz hover:text-verniz-shine">
-          <Upload size={16} />
-          {pendente ? "Enviando..." : "Trocar imagem"}
-          <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={pendente} />
-        </label>
+        <div className="flex flex-wrap gap-2">
+          <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel-line text-sm cursor-pointer hover:border-verniz hover:text-verniz-shine">
+            <Upload size={16} />
+            {pendente ? "Enviando..." : "Enviar foto"}
+            <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={pendente || enviandoVideo} />
+          </label>
+          <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel-line text-sm cursor-pointer hover:border-verniz hover:text-verniz-shine">
+            <Film size={16} />
+            {enviandoVideo ? "Enviando vídeo..." : "Enviar vídeo"}
+            <input type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={handleVideo} disabled={pendente || enviandoVideo} />
+          </label>
+          {url && (
+            <button type="button" onClick={() => { setUrl(""); onUrlChange?.(""); }} className="px-3 py-2 rounded-lg border border-card-line text-steel-line text-sm hover:text-warn">
+              Remover
+            </button>
+          )}
+        </div>
       </div>
+      <input
+        type="url"
+        value={url}
+        onChange={(e) => { setUrl(e.target.value); onUrlChange?.(e.target.value); }}
+        placeholder="ou cole aqui o link de uma foto ou vídeo (.mp4)"
+        className="mt-2 w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-xs"
+      />
+      {url && ehVideo(url) && <p className="text-[11px] text-steel-line/70 mt-1">Vídeo: toca sozinho, sem som e em repetição no site.</p>}
 
       {specTexto && <p className="text-[11px] text-steel-line/60 mt-1">Recomendado: {specTexto}</p>}
       {erro && <p className="text-warn text-xs mt-1">{erro}</p>}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MoveHorizontal } from "lucide-react";
+import Midia from "@/components/Midia";
 
 export default function BeforeAfter({
   before,
@@ -23,8 +24,8 @@ export default function BeforeAfter({
   return (
     <div className="rounded-2xl bg-card border border-card-line overflow-hidden">
       <div className="relative h-[280px] md:h-[340px] bg-black select-none">
-        <img src={after} alt={afterLabel} className="absolute inset-0 w-full h-full object-cover" />
-        <img
+        <Midia src={after} alt={afterLabel} className="absolute inset-0 w-full h-full object-cover" />
+        <Midia
           src={before}
           alt={beforeLabel}
           className="absolute inset-0 w-full h-full object-cover"

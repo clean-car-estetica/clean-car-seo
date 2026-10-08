@@ -31,7 +31,7 @@ export async function uploadImagem(formData: FormData): Promise<string> {
 export async function criarEnvioVideo(nomeArquivo: string): Promise<{ caminho: string; token: string; publicUrl: string }> {
   const extensao = (nomeArquivo.split(".").pop() || "mp4").toLowerCase().replace(/[^a-z0-9]/g, "") || "mp4";
   const sufixo = Math.random().toString(36).slice(2, 8);
-  const caminho = `videos/topo-${sufixo}.${extensao}`;
+  const caminho = `videos/video-${sufixo}.${extensao}`;
   const { data, error } = await supabaseAdmin.storage.from("imagens").createSignedUploadUrl(caminho);
   if (error || !data) throw new Error(error?.message || "Não consegui preparar o envio do vídeo.");
   const { data: pub } = supabaseAdmin.storage.from("imagens").getPublicUrl(caminho);

@@ -7,6 +7,7 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import WhatsappCTA from "@/components/WhatsappCTA";
 import { supabasePublico } from "@/lib/supabase";
+import Midia from "@/components/Midia";
 
 export const revalidate = 60;
 
@@ -41,12 +42,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <Header />
       <main className="flex-1 pt-20">
         {post.imagem_url && (
-          <div
-            className="h-72 bg-cover bg-center"
-            style={{
-              backgroundImage: `linear-gradient(180deg, rgba(10,10,13,0.3), rgba(10,10,13,0.9)), url('${post.imagem_url}')`,
-            }}
-          />
+          <div className="relative h-72 overflow-hidden">
+            <Midia src={post.imagem_url} className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-b from-carbon/30 to-carbon/90" />
+          </div>
         )}
         <section className="mx-auto max-w-2xl px-6 py-16">
           <h1 className="font-display font-extrabold text-3xl md:text-5xl text-steel mb-6">{post.titulo}</h1>

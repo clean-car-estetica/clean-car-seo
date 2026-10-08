@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Midia from "@/components/Midia";
 
 export default function ServiceCard({
   slug,
@@ -23,10 +24,10 @@ export default function ServiceCard({
     >
       <div className="relative h-56 overflow-hidden">
         {image ? (
-          <img
+          <Midia
             src={image}
             alt={nome}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="foto-servico w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-card to-black">

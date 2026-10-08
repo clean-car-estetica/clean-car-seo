@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Midia from "@/components/Midia";
 
 // Fundo do topo: vídeo (computador e celular separados) ou foto, conforme o
 // painel. Quem pediu menos movimento no aparelho vê só a imagem parada.
@@ -27,13 +28,13 @@ export default function HeroMidia({
   return (
     <div className="absolute inset-0 -z-10 bg-carbon" aria-hidden="true">
       {imagemUrl && (
-        <img src={imagemUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <Midia src={imagemUrl} className="absolute inset-0 w-full h-full object-cover" />
       )}
       {src && (
         <video
           key={src}
           src={src}
-          poster={imagemUrl || undefined}
+          poster={imagemUrl && !/\.(mp4|webm|mov|m4v)/i.test(imagemUrl) ? imagemUrl : undefined}
           autoPlay
           muted
           loop
