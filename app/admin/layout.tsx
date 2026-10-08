@@ -5,7 +5,7 @@ import { marcarNavegadorInterno } from "@/lib/track";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { LayoutDashboard, Search, LogOut, Smile, Inbox, Link2, Plug, UserSearch, Menu, X, MousePointerClick } from "lucide-react";
+import { LayoutDashboard, Search, LogOut, Smile, Inbox, Link2, Plug, UserSearch, Menu, X, MousePointerClick, Star } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -54,7 +54,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin", label: "Resultados", icon: LayoutDashboard },
         { href: "/admin/editor", label: "Editor do site", icon: MousePointerClick },
         { href: "/admin/leads", label: "Contatos recebidos", icon: Inbox },
-        { href: "/admin/nps", label: "Avaliações (NPS)", icon: Smile },
+        { href: "/admin/avaliacoes-google", label: "Avaliações do Google", icon: Star },
+        { href: "/admin/nps", label: "Pesquisa NPS", icon: Smile },
       ],
     },
     {

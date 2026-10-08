@@ -249,3 +249,32 @@ export async function getTransformacoesPublicas(): Promise<Transformacao[]> {
     return transformacoesPadrao;
   }
 }
+
+// Avaliações reais do Google (trazidas todo dia por /api/cron/avaliacoes)
+export type AvaliacaoGoogle = {
+  chave: string;
+  autor: string;
+  foto_url: string | null;
+  nota: number;
+  texto: string | null;
+  publicado_em: string;
+};
+export type ResumoGoogle = { nota: number | null; total: number | null };
+
+export async function getAvaliacoesGoogle(limite = 9): Promise<{ itens: AvaliacaoGoogle[]; resumo: ResumoGoogle }> {
+  try {
+    const [{ data }, { data: r }] = await Promise.all([
+      supabasePublico
+        .from("avaliacoes_google")
+        .select("chave, autor, foto_url, nota, texto, publicado_em")
+        .eq("visivel", true)
+        .order("publicado_em", { ascending: false })
+        .limit(limite),
+      supabasePublico.from("site_content").select("data").eq("section", "google_resumo").maybeSingle(),
+    ]);
+    const d = (r?.data ?? {}) as { nota?: number; total?: number };
+    return { itens: (data ?? []) as AvaliacaoGoogle[], resumo: { nota: d.nota ?? null, total: d.total ?? null } };
+  } catch {
+    return { itens: [], resumo: { nota: null, total: null } };
+  }
+}

@@ -13,7 +13,7 @@ export const BLOCOS: Record<string, BlocoEditor> = {
   planos: { rotulo: "Planos mensais", caminho: "/admin/planos", dica: "Assinaturas, preços e o que cada uma inclui." },
   cidades: { rotulo: "Cidades atendidas", caminho: "/admin/cidades", dica: "Cidades que aparecem na lista e nas páginas locais." },
   textos: { rotulo: "Títulos das seções", caminho: "/admin/textos", dica: "Títulos e subtítulos fixos das seções da página inicial." },
-  depoimentos: { rotulo: "Depoimentos", caminho: "/admin/depoimentos", dica: "O que os clientes falaram." },
+  depoimentos: { rotulo: "Avaliações e depoimentos", caminho: "/admin/avaliacoes-google", dica: "Avaliações do Google que entram sozinhas e depoimentos manuais." },
   indicacao: { rotulo: "Indique e ganhe", caminho: "/admin/promocoes", dica: "Promoção de indicação e cupom." },
   faq: { rotulo: "Perguntas frequentes", caminho: "/admin/faq", dica: "Perguntas e respostas." },
   rodape: { rotulo: "Rodapé", caminho: "/admin/contato", dica: "Endereço, horários e links do rodapé." },
