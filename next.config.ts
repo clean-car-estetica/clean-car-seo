@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
         destination: "https://cleancarestetica.com.br/:path",
         permanent: true,
       },
+      // 08/10/2026: agenda online saiu do site — o agendamento é pelo WhatsApp (bot).
+      { source: "/agendar-online", destination: "/contato", permanent: true },
       { source: "/servicos/vitrificacao", destination: "/servicos/enceramento-tecnico", permanent: true },
       { source: "/servicos/vitrificacao/:cidade", destination: "/servicos/enceramento-tecnico/:cidade", permanent: true },
       { source: "/servicos/vitrificacao/:cidade/:bairro", destination: "/servicos/enceramento-tecnico/:cidade/:bairro", permanent: true },

@@ -73,7 +73,7 @@ export default async function ServicoPage({
               {servico.preco_desde && <span className="text-verniz-shine font-bold">A partir de R$ {servico.preco_desde}</span>}
             </div>
             <ObservacoesServicos className="mt-4 max-w-xl font-sans" />
-            <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
+            <AgendarButton servico={servico.nome} className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
               Agendar este serviço
             </AgendarButton>
           </div>
@@ -121,7 +121,7 @@ export default async function ServicoPage({
         )}
       </main>
       <Footer />
-      <WhatsappFloat />
+      <WhatsappFloat servico={servico.nome} />
     </>
   );
 }

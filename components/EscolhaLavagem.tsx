@@ -74,7 +74,7 @@ export default function EscolhaLavagem({ servicos }: { servicos: ServicoDB[] }) 
             </div>
             <p className="mt-3 text-steel max-w-2xl leading-relaxed">{s.descricao}</p>
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              <AgendarButton className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-7 py-3 hover:bg-verniz-shine transition-colors">
+              <AgendarButton servico={s.nome} className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-7 py-3 hover:bg-verniz-shine transition-colors">
                 Agendar {s.nome}
               </AgendarButton>
               <Link href={`/servicos/${s.slug}`} className="text-sm font-bold text-steel-line hover:text-verniz-shine underline underline-offset-4">

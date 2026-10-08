@@ -1,13 +1,13 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { whatsappLink } from "@/lib/config";
+import { whatsappLink, mensagemSaberMais } from "@/lib/config";
 import { useContato } from "@/components/ContatoProvider";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { parseRota, obterOrigem } from "@/lib/track";
 import { gtagEvent } from "@/lib/gtag";
 
-export default function WhatsappCTA({ texto = "Falar no WhatsApp" }: { texto?: string }) {
+export default function WhatsappCTA({ texto = "Falar no WhatsApp", servico }: { texto?: string; servico?: string }) {
   const pathname = usePathname();
   const contato = useContato();
 
@@ -23,7 +23,7 @@ export default function WhatsappCTA({ texto = "Falar no WhatsApp" }: { texto?: s
 
   return (
     <a
-      href={whatsappLink(contato)}
+      href={whatsappLink(contato, servico ? mensagemSaberMais(servico) : undefined)}
       onClick={registrarClique}
       target="_blank"
       rel="noopener noreferrer"

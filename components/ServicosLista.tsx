@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { ServicoDB } from "@/lib/site-data";
 import Midia from "@/components/Midia";
+import AgendarButton from "@/components/AgendarButton";
 
 // Os outros cuidados em lista, como um catálogo: no computador a foto do
 // serviço aparece ao lado quando o mouse (ou o foco do teclado) passa na
@@ -21,12 +22,12 @@ export default function ServicosLista({ servicos, titulo, subtitulo }: { servico
       <div className="mt-10 grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 items-start">
         <ul className="border-t border-card-line">
           {servicos.map((s, i) => (
-            <li key={s.slug} className="border-b border-card-line">
+            <li key={s.slug} className="border-b border-card-line flex items-center gap-3">
               <Link
                 href={`/servicos/${s.slug}`}
                 onMouseEnter={() => setAtivo(i)}
                 onFocus={() => setAtivo(i)}
-                className="group grid grid-cols-[4.5rem_minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center py-5 focus-visible:outline-2 focus-visible:outline-verniz"
+                className="group flex-1 min-w-0 grid grid-cols-[4.5rem_minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center py-5 focus-visible:outline-2 focus-visible:outline-verniz"
               >
                 <span className="lg:hidden h-16 w-[4.5rem] rounded-lg overflow-hidden bg-card">
                   {s.imagem_url && <Midia src={s.imagem_url} className="foto-servico h-full w-full object-cover" lazy />}
@@ -46,6 +47,12 @@ export default function ServicosLista({ servicos, titulo, subtitulo }: { servico
                   {s.duracao && <span className="block text-xs text-steel-line">{s.duracao}</span>}
                 </span>
               </Link>
+              <AgendarButton
+                servico={s.nome}
+                className="shrink-0 rounded-full border border-verniz/60 text-verniz-shine font-display font-bold text-sm px-4 py-2 hover:bg-verniz hover:text-carbon transition-colors"
+              >
+                Agendar
+              </AgendarButton>
             </li>
           ))}
         </ul>

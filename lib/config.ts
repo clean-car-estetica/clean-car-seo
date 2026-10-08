@@ -21,6 +21,17 @@ export const CONTATO_PADRAO = {
 
 export type Contato = typeof CONTATO_PADRAO;
 
+// 08/10/2026: a agenda online saiu do site — todo "Agendar" abre o WhatsApp
+// (o bot agenda) com a mensagem dizendo que veio do site e qual serviço.
+export function mensagemAgendar(servico?: string) {
+  return servico
+    ? `Olá! Vim pelo site da Clean Car e gostaria de agendar: ${servico}.`
+    : "Olá! Vim pelo site da Clean Car e gostaria de agendar um horário.";
+}
+export function mensagemSaberMais(servico: string) {
+  return `Olá! Vim pelo site da Clean Car e gostaria de saber mais sobre ${servico}.`;
+}
+
 export function whatsappLink(contato: Contato, mensagem?: string) {
   const texto = encodeURIComponent(mensagem ?? contato.whatsappMsg);
   return `https://wa.me/${contato.whatsapp}?text=${texto}`;

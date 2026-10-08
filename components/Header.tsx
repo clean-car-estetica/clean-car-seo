@@ -42,7 +42,6 @@ export default function Header() {
   ];
   const LINKS_MENU = [
     ...LINKS,
-    { href: "/mogi-das-cruzes", label: t.navMogi },
     { href: "/faq", label: t.navFaq },
     { href: "/#indicacao", label: t.navIndicacao },
     { href: "/beneficios", label: t.navBeneficios },
@@ -102,7 +101,8 @@ export default function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-                    <AgendarButton className="hidden sm:inline-block rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors whitespace-nowrap">
+                    <div className="hidden sm:flex items-center gap-2">{iconesSociais}</div>
+          <AgendarButton className="hidden sm:inline-block rounded-full bg-verniz text-carbon font-display font-bold px-5 py-2 text-sm tracking-wide hover:bg-verniz-shine transition-colors whitespace-nowrap">
             {t.navBotaoAgendar}
           </AgendarButton>
           <button
@@ -122,7 +122,7 @@ export default function Header() {
               {l.label}
             </Link>
           ))}
-          <div className="flex items-center gap-2 py-1">{iconesSociais}</div>
+          <div className="sm:hidden flex items-center gap-2 py-1">{iconesSociais}</div>
           <AgendarButton className="sm:hidden inline-block text-center rounded-full bg-verniz text-carbon font-display font-bold px-5 py-3 text-sm tracking-wide hover:bg-verniz-shine transition-colors">
             {t.navBotaoAgendar}
           </AgendarButton>

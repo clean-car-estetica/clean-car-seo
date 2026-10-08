@@ -91,7 +91,7 @@ export default async function ServicoCidadePage({
             <p className="text-sm text-steel-line">{cidade.bairros.join(", ")}</p>
           </div>
 
-          <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
+          <AgendarButton servico={servico.nome} className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
             Agendar em {cidade.nome}
           </AgendarButton>
         </section>
@@ -119,7 +119,7 @@ export default async function ServicoCidadePage({
         />
       </main>
       <Footer />
-      <WhatsappFloat />
+      <WhatsappFloat servico={servico.nome} />
     </>
   );
 }

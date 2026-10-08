@@ -1,6 +1,7 @@
 "use client";
 
 import { useContato } from "@/components/ContatoProvider";
+import { whatsappLink, mensagemAgendar } from "@/lib/config";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { usePathname } from "next/navigation";
 import { parseRota, obterOrigem } from "@/lib/track";
@@ -10,10 +11,14 @@ export default function AgendarButton({
   className,
   children,
   href,
+  servico,
 }: {
   className?: string;
   children: React.ReactNode;
+  /** Link próprio (ex.: código de indicação). Sem ele, abre o WhatsApp. */
   href?: string;
+  /** Nome do serviço: vai na mensagem do WhatsApp. */
+  servico?: string;
 }) {
   const pathname = usePathname();
   const contato = useContato();
@@ -29,7 +34,13 @@ export default function AgendarButton({
   }
 
   return (
-    <a href={href ?? contato.agendamentoUrl} onClick={registrarClique} className={className}>
+    <a
+      href={href ?? whatsappLink(contato, mensagemAgendar(servico))}
+      onClick={registrarClique}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
       {children}
     </a>
   );
