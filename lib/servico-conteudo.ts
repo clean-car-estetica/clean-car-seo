@@ -50,7 +50,7 @@ export const CONTEUDO_SERVICO: Record<string, ConteudoServico> = {
     ],
     perguntas: [
       { pergunta: "Por que demora mais de 3 horas?", resposta: "Porque é uma lavagem detalhada: cada fresta, emblema e moldura é limpa à mão, e o selante precisa ser aplicado e acabado com calma para durar." },
-      { pergunta: "O selante substitui a vitrificação?", resposta: "Não. O selante protege por até 3 meses. A vitrificação é um revestimento cerâmico que dura até 3 anos." },
+      { pergunta: "Quanto tempo dura o selante?", resposta: "Até 3 meses, seguindo os cuidados de lavagem que passamos na entrega." },
       { pergunta: "Tem leva e traz?", resposta: "Sim, conforme o bairro. Consulte pelo WhatsApp." },
     ],
   },
@@ -173,20 +173,6 @@ export const CONTEUDO_SERVICO: Record<string, ConteudoServico> = {
       { pergunta: "É só um perfume?", resposta: "Não. O tratamento ataca a causa do cheiro. Perfume só disfarça por alguns dias." },
       { pergunta: "Resolve cheiro de cigarro?", resposta: "Sim. Para casos muito fortes, recomendamos combinar com a higienização interna." },
       { pergunta: "Quanto tempo leva?", resposta: "Cerca de 1 hora." },
-    ],
-  },
-  vitrificacao: {
-    paraQuem: "Para carro novo ou com a pintura recém-corrigida, para quem quer a proteção mais duradoura e um brilho que chama atenção.",
-    etapas: [
-      { titulo: "Avaliação da pintura", texto: "Gratuita. Define se é preciso corrigir antes de vitrificar." },
-      { titulo: "Preparação", texto: "Lavagem e descontaminação completas da pintura." },
-      { titulo: "Revestimento cerâmico", texto: "Aplicação painel por painel." },
-      { titulo: "Cura", texto: "Tempo de cura antes da entrega, para a camada endurecer." },
-    ],
-    perguntas: [
-      { pergunta: "Quanto tempo dura a vitrificação?", resposta: "Até 3 anos, seguindo os cuidados de lavagem que passamos na entrega." },
-      { pergunta: "Qual a diferença para o enceramento?", resposta: "A cera protege por algumas semanas. A vitrificação forma uma camada cerâmica dura que dura anos e deixa a lavagem muito mais fácil." },
-      { pergunta: "Por que o carro fica um dia?", resposta: "Pela preparação da pintura e pelo tempo de cura do revestimento." },
     ],
   },
   "protecao-de-rodas": {

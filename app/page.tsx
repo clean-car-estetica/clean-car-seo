@@ -144,9 +144,8 @@ export default async function Home() {
                 a <Link href="/servicos/lavagem-prata/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem com enceramento</Link>,
                 a <Link href="/servicos/lavagem-ouro/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem detalhada</Link>,
                 a <Link href="/servicos/higienizacao/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">higienização interna</Link> com extratora,
-                a <Link href="/servicos/lavagem-motor/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem de motor a seco</Link>,
-                a <Link href="/servicos/restauracao-de-farol/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">restauração de faróis</Link> e
-                a <Link href="/servicos/vitrificacao/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">vitrificação</Link> da pintura.
+                a <Link href="/servicos/lavagem-motor/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem de motor a seco</Link>
+                e a <Link href="/servicos/restauracao-de-farol/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">restauração de faróis</Link>.
               </p>
               <p>
                 Em todas as etapas usamos produtos profissionais Vonixx e um processo pensado para não riscar: pré-lavagem

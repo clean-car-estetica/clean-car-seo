@@ -33,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // avaliação do site para baixo. Os bairros agora redirecionam para a
   // página do serviço; as cidades ficam acessíveis, mas sem indexar,
   // a menos que tenham texto próprio cadastrado em Páginas locais.
-  const slugs = new Set([...servicos.map((s) => s.slug), "vitrificacao"]);
+  const slugs = new Set(servicos.map((s) => s.slug));
   for (const slug of slugs) {
     entradas.push({ url: `${BASE_URL}/servicos/${slug}`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.8 });
   }

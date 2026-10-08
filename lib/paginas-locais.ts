@@ -9,7 +9,6 @@ export const PAGINAS_LOCAIS: { servico: string; cidade: string }[] = [
   { servico: "lavagem-ouro", cidade: "mogi-das-cruzes" },
   { servico: "higienizacao", cidade: "mogi-das-cruzes" },
   { servico: "higienizacao-banco-dianteiro", cidade: "mogi-das-cruzes" },
-  { servico: "vitrificacao", cidade: "mogi-das-cruzes" },
   { servico: "lavagem-bronze", cidade: "suzano" },
   { servico: "higienizacao", cidade: "suzano" },
   { servico: "revitalizacao-plastico", cidade: "suzano" },

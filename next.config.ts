@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
       { source: "/servicos/lavagem-chassi", destination: "/servicos/lavagem-ouro", permanent: true },
       { source: "/servicos/lavagem-chassi/:cidade", destination: "/servicos/lavagem-ouro/:cidade", permanent: true },
       { source: "/servicos/lavagem-chassi/:cidade/:bairro", destination: "/servicos/lavagem-ouro/:cidade/:bairro", permanent: true },
+      // 08/10/2026: vitrificação, polimento e lavagem de chassi não são mais feitos
+      { source: "/servicos/vitrificacao", destination: "/servicos/enceramento-tecnico", permanent: true },
+      { source: "/servicos/vitrificacao/:cidade", destination: "/servicos/enceramento-tecnico/:cidade", permanent: true },
+      { source: "/servicos/vitrificacao/:cidade/:bairro", destination: "/servicos/enceramento-tecnico/:cidade/:bairro", permanent: true },
       { source: "/servicos/ducha", destination: "/servicos/lavagem-bronze", permanent: true },
       { source: "/servicos/ducha/:cidade", destination: "/servicos/lavagem-bronze/:cidade", permanent: true },
       { source: "/servicos/ducha/:cidade/:bairro", destination: "/servicos/lavagem-bronze/:cidade/:bairro", permanent: true },
