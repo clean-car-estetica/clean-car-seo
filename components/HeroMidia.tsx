@@ -28,7 +28,7 @@ export default function HeroMidia({
   return (
     <div className="absolute inset-0 -z-10 bg-carbon" aria-hidden="true">
       {imagemUrl && (
-        <Midia src={imagemUrl} className="absolute inset-0 w-full h-full object-cover" />
+        <Midia src={imagemUrl} prioridade className="absolute inset-0 w-full h-full object-cover" />
       )}
       {src && (
         <video

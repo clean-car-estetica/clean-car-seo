@@ -1,4 +1,5 @@
 import { permanentRedirect } from "next/navigation";
+import { temPaginaLocal } from "@/lib/paginas-locais";
 
 // 07/10/2026: as páginas por bairro eram quase iguais entre si (só mudava
 // o nome do bairro) e o Google não indexava. Agora qualquer endereço antigo
@@ -9,6 +10,8 @@ export default async function ServicoBairroPage({
 }: {
   params: Promise<{ servico: string; cidade: string; bairro: string }>;
 }) {
-  const { servico } = await params;
-  permanentRedirect(`/servicos/${servico}`);
+  const { servico, cidade } = await params;
+  // Se o serviço tem página própria naquela cidade, o bairro leva para ela
+  // (mais próxima do que a pessoa buscou); senão, para a página do serviço.
+  permanentRedirect(temPaginaLocal(servico, cidade) ? `/servicos/${servico}/${cidade}` : `/servicos/${servico}`);
 }

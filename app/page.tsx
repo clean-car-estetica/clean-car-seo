@@ -20,6 +20,7 @@ import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
 import Faq from "@/components/Faq";
 import Bloco from "@/components/Bloco";
+import { paginaDaCidade } from "@/lib/paginas-locais";
 import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
 import { getTextosGerais } from "@/lib/site-content";
 
@@ -64,9 +65,12 @@ export default async function Home() {
               <span className="w-2 h-2 rounded-full bg-cera" />
               <span className="text-xs font-display font-bold tracking-wide text-cera">{hero.badge_texto}</span>
             </span>
-            <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-8xl leading-[0.9] max-w-3xl mt-6 text-balance">
-              {hero.titulo_parte1} <span className="text-verniz-shine glow-text">{hero.titulo_destaque}</span>
+            <h1 className="mt-5 text-sm md:text-base font-display font-bold uppercase tracking-[0.14em] text-steel">
+              Estética automotiva em Mogi das Cruzes
             </h1>
+            <p className="font-display font-extrabold text-5xl sm:text-6xl md:text-8xl leading-[0.9] max-w-3xl mt-3 text-balance">
+              {hero.titulo_parte1} <span className="text-verniz-shine glow-text">{hero.titulo_destaque}</span>
+            </p>
             <p className="mt-6 max-w-xl text-steel text-lg leading-relaxed">{hero.subtitulo}</p>
             <div className="flex flex-wrap gap-3 mt-8">
               <AgendarButton className="inline-block rounded-full bg-verniz text-carbon font-display font-bold text-lg px-8 py-3 hover:bg-verniz-shine transition-colors">
@@ -123,6 +127,44 @@ export default async function Home() {
 
         <Bloco id="planos"><Planos itens={planos} /></Bloco>
 
+        {/* Texto principal para o Google: quem somos, onde e o que fazemos */}
+        <section className="mx-auto max-w-6xl px-6 py-16 md:py-20 grid lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] gap-10">
+          <div>
+            <h2 className="font-display font-bold text-3xl md:text-4xl text-steel leading-tight text-balance">
+              Estética automotiva em Mogi das Cruzes e no Alto Tietê
+            </h2>
+            <div className="mt-5 space-y-4 text-steel-line leading-relaxed max-w-2xl">
+              <p>
+                A Clean Car Estética Automotiva fica no Jardim Universo, em Mogi das Cruzes, e cuida de carros de toda a
+                região: Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema. Trabalhamos com hora marcada e,
+                se você não puder trazer o carro, buscamos e devolvemos com o leva e traz.
+              </p>
+              <p>
+                Do básico ao completo: a <Link href="/servicos/lavagem-bronze/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem de carro</Link> do dia a dia,
+                a <Link href="/servicos/lavagem-prata/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem com enceramento</Link>,
+                a <Link href="/servicos/lavagem-ouro/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem detalhada</Link>,
+                a <Link href="/servicos/higienizacao/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">higienização interna</Link> com extratora,
+                a <Link href="/servicos/lavagem-motor/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem de motor a seco</Link>,
+                a <Link href="/servicos/restauracao-de-farol/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">restauração de faróis</Link> e
+                a <Link href="/servicos/vitrificacao/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">vitrificação</Link> da pintura.
+              </p>
+              <p>
+                Em todas as etapas usamos produtos profissionais Vonixx e um processo pensado para não riscar: pré-lavagem
+                com espuma, shampoo neutro e luvas de microfibra exclusivas. A avaliação é gratuita e o serviço tem garantia
+                de execução de 48 horas.
+              </p>
+            </div>
+          </div>
+          <aside className="self-start rounded-2xl bg-card border border-card-line p-6">
+            <h3 className="font-display font-bold text-xl text-steel">Clean Car Estética Automotiva</h3>
+            <address className="not-italic mt-3 text-sm text-steel-line leading-relaxed">
+              Rua Prefeito Sebastião Cascardo, 438<br />Jardim Universo, Mogi das Cruzes – SP<br />CEP 08740-450
+            </address>
+            <p className="mt-3 text-sm text-steel-line">Seg a sex, 9h às 18h · Sáb, 9h às 17h</p>
+            <p className="mt-3 text-sm text-steel-line">Leva e traz · Hora marcada · Avaliação grátis</p>
+          </aside>
+        </section>
+
         {/* Cidades */}
         <section data-editar="cidades" className="bg-carbon-soft py-20 border-y border-card-line">
           <div className="mx-auto max-w-6xl px-6">
@@ -136,7 +178,7 @@ export default async function Home() {
               {cidades.map((c) => (
                 <Link
                   key={c.slug}
-                  href={`/servicos/lavagem-bronze/${c.slug}`}
+                  href={paginaDaCidade(c.slug)}
                   className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-sm text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
                 >
                   {c.nome}

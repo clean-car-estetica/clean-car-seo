@@ -67,7 +67,7 @@ export default function ServicoTopo({
         <div className="order-1 lg:order-2">
           <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-card-line bg-card">
             {midia ? (
-              <Midia src={midia} alt={nomeServico} className="foto-servico absolute inset-0 w-full h-full object-cover" />
+              <Midia src={midia} alt={nomeServico} prioridade sizes="(min-width: 1024px) 45vw, 100vw" className="foto-servico absolute inset-0 w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center p-8 text-center font-display font-bold text-3xl text-steel-line/50">
                 {nomeServico}

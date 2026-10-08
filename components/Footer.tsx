@@ -41,17 +41,17 @@ export default function Footer() {
             Contato
           </div>
           <p className="text-sm">
-            <a href={whatsappLink(contato)} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+            <a href={whatsappLink(contato)} target="_blank" rel="noopener noreferrer" className="inline-block py-1.5 hover:text-verniz-shine">
               WhatsApp: {contato.whatsapp}
             </a>
           </p>
           <p className="text-sm">
-            <a href={contato.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+            <a href={contato.instagramUrl} target="_blank" rel="noopener noreferrer" className="inline-block py-1.5 hover:text-verniz-shine">
               @{contato.instagram}
             </a>
           </p>
           <p className="text-sm">
-            <a href={contato.googleUrl} target="_blank" rel="noopener noreferrer" className="hover:text-verniz-shine">
+            <a href={contato.googleUrl} target="_blank" rel="noopener noreferrer" className="inline-block py-1.5 hover:text-verniz-shine">
               Ver no Google Maps / avaliações
             </a>
           </p>
@@ -60,7 +60,7 @@ export default function Footer() {
           )}
         </div>
       </div>
-      <div className="text-center text-xs text-steel-line/60 py-4 border-t border-card-line">
+      <div className="text-center text-xs text-steel-line py-4 border-t border-card-line">
         © {new Date().getFullYear()} Clean Car Estética Automotiva
       </div>
     </footer>

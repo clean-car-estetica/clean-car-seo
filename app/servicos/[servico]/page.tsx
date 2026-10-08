@@ -15,6 +15,8 @@ import ProcessoEtapas from "@/components/ProcessoEtapas";
 import ServicosLista from "@/components/ServicosLista";
 import BeforeAfter from "@/components/BeforeAfter";
 import Faq from "@/components/Faq";
+import { CONTEUDO_SERVICO } from "@/lib/servico-conteudo";
+import { PAGINAS_LOCAIS } from "@/lib/paginas-locais";
 
 export const revalidate = 60;
 
@@ -62,6 +64,13 @@ export default async function ServicoPage({
   ]);
   if (!servico) return notFound();
   const outros = todos.filter((x) => x.slug !== servico.slug).slice(0, 6);
+  const conteudo = CONTEUDO_SERVICO[servico.slug];
+  const perguntas = [
+    ...(conteudo?.perguntas ?? []).map((p, i) => ({ id: -100 - i, pergunta: p.pergunta, resposta: p.resposta })),
+    ...faqs.slice(0, conteudo ? 2 : 4),
+  ];
+  // Cidades com página própria deste serviço aparecem primeiro
+  const comPagina = new Set(PAGINAS_LOCAIS.filter((p) => p.servico === servico.slug).map((p) => p.cidade));
 
   return (
     <>
@@ -112,6 +121,35 @@ export default async function ServicoPage({
           }}
         />
 
+        {conteudo && (
+          <section className="mx-auto max-w-6xl px-6 py-16 md:py-20 grid lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] gap-10">
+            <div>
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-steel leading-tight text-balance">
+                Como funciona: {servico.nome.split(" —")[0]}
+              </h2>
+              <p className="mt-4 text-steel-line leading-relaxed">
+                <strong className="text-steel">Para quem é:</strong> {conteudo.paraQuem}
+              </p>
+              <p className="mt-4 text-sm text-steel-line">
+                {servico.duracao ? `Tempo médio: ${servico.duracao}. ` : ""}
+                {servico.preco_desde ? `A partir de R$ ${servico.preco_desde}. ` : ""}
+                Feito no Jardim Universo, em Mogi das Cruzes, com produtos Vonixx.
+              </p>
+            </div>
+            <ol className="grid gap-4">
+              {conteudo.etapas.map((e, i) => (
+                <li key={e.titulo} className="flex gap-4 rounded-2xl bg-card border border-card-line p-5">
+                  <span className="font-display font-extrabold text-2xl text-verniz-shine tabular-nums leading-none">{i + 1}</span>
+                  <span>
+                    <span className="block font-display font-bold text-lg text-steel">{e.titulo}</span>
+                    <span className="block text-sm text-steel-line mt-1 leading-relaxed">{e.texto}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
         <Bloco id="processo"><ProcessoEtapas passos={passos} /></Bloco>
 
         {transformacoes.length > 0 && (
@@ -131,9 +169,9 @@ export default async function ServicoPage({
         {!semPaginasLocais && cidades.length > 0 && (
           <section className="mx-auto max-w-6xl px-6 pb-20">
             <h2 className="font-display font-bold text-3xl text-steel mb-2">{servico.nome} perto de você</h2>
-            <p className="text-steel-line mb-6">A loja fica em Mogi das Cruzes e recebe clientes de toda a região.</p>
+            <p className="text-steel-line mb-6">Nosso espaço fica no Jardim Universo, em Mogi das Cruzes, e recebe clientes de toda a região. Também temos leva e traz.</p>
             <div className="flex flex-wrap gap-3">
-              {cidades.map((c) => (
+              {[...cidades].sort((a, b) => Number(comPagina.has(b.slug)) - Number(comPagina.has(a.slug))).map((c) => (
                 <Link
                   key={c.slug}
                   href={`/servicos/${servico.slug}/${c.slug}`}
@@ -146,7 +184,7 @@ export default async function ServicoPage({
           </section>
         )}
 
-        {faqs.length > 0 && <Bloco id="faq"><Faq itens={faqs.slice(0, 4)} /></Bloco>}
+        {perguntas.length > 0 && <Bloco id="faq"><Faq itens={perguntas} /></Bloco>}
       </main>
       <Footer />
       <WhatsappFloat servico={servico.nome} esconderNoCelular />

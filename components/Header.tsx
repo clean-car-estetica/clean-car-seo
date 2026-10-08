@@ -90,7 +90,7 @@ export default function Header() {
           aria-label="Clean Car — voltar ao início"
           className="flex items-center gap-3 font-display font-extrabold text-2xl tracking-tight text-steel shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-verniz"
         >
-          <img src="/logo-clean-car.png" alt="" width={44} height={44} className="w-11 h-11 rounded-full ring-2 ring-verniz/40" />
+          <img src="/logo-clean-car-96.webp" alt="" width={44} height={44} className="w-11 h-11 rounded-full ring-2 ring-verniz/40" />
           <span>
             CLEAN <span className="text-verniz-shine glow-text">CAR</span>
           </span>

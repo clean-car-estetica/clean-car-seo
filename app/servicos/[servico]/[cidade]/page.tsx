@@ -37,7 +37,7 @@ export async function generateMetadata({
   const conteudo = await getConteudoLocalPublico(servico, cidade);
   const preco = servico.preco_desde ? ` a partir de R$ ${servico.preco_desde}` : "";
   const titulo = `${tituloBase} em ${cidade.nome}${servico.preco_desde ? ` · R$ ${servico.preco_desde}` : ""} | Clean Car`;
-  const descricao = `${servico.nome} para quem é de ${cidade.nome}: ${servico.resumo}${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}, na nossa loja em Mogi das Cruzes, com hora marcada. Agende pelo WhatsApp.`;
+  const descricao = `${servico.nome} para quem é de ${cidade.nome}: ${servico.resumo}${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}, em Mogi das Cruzes, com hora marcada e leva e traz. Agende pelo WhatsApp.`;
   return {
     title: { absolute: titulo },
     description: descricao,
@@ -95,7 +95,7 @@ export default async function ServicoCidadePage({
             <h2 className="font-display font-bold text-xl text-steel mb-2">Bairros atendidos em {cidade.nome}</h2>
             <p className="text-sm text-steel-line leading-relaxed">{cidade.bairros.join(", ")}</p>
             <p className="mt-4 text-sm text-steel-line">
-              O serviço é feito na nossa loja em Mogi das Cruzes, com hora marcada.
+              O serviço é feito no nosso espaço no Jardim Universo, em Mogi das Cruzes, com hora marcada. Também buscamos e devolvemos o carro (leva e traz): consulte o seu bairro pelo WhatsApp.
             </p>
           </aside>
         </section>
