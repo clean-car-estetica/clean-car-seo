@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import type { DepoimentoDB } from "@/lib/site-data";
+import LinksGoogle from "@/components/LinksGoogle";
 
 export default function Depoimentos({ itens }: { itens: DepoimentoDB[] }) {
   if (itens.length === 0) return null;
@@ -24,6 +25,7 @@ export default function Depoimentos({ itens }: { itens: DepoimentoDB[] }) {
           </div>
         ))}
       </div>
+      <LinksGoogle />
     </section>
   );
 }

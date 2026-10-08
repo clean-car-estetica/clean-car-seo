@@ -8,6 +8,8 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import { servicos, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 import { getServicoPublico, getCidadesPublicas, getServicosPublicos, getProcessoPassos, getTransformacoesPublicas, getFaqsPublicos } from "@/lib/site-data";
 import ServicoTopo from "@/components/ServicoTopo";
+import Diferenciais from "@/components/Diferenciais";
+import BarraAgendarCelular from "@/components/BarraAgendarCelular";
 import ProcessoEtapas from "@/components/ProcessoEtapas";
 import ServicosLista from "@/components/ServicosLista";
 import BeforeAfter from "@/components/BeforeAfter";
@@ -28,13 +30,16 @@ export async function generateMetadata({
   const servico = await getServicoPublico(servicoSlug);
   if (!servico) return {};
   const tituloBase = servico.termo_popular || servico.nome;
-  const titulo =
-    tituloBase === servico.nome
-      ? `${servico.nome} em Mogi das Cruzes e Região`
-      : `${tituloBase} em Mogi das Cruzes e Região | ${servico.nome}`;
+  // 08/10/2026: preço e cidade no título/descrição — é o que faz a pessoa
+  // clicar no resultado do Google (o "| Clean Car..." entra pelo template).
+  const preco = servico.preco_desde ? ` a partir de R$ ${servico.preco_desde}` : "";
+  // Título curto o bastante para o Google não cortar o preço.
+  const titulo = `${tituloBase} em Mogi das Cruzes${servico.preco_desde ? ` · R$ ${servico.preco_desde}` : ""} | Clean Car`;
+  const descricao = `${servico.nome} na Clean Car, em Mogi das Cruzes: ${servico.resumo}${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}${servico.duracao ? ` (${servico.duracao})` : ""}. Produtos Vonixx e hora marcada. Agende pelo WhatsApp.`;
   return {
-    title: titulo,
-    description: `${tituloBase} em Mogi das Cruzes: ${servico.descricao}`,
+    title: { absolute: titulo },
+    description: descricao,
+    openGraph: { title: titulo, description: descricao, images: servico.imagem_url && !/\.(mp4|webm|mov)/i.test(servico.imagem_url) ? [servico.imagem_url] : undefined },
     alternates: { canonical: `${SITE_URL}/servicos/${servico.slug}` },
   };
 }
@@ -70,7 +75,22 @@ export default async function ServicoPage({
           preco={servico.preco_desde}
           midia={servico.imagem_url}
         />
+        <Diferenciais className="py-10" />
 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Início", item: `${SITE_URL}/` },
+                { "@type": "ListItem", position: 2, name: "Serviços", item: `${SITE_URL}/#servicos` },
+                { "@type": "ListItem", position: 3, name: servico.nome, item: `${SITE_URL}/servicos/${servico.slug}` },
+              ],
+            }),
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -80,11 +100,7 @@ export default async function ServicoPage({
               serviceType: servico.termo_popular || servico.nome,
               name: servico.nome,
               description: servico.descricao,
-              provider: {
-                "@type": "AutoRepair",
-                name: "Clean Car Estética Automotiva",
-                url: `${SITE_URL}/`,
-              },
+              provider: { "@id": `${SITE_URL}/#empresa` },
               areaServed: "Mogi das Cruzes e região",
               ...(servico.preco_desde
                 ? { offers: { "@type": "Offer", price: servico.preco_desde, priceCurrency: "BRL" } }
@@ -130,7 +146,8 @@ export default async function ServicoPage({
         {faqs.length > 0 && <Faq itens={faqs.slice(0, 4)} />}
       </main>
       <Footer />
-      <WhatsappFloat servico={servico.nome} />
+      <WhatsappFloat servico={servico.nome} esconderNoCelular />
+      <BarraAgendarCelular servico={servico.nome} preco={servico.preco_desde} />
     </>
   );
 }

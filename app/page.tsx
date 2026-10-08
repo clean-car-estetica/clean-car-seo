@@ -13,6 +13,7 @@ import HeroMidia from "@/components/HeroMidia";
 import EscolhaLavagem from "@/components/EscolhaLavagem";
 import ServicosLista from "@/components/ServicosLista";
 import FaixaServicos from "@/components/FaixaServicos";
+import Diferenciais from "@/components/Diferenciais";
 import Produtos from "@/components/Produtos";
 import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
@@ -76,6 +77,7 @@ export default async function Home() {
         </section>
 
         <FaixaServicos nomes={servicos.map((x) => x.nome)} />
+        <Diferenciais className="pt-14" />
 
         <EscolhaLavagem servicos={servicos} />
 

@@ -58,12 +58,16 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "AutoRepair",
+              "@type": ["AutoWash", "AutoRepair"],
+              "@id": `${SITE_URL}/#empresa`,
               name: "Clean Car Estética Automotiva",
               description: meta.descricao,
               image: `${SITE_URL}/opengraph-image`,
-              telephone: contato.whatsapp,
+              logo: `${SITE_URL}/logo-clean-car.png`,
+              telephone: `+${contato.whatsapp}`,
               url: `${SITE_URL}/`,
+              hasMap: contato.googleUrl,
+              geo: { "@type": "GeoCoordinates", latitude: -23.5457743, longitude: -46.2131629 },
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Rua Prefeito Sebastião Cascardo, 438 - Jardim Universo",
@@ -82,7 +86,7 @@ export default async function RootLayout({
                 "Guararema",
               ],
               sameAs: [contato.instagramUrl, contato.googleUrl],
-              priceRange: "R$",
+              priceRange: "R$ 45 – R$ 380",
               openingHoursSpecification: [
                 {
                   "@type": "OpeningHoursSpecification",

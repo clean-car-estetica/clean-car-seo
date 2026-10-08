@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { parseRota, obterOrigem } from "@/lib/track";
 import { gtagEvent } from "@/lib/gtag";
 
-export default function WhatsappFloat({ servico }: { servico?: string } = {}) {
+export default function WhatsappFloat({ servico, esconderNoCelular = false }: { servico?: string; esconderNoCelular?: boolean } = {}) {
   const pathname = usePathname();
   const contato = useContato();
 
@@ -27,7 +27,7 @@ export default function WhatsappFloat({ servico }: { servico?: string } = {}) {
       onClick={registrarClique}
       target="_blank"
       rel="noopener noreferrer"
-      className="pulse-wa fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+      className={`pulse-wa ${esconderNoCelular ? "hidden md:flex" : "flex"} fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-[#25D366] text-white items-center justify-center shadow-lg hover:scale-110 transition-transform`}
       aria-label="Falar no WhatsApp"
     >
       <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">

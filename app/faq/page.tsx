@@ -9,8 +9,8 @@ import { getTextosGerais } from "@/lib/site-content";
 export const revalidate = 60;
 
 export const metadata = {
-  title: "Perguntas frequentes",
-  description: "Tire suas dúvidas sobre lavagem, higienização e enceramento na Clean Car.",
+  title: "Perguntas frequentes: preços, prazos e garantia",
+  description: "Quanto tempo leva, se precisa deixar o carro, garantia e formas de pagamento: as dúvidas mais comuns sobre lavagem e higienização na Clean Car, em Mogi das Cruzes.",
   alternates: { canonical: `${SITE_URL}/faq` },
 };
 

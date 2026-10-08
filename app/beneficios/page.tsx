@@ -8,8 +8,8 @@ import { getTextosGerais } from "@/lib/site-content";
 export const revalidate = 60;
 
 export const metadata = {
-  title: "Benefícios e Fidelidade",
-  description: "Programa de fidelidade Clean Car: acumule pontos e troque por descontos.",
+  title: "Benefícios e fidelidade: ganhe pontos a cada lavagem",
+  description: "Programa de fidelidade da Clean Car em Mogi das Cruzes: acumule pontos em cada serviço e troque por descontos e lavagens.",
   alternates: { canonical: `${SITE_URL}/beneficios` },
 };
 

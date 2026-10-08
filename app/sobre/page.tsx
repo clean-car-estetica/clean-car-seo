@@ -8,7 +8,7 @@ import { getSobre } from "@/lib/site-content";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: "Sobre Nós",
+  title: "Sobre a Clean Car: estética automotiva no Jardim Universo, Mogi das Cruzes",
   description: "Conheça a Clean Car Estética Automotiva: loja física em Mogi das Cruzes, produtos Vonixx e atendimento em toda a região do Alto Tietê.",
   alternates: { canonical: `${SITE_URL}/sobre` },
 };

@@ -1,6 +1,8 @@
 import { SITE_URL } from "@/lib/config";
 import { fotoServico } from "@/lib/fotos";
 import ServicoTopo from "@/components/ServicoTopo";
+import Diferenciais from "@/components/Diferenciais";
+import BarraAgendarCelular from "@/components/BarraAgendarCelular";
 import ServicosLista from "@/components/ServicosLista";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -31,19 +33,13 @@ export async function generateMetadata({
   const tituloBase = servico.termo_popular || servico.nome;
   // Só indexa se a página tiver texto próprio cadastrado (Páginas locais);
   // texto genérico repetido em todas as cidades o Google descarta.
-  const [conteudo, todos, cidades] = await Promise.all([
-    getConteudoLocalPublico(servico, cidade),
-    getServicosPublicos(),
-    getCidadesPublicas(),
-  ]);
-  const outros = todos.filter((x) => x.slug !== servico.slug).slice(0, 6);
-  const titulo =
-    tituloBase === servico.nome
-      ? `${servico.nome} em ${cidade.nome} | Clean Car`
-      : `${tituloBase} em ${cidade.nome} | ${servico.nome} - Clean Car`;
+  const conteudo = await getConteudoLocalPublico(servico, cidade);
+  const preco = servico.preco_desde ? ` a partir de R$ ${servico.preco_desde}` : "";
+  const titulo = `${tituloBase} em ${cidade.nome}${servico.preco_desde ? ` · R$ ${servico.preco_desde}` : ""} | Clean Car`;
+  const descricao = `${servico.nome} para quem é de ${cidade.nome}: ${servico.resumo}${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}, na nossa loja em Mogi das Cruzes, com hora marcada. Agende pelo WhatsApp.`;
   return {
-    title: titulo,
-    description: `${tituloBase} em ${cidade.nome} e região. ${servico.resumo}`,
+    title: { absolute: titulo },
+    description: descricao,
     alternates: { canonical: conteudo.proprio ? `${SITE_URL}/servicos/${servico.slug}/${cidade.slug}` : `${SITE_URL}/servicos/${servico.slug}` },
     robots: conteudo.proprio ? undefined : { index: false, follow: true },
   };
@@ -82,6 +78,7 @@ export default async function ServicoCidadePage({
           midia={imagemFundo}
           textoAgendar={`Agendar ${servico.nome}`}
         />
+        <Diferenciais className="pt-10" />
 
         <section className="mx-auto max-w-6xl px-6 py-16 md:py-20 grid lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] gap-10">
           <div>
@@ -141,7 +138,8 @@ export default async function ServicoCidadePage({
         )}
       </main>
       <Footer />
-      <WhatsappFloat servico={servico.nome} />
+      <WhatsappFloat servico={servico.nome} esconderNoCelular />
+      <BarraAgendarCelular servico={servico.nome} preco={servico.preco_desde} />
     </>
   );
 }
