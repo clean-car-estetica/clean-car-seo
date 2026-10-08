@@ -20,7 +20,7 @@ import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
 import Faq from "@/components/Faq";
 import Bloco from "@/components/Bloco";
-import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos, getAvaliacoesGoogle } from "@/lib/site-data";
+import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
 import { getTextosGerais } from "@/lib/site-content";
 
 export const revalidate = 60;
@@ -30,7 +30,7 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, avaliacoes] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -41,7 +41,6 @@ export default async function Home() {
     getProdutosLista(),
     getTextosGerais(),
     getFaqsPublicos(),
-    getAvaliacoesGoogle(),
   ]);
   const lavagens = ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"];
   const outros = servicos.filter((x) => !lavagens.includes(x.slug));
@@ -147,7 +146,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <Bloco id="depoimentos"><Depoimentos itens={depoimentos} google={avaliacoes.itens} resumo={avaliacoes.resumo} /></Bloco>
+        <Bloco id="depoimentos"><Depoimentos itens={depoimentos} /></Bloco>
         <Bloco id="indicacao"><Indicacao /></Bloco>
 
         {/* Prévia do FAQ — 3 primeiras perguntas, lista completa em /faq */}
