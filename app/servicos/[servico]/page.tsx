@@ -42,7 +42,7 @@ export async function generateMetadata({
   return {
     title: { absolute: titulo },
     description: descricao,
-    openGraph: { title: titulo, description: descricao, images: servico.imagem_url && !/\.(mp4|webm|mov)/i.test(servico.imagem_url) ? [servico.imagem_url] : undefined },
+    openGraph: { title: titulo, description: descricao },
     alternates: { canonical: `${SITE_URL}/servicos/${servico.slug}` },
   };
 }
