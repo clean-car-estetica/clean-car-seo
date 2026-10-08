@@ -1,15 +1,17 @@
 import { SITE_URL } from "@/lib/config";
-import ObservacoesServicos from "@/components/ObservacoesServicos";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
-import AgendarButton from "@/components/AgendarButton";
 import { servicos, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
-import { getServicoPublico, getCidadesPublicas } from "@/lib/site-data";
-import Midia from "@/components/Midia";
+import { getServicoPublico, getCidadesPublicas, getServicosPublicos, getProcessoPassos, getTransformacoesPublicas, getFaqsPublicos } from "@/lib/site-data";
+import ServicoTopo from "@/components/ServicoTopo";
+import ProcessoEtapas from "@/components/ProcessoEtapas";
+import ServicosLista from "@/components/ServicosLista";
+import BeforeAfter from "@/components/BeforeAfter";
+import Faq from "@/components/Faq";
 
 export const revalidate = 60;
 
@@ -44,40 +46,30 @@ export default async function ServicoPage({
 }) {
   const { servico: servicoSlug } = await params;
   const semPaginasLocais = SERVICOS_SEM_PAGINAS_LOCAIS.includes(servicoSlug);
-  const [servico, cidades] = await Promise.all([
+  const [servico, cidades, todos, passos, transformacoes, faqs] = await Promise.all([
     getServicoPublico(servicoSlug),
     semPaginasLocais ? Promise.resolve([]) : getCidadesPublicas(),
+    getServicosPublicos(),
+    getProcessoPassos(),
+    getTransformacoesPublicas(),
+    getFaqsPublicos(),
   ]);
   if (!servico) return notFound();
+  const outros = todos.filter((x) => x.slug !== servico.slug).slice(0, 6);
 
   return (
     <>
       <Header />
       <main className="flex-1 pt-20">
-        <section className="relative isolate overflow-hidden bg-carbon text-steel">
-          <Midia src={servico.imagem_url} className="foto-servico absolute inset-0 -z-10 w-full h-full object-cover" />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-carbon/60 to-carbon" />
-          <div className="mx-auto max-w-4xl px-6 py-24">
-            <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm mb-4">
-              Serviço Clean Car {servico.tag ? `· ${servico.tag}` : ""}
-            </p>
-            <h1 className="font-display font-extrabold text-4xl md:text-6xl leading-tight">
-              {servico.termo_popular || servico.nome}
-            </h1>
-            {servico.termo_popular && (
-              <p className="mt-1 text-steel-line text-sm">Serviço: {servico.nome}</p>
-            )}
-            <p className="mt-6 text-lg text-steel-line max-w-2xl leading-relaxed">{servico.descricao}</p>
-            <div className="mt-8 flex gap-6 font-display text-sm text-steel-line">
-              {servico.duracao && <span>⏱ A partir de {servico.duracao}</span>}
-              {servico.preco_desde && <span className="text-verniz-shine font-bold">A partir de R$ {servico.preco_desde}</span>}
-            </div>
-            <ObservacoesServicos className="mt-4 max-w-xl font-sans" />
-            <AgendarButton servico={servico.nome} className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
-              Agendar este serviço
-            </AgendarButton>
-          </div>
-        </section>
+        <ServicoTopo
+          titulo={servico.termo_popular || servico.nome}
+          nomeServico={servico.nome}
+          contexto={servico.tag ? `${servico.tag} · Mogi das Cruzes` : "Mogi das Cruzes e Alto Tietê"}
+          descricao={servico.descricao}
+          duracao={servico.duracao}
+          preco={servico.preco_desde}
+          midia={servico.imagem_url}
+        />
 
         <script
           type="application/ld+json"
@@ -101,24 +93,41 @@ export default async function ServicoPage({
           }}
         />
 
-        {!semPaginasLocais && (
-          <section className="mx-auto max-w-4xl px-6 py-16">
-            <h2 className="font-display font-bold text-2xl mb-6 text-steel">
-              {servico.nome} perto de você
-            </h2>
+        <ProcessoEtapas passos={passos} />
+
+        {transformacoes.length > 0 && (
+          <section className="mx-auto max-w-6xl px-6 py-20">
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-steel leading-none">Arraste e veja a diferença</h2>
+            <p className="mt-3 text-steel-line max-w-xl mb-10">Resultados reais de carros que passaram pela Clean Car.</p>
+            <div className="grid md:grid-cols-2 gap-6">
+              {transformacoes.slice(0, 2).map((t) => (
+                <BeforeAfter key={t.id} title={t.titulo} description={t.descricao} before={t.imagem_antes} after={t.imagem_depois} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <ServicosLista servicos={outros} titulo="Combina com outros cuidados" subtitulo="Aproveite a visita e cuide do carro por completo." />
+
+        {!semPaginasLocais && cidades.length > 0 && (
+          <section className="mx-auto max-w-6xl px-6 pb-20">
+            <h2 className="font-display font-bold text-3xl text-steel mb-2">{servico.nome} perto de você</h2>
+            <p className="text-steel-line mb-6">A loja fica em Mogi das Cruzes e recebe clientes de toda a região.</p>
             <div className="flex flex-wrap gap-3">
               {cidades.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/servicos/${servico.slug}/${c.slug}`}
-                  className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-sm text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
+                  className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
                 >
-                  {servico.nome} em {c.nome}
+                  {c.nome}
                 </Link>
               ))}
             </div>
           </section>
         )}
+
+        {faqs.length > 0 && <Faq itens={faqs.slice(0, 4)} />}
       </main>
       <Footer />
       <WhatsappFloat servico={servico.nome} />
