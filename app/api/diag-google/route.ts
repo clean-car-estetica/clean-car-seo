@@ -14,7 +14,16 @@ export async function GET(req: Request) {
   const r: Record<string, unknown> = { conta: c.conta, email: c.email, ga4: c.ga4, site: c.site };
   try {
     const l = await consultarSearchConsole({ inicio, fim: hoje });
-    r.searchConsole = { ok: true, cliques: l[0]?.clicks ?? 0, aparicoes: l[0]?.impressions ?? 0 };
+    r.searchConsole = { ok: true, cliques: l[0]?.clicks ?? 0, aparicoes: l[0]?.impressions ?? 0, posicao: l[0]?.position ?? 0 };
+    if (new URL(req.url).searchParams.get("detalhe") === "1") {
+      const inicio90 = new Date(Date.now() - 89 * 86_400_000).toISOString().slice(0, 10);
+      const [buscas, paginas] = await Promise.all([
+        consultarSearchConsole({ inicio: inicio90, fim: hoje, dimensoes: ["query"], limite: 60 }),
+        consultarSearchConsole({ inicio: inicio90, fim: hoje, dimensoes: ["page"], limite: 40 }),
+      ]);
+      r.buscas90 = buscas.map((b) => [b.keys[0], b.clicks, b.impressions, Math.round(b.position * 10) / 10]);
+      r.paginas90 = paginas.map((b) => [b.keys[0], b.clicks, b.impressions, Math.round(b.position * 10) / 10]);
+    }
   } catch (e) {
     r.searchConsole = { ok: false, erro: (e as Error).message };
   }
