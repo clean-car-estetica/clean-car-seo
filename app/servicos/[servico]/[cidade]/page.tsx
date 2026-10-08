@@ -1,3 +1,4 @@
+import Bloco from "@/components/Bloco";
 import { SITE_URL } from "@/lib/config";
 import { fotoServico } from "@/lib/fotos";
 import ServicoTopo from "@/components/ServicoTopo";
@@ -68,6 +69,7 @@ export default async function ServicoCidadePage({
     <>
       <Header />
       <main className="flex-1 pt-20">
+        <Bloco id="servico" ancora={servico.slug}>
         <ServicoTopo
           titulo={`${servico.termo_popular || servico.nome} em ${cidade.nome}`}
           nomeServico={servico.nome}
@@ -78,9 +80,10 @@ export default async function ServicoCidadePage({
           midia={imagemFundo}
           textoAgendar={`Agendar ${servico.nome}`}
         />
+        </Bloco>
         <Diferenciais className="pt-10" />
 
-        <section className="mx-auto max-w-6xl px-6 py-16 md:py-20 grid lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] gap-10">
+        <section data-editar="pagina-local" data-ancora={`${servico.slug}/${cidade.slug}`} className="mx-auto max-w-6xl px-6 py-16 md:py-20 grid lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] gap-10">
           <div>
             {conteudo.paragrafos.map((p, i) => (
               <p key={i} className="mb-5 text-steel leading-relaxed text-lg max-w-2xl">

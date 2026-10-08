@@ -95,3 +95,17 @@ body {
   .pulse-wa { animation: none; }
   .faixa-trilho, .painel-foto, .hero-video { animation: none; }
 }
+
+/* ---------- Editor visual (só dentro da prévia do console) ---------- */
+.cc-editar [data-editar] { cursor: pointer; }
+.cc-editar [data-editar]:not(.fixed, .absolute, .sticky) { position: relative; }
+.cc-editar [data-editar]::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 30;
+  outline: 2px dashed transparent; outline-offset: -4px; transition: outline-color .15s, background-color .15s;
+}
+.cc-editar [data-editar]:hover::after { outline-color: var(--verniz); background: color-mix(in srgb, var(--verniz) 6%, transparent); }
+.cc-editar [data-editar].cc-bloco-ativo::after { outline: 3px solid var(--verniz); background: color-mix(in srgb, var(--verniz) 8%, transparent); }
+.cc-editar [data-editar] [data-editar]:hover::after { outline-color: var(--cera); }
+/* Painel lateral do editor: telas do console sem o menu */
+.cc-embed .admin-chrome { display: none !important; }
+.cc-embed .admin-main { padding: 1rem !important; }

@@ -23,6 +23,7 @@ export default function CupomPopup() {
   useEffect(() => {
     if (!cupom.ativo) return;
     if (pathname.startsWith("/admin") || pathname === "/avaliar" || pathname === "/orcamento") return;
+    if (document.documentElement.classList.contains("cc-editar")) return;
     if (sessionStorage.getItem(CHAVE_LOCAL)) return;
     const t = setTimeout(() => setVisivel(true), 12000);
     return () => clearTimeout(t);

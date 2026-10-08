@@ -19,6 +19,7 @@ import Indicacao from "@/components/Indicacao";
 import Planos from "@/components/Planos";
 import Depoimentos from "@/components/Depoimentos";
 import Faq from "@/components/Faq";
+import Bloco from "@/components/Bloco";
 import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
 import { getTextosGerais } from "@/lib/site-content";
 
@@ -49,7 +50,7 @@ export default async function Home() {
       <Header />
       <main className="flex-1 pt-20">
         {/* Topo: vídeo (ou foto) escolhido no painel, texto à esquerda */}
-        <section className="relative isolate min-h-[calc(100svh-5rem)] flex items-end md:items-center text-steel overflow-hidden">
+        <section data-editar="topo" className="relative isolate min-h-[calc(100svh-5rem)] flex items-end md:items-center text-steel overflow-hidden">
           <HeroMidia
             tipo={hero.tipo_midia}
             videoUrl={hero.video_url}
@@ -76,15 +77,15 @@ export default async function Home() {
           </div>
         </section>
 
-        <FaixaServicos nomes={servicos.map((x) => x.nome)} />
+        <Bloco id="servicos"><FaixaServicos nomes={servicos.map((x) => x.nome)} /></Bloco>
         <Diferenciais className="pt-14" />
 
-        <EscolhaLavagem servicos={servicos} />
+        <Bloco id="servicos"><EscolhaLavagem servicos={servicos} /></Bloco>
 
 
         {/* Antes e depois */}
         {transformacoes.length > 0 && (
-          <section className="bg-carbon py-20">
+          <section data-editar="antes-depois" className="bg-carbon py-20">
             <div className="mx-auto max-w-6xl px-6">
               <div className="text-center mb-12">
                 <h2 className="font-display font-bold text-3xl md:text-4xl text-steel">
@@ -109,19 +110,21 @@ export default async function Home() {
           </section>
         )}
 
-        <ProcessoEtapas passos={passos} />
+        <Bloco id="processo"><ProcessoEtapas passos={passos} /></Bloco>
 
-        <ServicosLista servicos={outros} titulo={textos.homeServicosTitulo} subtitulo={textos.homeServicosSubtitulo} />
-        <div className="mx-auto max-w-6xl px-6 -mt-12 mb-16">
-          <ObservacoesServicos className="max-w-3xl" />
-        </div>
+        <Bloco id="servicos">
+          <ServicosLista servicos={outros} titulo={textos.homeServicosTitulo} subtitulo={textos.homeServicosSubtitulo} />
+          <div className="mx-auto max-w-6xl px-6 -mt-12 pb-16">
+            <ObservacoesServicos className="max-w-3xl" />
+          </div>
+        </Bloco>
 
-        <Produtos produtos={produtos} />
+        <Bloco id="produtos"><Produtos produtos={produtos} /></Bloco>
 
-        <Planos itens={planos} />
+        <Bloco id="planos"><Planos itens={planos} /></Bloco>
 
         {/* Cidades */}
-        <section className="bg-carbon-soft py-20 border-y border-card-line">
+        <section data-editar="cidades" className="bg-carbon-soft py-20 border-y border-card-line">
           <div className="mx-auto max-w-6xl px-6">
             <h2 className="font-display font-bold text-3xl md:text-4xl mb-2 text-steel">
               {textos.homeCidadesTitulo}
@@ -143,12 +146,12 @@ export default async function Home() {
           </div>
         </section>
 
-        <Depoimentos itens={depoimentos} />
-        <Indicacao />
+        <Bloco id="depoimentos"><Depoimentos itens={depoimentos} /></Bloco>
+        <Bloco id="indicacao"><Indicacao /></Bloco>
 
         {/* Prévia do FAQ — 3 primeiras perguntas, lista completa em /faq */}
         {faqs.length > 0 && (
-          <Faq
+          <Bloco id="faq"><Faq
             itens={faqs.slice(0, 3)}
             rodape={
               <Link
@@ -158,7 +161,7 @@ export default async function Home() {
                 Ver todas as perguntas
               </Link>
             }
-          />
+          /></Bloco>
         )}
       </main>
       <Footer />

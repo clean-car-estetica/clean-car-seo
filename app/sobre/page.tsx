@@ -19,7 +19,7 @@ export default async function SobrePage() {
   return (
     <>
       <Header />
-      <main className="flex-1 pt-20">
+      <main data-editar="sobre" className="flex-1 pt-20">
         <section className="mx-auto max-w-2xl px-6 py-20">
           <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm mb-4">
             Quem somos

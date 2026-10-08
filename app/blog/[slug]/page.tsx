@@ -40,7 +40,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <>
       <Header />
-      <main className="flex-1 pt-20">
+      <main data-editar="blog" className="flex-1 pt-20">
         {post.imagem_url && (
           <div className="relative h-72 overflow-hidden">
             <Midia src={post.imagem_url} className="absolute inset-0 w-full h-full object-cover" />

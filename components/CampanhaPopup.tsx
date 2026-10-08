@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import type { Campanha } from "@/lib/site-content";
 import { gtagEvent } from "@/lib/gtag";
-import { supabaseBrowser } from "@/lib/supabase-browser";
-import { parseRota, obterOrigem } from "@/lib/track";
+import { parseRota, obterOrigem, registrarEvento } from "@/lib/track";
 import Midia from "@/components/Midia";
 
 const CHAVE_LOCAL = "cleancar_campanha_fechada";
@@ -18,6 +17,7 @@ export default function CampanhaPopup({ campanha }: { campanha: Campanha }) {
   useEffect(() => {
     if (!campanha.ativo) return;
     if (pathname.startsWith("/admin") || pathname === "/avaliar" || pathname === "/orcamento") return;
+    if (document.documentElement.classList.contains("cc-editar")) return;
     if (sessionStorage.getItem(CHAVE_LOCAL)) return;
     const t = setTimeout(() => setVisivel(true), 3000);
     return () => clearTimeout(t);
@@ -31,10 +31,7 @@ export default function CampanhaPopup({ campanha }: { campanha: Campanha }) {
   function registrarClique() {
     const { service_slug, city_slug } = parseRota(pathname);
     const origem = obterOrigem();
-    supabaseBrowser()
-      .from("events")
-      .insert({ event_type: "click_agendar", page_path: pathname, service_slug, city_slug, origem })
-      .then(() => {});
+    registrarEvento("click_agendar", pathname, { service_slug, city_slug, origem });
     gtagEvent("click_campanha");
     fechar();
   }

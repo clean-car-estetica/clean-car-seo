@@ -2,6 +2,7 @@ import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
+import ModoEdicao from "@/components/ModoEdicao";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CupomPopup from "@/components/CupomPopup";
 import CampanhaPopup from "@/components/CampanhaPopup";
@@ -45,8 +46,16 @@ export default async function RootLayout({
   const [contato, promocoes, tema, meta, textos, campanha] = await Promise.all([getContatoContent(), getPromocoes(), getTema(), getMetadados(), getTextosGerais(), getCampanha()]);
 
   return (
-    <html lang="pt-BR" className="h-full">
+    <html lang="pt-BR" className="h-full" suppressHydrationWarning>
       <head>
+        {/* Antes de tudo: marca o modo de edição (prévia do editor visual), o modo
+            "embutido" do painel lateral e desliga o Google Analytics no navegador
+            do dono, para as visitas dele não entrarem nas métricas. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var q=location.search,d=document.documentElement,f=window.top!==window.self;if(f&&/[?&]embed=1/.test(q))window.name='cc-embed';if(f&&/[?&]editar=1/.test(q))window.name='cc-previa';if(f&&window.name==='cc-embed')d.classList.add('cc-embed');if(f&&window.name==='cc-previa')d.classList.add('cc-editar');if(localStorage.getItem('cleancar_interno')==='1'||d.classList.contains('cc-editar'))window['ga-disable-G-54H7DP2E49']=true;}catch(e){}})();`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -121,6 +130,7 @@ export default async function RootLayout({
           <PromoProvider promocoes={promocoes}>
             <TextosProvider textos={textos}>
               <PageviewTracker />
+              <ModoEdicao />
               {children}
               {campanha.ativo ? <CampanhaPopup campanha={campanha} /> : <CupomPopup />}
             </TextosProvider>

@@ -82,7 +82,7 @@ export default function Header() {
   );
 
   return (
-    <header className="fixed top-0 left-0 w-full z-40 bg-carbon/85 backdrop-blur-md border-b border-card-line">
+    <header data-editar="contato" className="fixed top-0 left-0 w-full z-40 bg-carbon/85 backdrop-blur-md border-b border-card-line">
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between gap-4">
         <Link
           href="/"

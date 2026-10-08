@@ -1,3 +1,4 @@
+import Bloco from "@/components/Bloco";
 import { SITE_URL } from "@/lib/config";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,7 +28,7 @@ export default async function FaqPage() {
             {textos.faqTitulo}
           </h1>
         </section>
-        <Faq itens={faqs} />
+        <Bloco id="faq"><Faq itens={faqs} /></Bloco>
       </main>
       <Footer />
       <WhatsappFloat />

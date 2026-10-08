@@ -2,8 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useContato } from "@/components/ContatoProvider";
-import { supabaseBrowser } from "@/lib/supabase-browser";
-import { parseRota, obterOrigem } from "@/lib/track";
+import { parseRota, obterOrigem, registrarEvento } from "@/lib/track";
 import { gtagEvent } from "@/lib/gtag";
 
 export default function AssinarPlanoButton({ nomePlano, preco, className }: { nomePlano: string; preco: number; className?: string }) {
@@ -17,10 +16,7 @@ export default function AssinarPlanoButton({ nomePlano, preco, className }: { no
   function registrarClique() {
     const { service_slug, city_slug } = parseRota(pathname);
     const origem = obterOrigem();
-    supabaseBrowser()
-      .from("events")
-      .insert({ event_type: "click_whatsapp", page_path: pathname, service_slug, city_slug, origem })
-      .then(() => {});
+    registrarEvento("click_whatsapp", pathname, { service_slug, city_slug, origem });
     gtagEvent("click_assinar_plano", { plano: nomePlano });
   }
 

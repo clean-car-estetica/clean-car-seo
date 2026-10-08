@@ -9,7 +9,7 @@ export default function Footer() {
   const t = useTextos();
 
   return (
-    <footer id="contato" className="bg-carbon-soft border-t border-card-line text-steel-line mt-auto">
+    <footer data-editar="rodape" id="contato" className="bg-carbon-soft border-t border-card-line text-steel-line mt-auto">
       <div className="mx-auto max-w-6xl px-6 py-14 grid gap-10 sm:grid-cols-2 md:grid-cols-4">
         <div>
           <div className="font-display font-extrabold text-xl text-steel">CLEAN <span className="text-verniz-shine">CAR</span></div>

@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { buscarHorariosGbr, criarAgendamentoGbr } from "@/app/agendar-online/actions";
-import { supabaseBrowser } from "@/lib/supabase-browser";
-import { parseRota, obterOrigem } from "@/lib/track";
+import { parseRota, obterOrigem, registrarEvento } from "@/lib/track";
 import { gtagEvent } from "@/lib/gtag";
 import type { ServicoGbr, HorarioGbr } from "@/lib/gbr-api";
 
@@ -55,10 +54,7 @@ export default function AgendamentoForm({ servicosIniciais }: { servicosIniciais
     }
     const { service_slug, city_slug } = parseRota(pathname);
     const origem = obterOrigem();
-    supabaseBrowser()
-      .from("events")
-      .insert({ event_type: "form_submit", page_path: pathname, service_slug, city_slug, origem })
-      .then(() => {});
+    registrarEvento("form_submit", pathname, { service_slug, city_slug, origem });
     gtagEvent("agendamento_online", { servico_id: servicoId });
     setEtapa("sucesso");
   }

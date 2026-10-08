@@ -24,7 +24,7 @@ export default async function BlogIndex() {
   return (
     <>
       <Header />
-      <main className="flex-1 pt-20">
+      <main data-editar="blog" className="flex-1 pt-20">
         <section className="mx-auto max-w-5xl px-6 py-20">
           <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm mb-4">Blog</p>
           <h1 className="font-display font-extrabold text-4xl md:text-5xl text-steel mb-10">

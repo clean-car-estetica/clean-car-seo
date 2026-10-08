@@ -69,7 +69,7 @@ export default async function ConteudoPage() {
 
       <div className="grid gap-5">
         {servicos?.map((s) => (
-          <div key={s.slug} className="bg-card border border-card-line rounded-2xl p-6">
+          <div key={s.slug} id={`servico-${s.slug}`} className="bg-card border border-card-line rounded-2xl p-6 scroll-mt-4 target:border-verniz">
             <form action={atualizarServico} className="grid md:grid-cols-[160px_1fr] gap-5">
               <input type="hidden" name="slug" value={s.slug} />
               <img src={s.imagem_url} alt={s.nome} className="w-full h-32 object-cover rounded-xl" />

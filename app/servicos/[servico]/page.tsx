@@ -1,3 +1,4 @@
+import Bloco from "@/components/Bloco";
 import { SITE_URL } from "@/lib/config";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -66,6 +67,7 @@ export default async function ServicoPage({
     <>
       <Header />
       <main className="flex-1 pt-20">
+        <Bloco id="servico" ancora={servico.slug}>
         <ServicoTopo
           titulo={servico.termo_popular || servico.nome}
           nomeServico={servico.nome}
@@ -75,6 +77,7 @@ export default async function ServicoPage({
           preco={servico.preco_desde}
           midia={servico.imagem_url}
         />
+        </Bloco>
         <Diferenciais className="py-10" />
 
         <script
@@ -109,7 +112,7 @@ export default async function ServicoPage({
           }}
         />
 
-        <ProcessoEtapas passos={passos} />
+        <Bloco id="processo"><ProcessoEtapas passos={passos} /></Bloco>
 
         {transformacoes.length > 0 && (
           <section className="mx-auto max-w-6xl px-6 py-20">
@@ -143,7 +146,7 @@ export default async function ServicoPage({
           </section>
         )}
 
-        {faqs.length > 0 && <Faq itens={faqs.slice(0, 4)} />}
+        {faqs.length > 0 && <Bloco id="faq"><Faq itens={faqs.slice(0, 4)} /></Bloco>}
       </main>
       <Footer />
       <WhatsappFloat servico={servico.nome} esconderNoCelular />

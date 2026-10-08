@@ -1,20 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { marcarNavegadorInterno } from "@/lib/track";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import {
   LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
   Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2,
-  Palette, FileText, Layers, PackageSearch, Type, Plug, FilePlus2, Megaphone, UserSearch, BookUser, Menu, X, ChevronDown,
+  Palette, FileText, Layers, PackageSearch, Type, Plug, FilePlus2, Megaphone, UserSearch, BookUser, Menu, X, ChevronDown, MousePointerClick,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuAberto, setMenuAberto] = useState(false);
-  const [gruposFechados, setGruposFechados] = useState<Set<string>>(new Set());
+  const [gruposFechados, setGruposFechados] = useState<Set<string>>(
+    new Set(["Blocos da página inicial", "Vendas e fidelidade", "Ajustes"])
+  );
+
+  // Quem entra no console é o dono: este navegador deixa de contar nas métricas.
+  // No painel lateral do editor (modo embutido), avisa o editor quando algo é salvo
+  // para ele recarregar a prévia.
+  useEffect(() => {
+    marcarNavegadorInterno(true);
+    if (!document.documentElement.classList.contains("cc-embed")) return;
+    const avisar = () => window.parent.postMessage({ origem: "cc-painel", tipo: "salvo" }, window.location.origin);
+    const aoEnviar = () => {
+      setTimeout(avisar, 1200);
+      setTimeout(avisar, 3500);
+    };
+    document.addEventListener("submit", aoEnviar, true);
+    return () => document.removeEventListener("submit", aoEnviar, true);
+  }, []);
 
   function alternarGrupo(titulo: string) {
     setGruposFechados((atual) => {
@@ -26,6 +44,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+  if (pathname === "/admin/editor") {
     return <>{children}</>;
   }
 
@@ -41,55 +62,56 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const grupos = [
     {
-      titulo: "Visão geral",
+      titulo: "Painel",
       links: [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/leads", label: "Leads", icon: Inbox },
-        { href: "/admin/nps", label: "NPS", icon: Smile },
-        { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
-        { href: "/admin/links", label: "Links de rastreamento", icon: Link2 },
-        { href: "/admin/consulta-gbr", label: "Consultar cliente (GBR)", icon: UserSearch },
+        { href: "/admin", label: "Resultados", icon: LayoutDashboard },
+        { href: "/admin/editor", label: "Editor do site", icon: MousePointerClick },
+        { href: "/admin/leads", label: "Contatos recebidos", icon: Inbox },
+        { href: "/admin/nps", label: "Avaliações (NPS)", icon: Smile },
       ],
     },
     {
-      titulo: "Blocos da Home",
+      titulo: "SEO e conteúdo",
       links: [
-        { href: "/admin/home", label: "Topo (hero)", icon: Home },
-        { href: "/admin/sobre", label: "Sobre Nós", icon: BookUser },
+        { href: "/admin/conteudo", label: "Serviços e preços", icon: ImageIcon },
+        { href: "/admin/blog", label: "Blog", icon: Newspaper },
+        { href: "/admin/cidades", label: "Cidades", icon: Building2 },
+        { href: "/admin/paginas-locais", label: "Textos por cidade", icon: MapPin },
+        { href: "/admin/faq", label: "Perguntas frequentes", icon: HelpCircle },
+        { href: "/admin/metadados", label: "Como aparece no Google", icon: FileText },
+        { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
+        { href: "/admin/paginas", label: "Páginas extras", icon: FilePlus2 },
+      ],
+    },
+    {
+      titulo: "Blocos da página inicial",
+      links: [
+        { href: "/admin/home", label: "Topo (vídeo e título)", icon: Home },
+        { href: "/admin/transformacoes", label: "Antes e depois", icon: GitCompare },
         { href: "/admin/processo", label: "Nosso processo", icon: Layers },
         { href: "/admin/produtos", label: "Produtos usados", icon: PackageSearch },
-        { href: "/admin/transformacoes", label: "Antes e depois", icon: GitCompare },
         { href: "/admin/depoimentos", label: "Depoimentos", icon: MessageSquareQuote },
+        { href: "/admin/sobre", label: "Sobre nós", icon: BookUser },
+        { href: "/admin/textos", label: "Títulos das seções", icon: Type },
       ],
     },
     {
-      titulo: "Catálogo e páginas",
-      links: [
-        { href: "/admin/conteudo", label: "Serviços", icon: ImageIcon },
-        { href: "/admin/cidades", label: "Cidades", icon: Building2 },
-        { href: "/admin/paginas-locais", label: "Páginas locais", icon: MapPin },
-        { href: "/admin/blog", label: "Blog", icon: Newspaper },
-        { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
-        { href: "/admin/paginas", label: "Páginas personalizadas", icon: FilePlus2 },
-      ],
-    },
-    {
-      titulo: "Fidelidade e promoções",
+      titulo: "Vendas e fidelidade",
       links: [
         { href: "/admin/planos", label: "Planos mensais", icon: CreditCard },
         { href: "/admin/promocoes", label: "Promoções", icon: Percent },
-        { href: "/admin/campanha", label: "Campanha (pop-up)", icon: Megaphone },
+        { href: "/admin/campanha", label: "Pop-up de campanha", icon: Megaphone },
         { href: "/admin/beneficios", label: "Benefícios", icon: Award },
       ],
     },
     {
-      titulo: "Configurações",
+      titulo: "Ajustes",
       links: [
-        { href: "/admin/contato", label: "Contato e links", icon: Phone },
-        { href: "/admin/tema", label: "Tema (cores)", icon: Palette },
-        { href: "/admin/metadados", label: "Metadados", icon: FileText },
-        { href: "/admin/textos", label: "Textos do site", icon: Type },
-        { href: "/admin/integracao-gbr", label: "Integração GBR SAS", icon: Plug },
+        { href: "/admin/contato", label: "Contato e redes", icon: Phone },
+        { href: "/admin/tema", label: "Cores do site", icon: Palette },
+        { href: "/admin/links", label: "Links de rastreamento", icon: Link2 },
+        { href: "/admin/integracao-gbr", label: "Integração GBR", icon: Plug },
+        { href: "/admin/consulta-gbr", label: "Consultar cliente (GBR)", icon: UserSearch },
       ],
     },
   ];
@@ -149,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-carbon flex flex-col md:flex-row">
       {/* Topo mobile */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-card-line">
+      <div className="admin-chrome md:hidden flex items-center justify-between p-4 border-b border-card-line">
         <div className="font-display font-extrabold text-lg text-steel">
           CLEAN <span className="text-verniz-shine">CAR</span>
         </div>
@@ -158,15 +180,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
       </div>
       {menuAberto && (
-        <div className="md:hidden border-b border-card-line p-6 flex flex-col max-h-[80vh] overflow-y-auto">{conteudoSidebar}</div>
+        <div className="admin-chrome md:hidden border-b border-card-line p-6 flex flex-col max-h-[80vh] overflow-y-auto">{conteudoSidebar}</div>
       )}
 
       {/* Sidebar desktop */}
-      <aside className="hidden md:flex w-64 shrink-0 border-r border-card-line p-6 flex-col h-screen sticky top-0">
+      <aside className="admin-chrome hidden md:flex w-64 shrink-0 border-r border-card-line p-6 flex-col h-screen sticky top-0">
         {conteudoSidebar}
       </aside>
 
-      <main className="flex-1 p-4 md:p-8 overflow-auto">{children}</main>
+      <main className="admin-main flex-1 min-w-0 p-4 md:p-8 overflow-auto">{children}</main>
     </div>
   );
 }
