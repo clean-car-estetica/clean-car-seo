@@ -248,28 +248,30 @@ export default function Editor({ servicos, cidades }: { servicos: Item[]; cidade
                 )}
               </section>
 
-              <section>
-                <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-steel-line mb-2">
-                  <Settings2 size={13} /> Ajustes gerais
-                </h3>
-                <ul className="grid gap-1">
-                  {AJUSTES_GERAIS.map((a) => (
-                    <li key={a.caminho}>
-                      <button
-                        type="button"
-                        onClick={() => setPainel({ rotulo: a.rotulo, dica: a.dica, url: `${a.caminho}?embed=1` })}
-                        className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-lg hover:bg-card group"
-                      >
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-bold text-steel group-hover:text-verniz-shine">{a.rotulo}</span>
-                          <span className="block text-xs text-steel-line truncate">{a.dica}</span>
-                        </span>
-                        <ChevronRight size={16} className="text-steel-line" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </section>
+              {AJUSTES_GERAIS.map((g) => (
+                <section key={g.grupo}>
+                  <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-steel-line mb-2">
+                    <Settings2 size={13} /> {g.grupo}
+                  </h3>
+                  <ul className="grid gap-1">
+                    {g.itens.map((a) => (
+                      <li key={a.caminho}>
+                        <button
+                          type="button"
+                          onClick={() => setPainel({ rotulo: a.rotulo, dica: a.dica, url: `${a.caminho}?embed=1` })}
+                          className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-lg hover:bg-card group"
+                        >
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-sm font-bold text-steel group-hover:text-verniz-shine">{a.rotulo}</span>
+                            <span className="block text-xs text-steel-line truncate">{a.dica}</span>
+                          </span>
+                          <ChevronRight size={16} className="text-steel-line" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
             </div>
           )}
         </aside>

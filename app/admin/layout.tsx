@@ -5,19 +5,12 @@ import { marcarNavegadorInterno } from "@/lib/track";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import {
-  LayoutDashboard, ImageIcon, Search, LogOut, Home, MapPin, Newspaper, HelpCircle,
-  Phone, Building2, Smile, Inbox, MessageSquareQuote, Percent, Award, GitCompare, CreditCard, Link2,
-  Palette, FileText, Layers, PackageSearch, Type, Plug, FilePlus2, Megaphone, UserSearch, BookUser, Menu, X, ChevronDown, MousePointerClick,
-} from "lucide-react";
+import { LayoutDashboard, Search, LogOut, Smile, Inbox, Link2, Plug, UserSearch, Menu, X, MousePointerClick } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuAberto, setMenuAberto] = useState(false);
-  const [gruposFechados, setGruposFechados] = useState<Set<string>>(
-    new Set(["Blocos da página inicial", "Vendas e fidelidade", "Ajustes"])
-  );
 
   // Quem entra no console é o dono: este navegador deixa de contar nas métricas.
   // No painel lateral do editor (modo embutido), avisa o editor quando algo é salvo
@@ -33,15 +26,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     document.addEventListener("submit", aoEnviar, true);
     return () => document.removeEventListener("submit", aoEnviar, true);
   }, []);
-
-  function alternarGrupo(titulo: string) {
-    setGruposFechados((atual) => {
-      const novo = new Set(atual);
-      if (novo.has(titulo)) novo.delete(titulo);
-      else novo.add(titulo);
-      return novo;
-    });
-  }
 
   if (pathname === "/admin/login") {
     return <>{children}</>;
@@ -60,6 +44,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.refresh();
   }
 
+  // Menu enxuto: tudo que muda o conteúdo do site agora se edita pelo
+  // Editor do site (clicando na prévia). Aqui ficam só as telas que não
+  // são "pedaços do site".
   const grupos = [
     {
       titulo: "Painel",
@@ -71,47 +58,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       ],
     },
     {
-      titulo: "SEO e conteúdo",
+      titulo: "Ferramentas",
       links: [
-        { href: "/admin/conteudo", label: "Serviços e preços", icon: ImageIcon },
-        { href: "/admin/blog", label: "Blog", icon: Newspaper },
-        { href: "/admin/cidades", label: "Cidades", icon: Building2 },
-        { href: "/admin/paginas-locais", label: "Textos por cidade", icon: MapPin },
-        { href: "/admin/faq", label: "Perguntas frequentes", icon: HelpCircle },
-        { href: "/admin/metadados", label: "Como aparece no Google", icon: FileText },
         { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
-        { href: "/admin/paginas", label: "Páginas extras", icon: FilePlus2 },
-      ],
-    },
-    {
-      titulo: "Blocos da página inicial",
-      links: [
-        { href: "/admin/home", label: "Topo (vídeo e título)", icon: Home },
-        { href: "/admin/transformacoes", label: "Antes e depois", icon: GitCompare },
-        { href: "/admin/processo", label: "Nosso processo", icon: Layers },
-        { href: "/admin/produtos", label: "Produtos usados", icon: PackageSearch },
-        { href: "/admin/depoimentos", label: "Depoimentos", icon: MessageSquareQuote },
-        { href: "/admin/sobre", label: "Sobre nós", icon: BookUser },
-        { href: "/admin/textos", label: "Títulos das seções", icon: Type },
-      ],
-    },
-    {
-      titulo: "Vendas e fidelidade",
-      links: [
-        { href: "/admin/planos", label: "Planos mensais", icon: CreditCard },
-        { href: "/admin/promocoes", label: "Promoções", icon: Percent },
-        { href: "/admin/campanha", label: "Pop-up de campanha", icon: Megaphone },
-        { href: "/admin/beneficios", label: "Benefícios", icon: Award },
-      ],
-    },
-    {
-      titulo: "Ajustes",
-      links: [
-        { href: "/admin/contato", label: "Contato e redes", icon: Phone },
-        { href: "/admin/tema", label: "Cores do site", icon: Palette },
         { href: "/admin/links", label: "Links de rastreamento", icon: Link2 },
-        { href: "/admin/integracao-gbr", label: "Integração GBR", icon: Plug },
         { href: "/admin/consulta-gbr", label: "Consultar cliente (GBR)", icon: UserSearch },
+        { href: "/admin/integracao-gbr", label: "Integração GBR", icon: Plug },
       ],
     },
   ];
@@ -124,18 +76,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
       <nav className="flex flex-col gap-3 flex-1 overflow-y-auto">
         {grupos.map((grupo) => {
-          const temPaginaAtiva = grupo.links.some((l) => l.href === pathname);
-          const fechado = gruposFechados.has(grupo.titulo) && !temPaginaAtiva;
           return (
             <div key={grupo.titulo}>
-              <button
-                onClick={() => alternarGrupo(grupo.titulo)}
-                className="w-full flex items-center justify-between px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-steel-line/60 hover:text-steel-line"
-              >
-                {grupo.titulo}
-                <ChevronDown size={14} className={`transition-transform ${fechado ? "-rotate-90" : ""}`} />
-              </button>
-              {!fechado && (
+              <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-steel-line/60">{grupo.titulo}</p>
+              {(
                 <div className="flex flex-col gap-1 mt-1">
                   {grupo.links.map(({ href, label, icon: Icon }) => (
                     <Link
@@ -143,7 +87,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       href={href}
                       onClick={() => setMenuAberto(false)}
                       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
-                        pathname === href
+                        (pathname === href || (href !== "/admin" && pathname.startsWith(href + "/")))
                           ? "bg-verniz/10 text-verniz-shine"
                           : "text-steel-line hover:bg-card hover:text-steel"
                       }`}
