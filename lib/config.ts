@@ -28,8 +28,10 @@ export function mensagemAgendar(servico?: string) {
     ? `Olá! Vim pelo site da Clean Car e gostaria de agendar: ${servico}.`
     : "Olá! Vim pelo site da Clean Car e gostaria de agendar um horário.";
 }
-export function mensagemSaberMais(servico: string) {
-  return `Olá! Vim pelo site da Clean Car e gostaria de saber mais sobre ${servico}.`;
+// WhatsApp das páginas de serviço: mensagem geral, sem citar o serviço da
+// página (o cliente pode ter chegado ali sem querer aquele serviço).
+export function mensagemSaberMais(_servico?: string) {
+  return "Olá! Vim pelo site da Clean Car e gostaria de saber mais sobre os serviços e preços.";
 }
 
 export function whatsappLink(contato: Contato, mensagem?: string) {
