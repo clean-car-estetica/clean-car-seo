@@ -2,12 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import { avisarIndexNow } from "@/lib/indexnow";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { slugify } from "@/lib/slug";
 import { textoParaPerguntas, textoParaSecoes } from "@/lib/formato-console";
 import { caminhoGuia, ROTA_GUIA, type TipoGuia } from "@/lib/guias";
 
 function revalidarSite(tipo: TipoGuia, slug: string) {
+  // Avisa Bing & cia. depois da resposta (não atrasa o console)
+  after(() => avisarIndexNow([caminhoGuia({ tipo, slug }), ROTA_GUIA[tipo], "/sitemap.xml"]));
   revalidatePath(caminhoGuia({ tipo, slug }));
   revalidatePath(ROTA_GUIA[tipo]);
   revalidatePath("/sitemap.xml");
@@ -89,4 +93,12 @@ export async function definirStatusGuia(formData: FormData) {
     .eq("slug", slug);
   if (error) throw new Error(error.message);
   revalidarSite(g.tipo as TipoGuia, slug);
+}
+
+// Botão do console: avisa Bing & cia. de todas as páginas do sitemap de uma vez
+export async function avisarBuscadoresDeTudo() {
+  const { default: sitemap } = await import("@/app/sitemap");
+  const entradas = await sitemap();
+  await avisarIndexNow(entradas.map((e) => e.url));
+  redirect("/admin/guias?avisado=1");
 }

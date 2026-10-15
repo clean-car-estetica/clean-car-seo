@@ -5,7 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import ImageUploader from "@/components/ImageUploader";
 import { perguntasParaTexto, secoesParaTexto } from "@/lib/formato-console";
 import { caminhoGuia, NOME_TIPO, type Guia, type TipoGuia } from "@/lib/guias";
-import { salvarGuia, definirStatusGuia, excluirGuia } from "./actions";
+import { salvarGuia, definirStatusGuia, excluirGuia, avisarBuscadoresDeTudo } from "./actions";
 import SeletorStatus from "@/components/admin/SeletorStatus";
 
 const campo = "w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm";
@@ -15,7 +15,7 @@ const dica = "text-xs text-steel-line/80 mt-1";
 export default async function GuiasAdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ editar?: string; nova?: string; ver?: string; salvo?: string }>;
+  searchParams: Promise<{ editar?: string; nova?: string; ver?: string; salvo?: string; avisado?: string }>;
 }) {
   const sp = await searchParams;
   const [{ data: guiasData }, { data: servicosData }] = await Promise.all([
@@ -59,6 +59,16 @@ export default async function GuiasAdminPage({
           ))
         )}
       </div>
+
+      <form action={avisarBuscadoresDeTudo} className="mb-6 max-w-3xl flex flex-wrap items-center gap-3 rounded-xl border border-card-line bg-card px-4 py-3">
+        <p className="text-sm text-steel-line flex-1 min-w-[220px]">
+          Cada publicação já avisa o Bing sozinha. Use o botão para reenviar todas as páginas do site de uma vez.
+        </p>
+        <button type="submit" className="rounded-full border border-verniz text-verniz-shine font-display font-bold px-4 py-1.5 text-sm hover:bg-verniz hover:text-carbon">
+          Avisar Bing de tudo
+        </button>
+        {sp.avisado && <span className="text-sm text-ok">Enviado.</span>}
+      </form>
 
       {sp.salvo && (
         <p className="mb-6 max-w-3xl rounded-lg border border-ok/40 bg-ok/10 px-4 py-2 text-sm text-ok">Salvo.</p>

@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { after } from "next/server";
+import { avisarIndexNow } from "@/lib/indexnow";
 
 function slugify(texto: string) {
   return texto
@@ -40,6 +42,7 @@ export async function salvarPost(formData: FormData) {
   });
   if (error) throw new Error(error.message);
   revalidatePath("/sitemap.xml");
+  after(() => avisarIndexNow([`/blog/${slug}`, "/blog"]));
 
   revalidatePath("/blog");
   revalidatePath(`/blog/${slug}`);
@@ -70,4 +73,5 @@ export async function definirStatusPost(formData: FormData) {
   revalidatePath(`/blog/${slug}`);
   revalidatePath("/sitemap.xml");
   revalidatePath("/admin/blog");
+  after(() => avisarIndexNow([`/blog/${slug}`, "/blog"]));
 }

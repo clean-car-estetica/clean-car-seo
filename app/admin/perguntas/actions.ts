@@ -3,12 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { slugify } from "@/lib/slug";
+import { after } from "next/server";
+import { avisarIndexNow } from "@/lib/indexnow";
 
 function revalidar(slug?: string | null) {
   revalidatePath("/perguntas");
   if (slug) revalidatePath(`/perguntas/${slug}`);
   revalidatePath("/sitemap.xml");
   revalidatePath("/admin/perguntas");
+  if (slug) after(() => avisarIndexNow([`/perguntas/${slug}`, "/perguntas"]));
 }
 
 async function slugLivre(base: string, id: number) {

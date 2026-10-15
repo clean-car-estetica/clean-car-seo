@@ -15,8 +15,9 @@ const ULTIMA_ATUALIZACAO = new Date("2026-10-15");
 // Base estática (páginas fixas, serviços e cidades) + o conteúdo publicado
 // pelo console (guias, blog, perguntas). 15/10/2026: a parte do banco tem
 // limite de 4 s — se o banco demorar, o sitemap sai só com a base estática,
-// sem erro para o Google. Atualiza a cada hora e na hora de cada publicação.
-export const revalidate = 3600;
+// sem erro para o Google. 15/10/2026: gerado a cada leitura (antes ficava
+// em cache e as guias/blog publicados demoravam a aparecer).
+export const dynamic = "force-dynamic";
 
 type Publicado = { url: string; lastModified: Date };
 

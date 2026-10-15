@@ -245,12 +245,12 @@ export default async function Resultados({
           />
           <Etapa
             icone={MessageCircle}
-            titulo="Chamou ou agendou"
+            titulo="Abriu o WhatsApp"
             valor={s.contatos}
             atual={s.contatos}
             antes={s.contatosAntes}
-            explicacao={`Cliques em WhatsApp (${n(s.whatsapp)}), Agendar (${n(s.agendar)}) e formulários (${n(s.formularios)}).`}
-            taxa={pessoas ? `${pct(s.contatos / pessoas)} das visitas viraram contato` : undefined}
+            explicacao={`Cliques que abrem o WhatsApp com a mensagem pronta: botão WhatsApp (${n(s.whatsapp)}) e Agendar (${n(s.agendar)}), mais formulários (${n(s.formularios)}). É o clique, não a mensagem: nem todo mundo envia. As que chegam começam com "Vim pelo site da Clean Car".`}
+            taxa={pessoas ? `${pct(s.contatos / pessoas)} das visitas clicaram` : undefined}
           />
         </div>
         {s.legado && (
@@ -264,7 +264,7 @@ export default async function Resultados({
         <Cartao titulo="Pessoas no site por dia" sub={a.ok ? "Fonte: Google Analytics" : "Fonte: contagem do próprio site"}>
           <GraficoDiario pontos={pessoasPorDia} unidade="pessoas" />
         </Cartao>
-        <Cartao titulo="Contatos por dia" sub="Cliques em WhatsApp, Agendar e formulários">
+        <Cartao titulo="Cliques para o WhatsApp por dia" sub="Abriu o WhatsApp pelo site (não quer dizer que enviou a mensagem)">
           <GraficoDiario pontos={s.porDia.map((d) => ({ data: d.data, valor: d.contatos }))} unidade="contatos" tipo="barras" cor="var(--cera)" />
         </Cartao>
       </div>
@@ -353,7 +353,7 @@ export default async function Resultados({
         </div>
       )}
 
-      <Cartao titulo="Últimos contatos pelo site" sub="Cada clique em WhatsApp, Agendar ou formulário">
+      <Cartao titulo="Últimos cliques para o WhatsApp" sub="Data e hora de cada clique: compare com as conversas que começam com “Vim pelo site da Clean Car”">
         {s.recentes.length === 0 ? (
           <p className="text-sm text-steel-line">Nenhum contato neste período.</p>
         ) : (
