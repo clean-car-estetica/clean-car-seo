@@ -2,8 +2,8 @@ import { Star, Quote } from "lucide-react";
 import { SITE_URL } from "@/lib/config";
 
 export const VIDEO_CLIENTE = {
-  src: "/midia/relato-cliente.mp4",
-  capa: "/midia/relato-cliente-capa.jpg",
+  src: "/midia/lavagem-de-carro-mogi-das-cruzes-cliente.mp4",
+  capa: "/midia/lavagem-de-carro-mogi-das-cruzes-cliente.jpg",
   data: "2026-10-15",
   duracao: "PT33S",
 };
@@ -23,8 +23,8 @@ export default function VideoCliente({ notaGoogle }: { notaGoogle?: string }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "VideoObject",
-    name: "Cliente mostra o carro na retirada da Clean Car Estética Automotiva",
-    description: "Cliente grava o carro na retirada da Clean Car, em Mogi das Cruzes: " + FALAS.join(" "),
+    name: "Lavagem de carro em Mogi das Cruzes: cliente mostra o resultado na Clean Car",
+    description: "Lavagem detalhada com higienização interna em Mogi das Cruzes. A cliente grava o carro na retirada e diz: \"não sei se saiu do lava rápido ou da concessionária\". Clean Car Estética Automotiva, Jardim Universo.",
     thumbnailUrl: `${SITE_URL}${VIDEO_CLIENTE.capa}`,
     contentUrl: `${SITE_URL}${VIDEO_CLIENTE.src}`,
     uploadDate: VIDEO_CLIENTE.data,
@@ -44,6 +44,7 @@ export default function VideoCliente({ notaGoogle }: { notaGoogle?: string }) {
           controls
           playsInline
           preload="none"
+          aria-label="Vídeo: cliente mostra o carro depois da lavagem na Clean Car, em Mogi das Cruzes"
           className="w-full max-w-[320px] mx-auto aspect-[9/16] rounded-3xl border border-card-line bg-card object-cover"
         />
 
