@@ -24,7 +24,7 @@ export default function VideoCliente({ notaGoogle }: { notaGoogle?: string }) {
     "@context": "https://schema.org",
     "@type": "VideoObject",
     name: "Lavagem de carro em Mogi das Cruzes: cliente mostra o resultado na Clean Car",
-    description: "Lavagem detalhada com higienização interna em Mogi das Cruzes. A cliente grava o carro na retirada e diz: \"não sei se saiu do lava rápido ou da concessionária\". Clean Car Estética Automotiva, Jardim Universo.",
+    description: "Resultado de lavagem de carro em Mogi das Cruzes. A cliente grava o carro na retirada e diz: \"não sei se saiu do lava rápido ou da concessionária\". Clean Car Estética Automotiva, Jardim Universo.",
     thumbnailUrl: `${SITE_URL}${VIDEO_CLIENTE.capa}`,
     contentUrl: `${SITE_URL}${VIDEO_CLIENTE.src}`,
     uploadDate: VIDEO_CLIENTE.data,
