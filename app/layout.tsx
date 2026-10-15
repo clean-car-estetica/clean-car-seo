@@ -1,4 +1,4 @@
-import { SITE_URL } from "@/lib/config";
+import { SITE_URL, filtrarLevaETraz } from "@/lib/config";
 import type { Metadata } from "next";
 import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
@@ -12,7 +12,8 @@ import { TextosProvider } from "@/components/TextosProvider";
 import { getContatoContent, getPromocoes, getTema, getMetadados, getTextosGerais, getCampanha } from "@/lib/site-content";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const meta = await getMetadados();
+  const [metaBruto, contato] = await Promise.all([getMetadados(), getContatoContent()]);
+  const meta = { ...metaBruto, descricao: filtrarLevaETraz(metaBruto.descricao, contato.levaETraz) };
   const palavrasChave = meta.palavrasChave.split(",").map((p) => p.trim()).filter(Boolean);
   return {
     metadataBase: new URL(SITE_URL),

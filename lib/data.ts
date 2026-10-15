@@ -69,4 +69,6 @@ export const cidades: Cidade[] = [
   { slug: "poa", nome: "Poá", bairros: ["Centro", "Jardim Silvina"], sede: false },
   { slug: "ferraz-de-vasconcelos", nome: "Ferraz de Vasconcelos", bairros: ["Centro", "Jardim Vitória Régia"], sede: false },
   { slug: "itaquaquecetuba", nome: "Itaquaquecetuba", bairros: ["Centro", "Jardim Odete"], sede: false },
+  // Reserva caso o banco não responda: Guararema tem página local própria
+  { slug: "guararema", nome: "Guararema", bairros: ["Centro", "Itaepó", "Nogueira", "Freguesia da Escada", "Lambari"], sede: false },
 ];

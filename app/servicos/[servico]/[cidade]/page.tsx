@@ -1,25 +1,32 @@
 import Bloco from "@/components/Bloco";
-import { SITE_URL } from "@/lib/config";
+import { SITE_URL, filtrarLevaETraz } from "@/lib/config";
+import { getContatoContent } from "@/lib/site-content";
+import { temPaginaLocal, PAGINAS_LOCAIS } from "@/lib/paginas-locais";
 import { fotoServico } from "@/lib/fotos";
 import ServicoTopo from "@/components/ServicoTopo";
 import Diferenciais from "@/components/Diferenciais";
 import BarraAgendarCelular from "@/components/BarraAgendarCelular";
 import ServicosLista from "@/components/ServicosLista";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
-import { servicos, cidades, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
+import { SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
 import { getServicoPublico, getConteudoLocalPublico, getCidadesPublicas, getCidadePublica, getServicosPublicos } from "@/lib/site-data";
 
 export const revalidate = 60;
 
+// 15/10/2026: só as combinações com texto próprio são geradas no build.
+// As demais (texto genérico repetido) redirecionam 301 para a página do
+// serviço — antes ficavam no ar com "noindex", e o Google acusava dezenas de
+// páginas "excluídas pela tag noindex" no Search Console.
 export function generateStaticParams() {
-  return servicos
-    .filter((s) => !SERVICOS_SEM_PAGINAS_LOCAIS.includes(s.slug))
-    .flatMap((s) => cidades.map((c) => ({ servico: s.slug, cidade: c.slug })));
+  return PAGINAS_LOCAIS.filter((p) => !SERVICOS_SEM_PAGINAS_LOCAIS.includes(p.servico)).map((p) => ({
+    servico: p.servico,
+    cidade: p.cidade,
+  }));
 }
 
 export async function generateMetadata({
@@ -34,15 +41,15 @@ export async function generateMetadata({
   const tituloBase = servico.termo_popular || servico.nome;
   // Só indexa se a página tiver texto próprio cadastrado (Páginas locais);
   // texto genérico repetido em todas as cidades o Google descarta.
-  const conteudo = await getConteudoLocalPublico(servico, cidade);
+  const [conteudo, contato] = await Promise.all([getConteudoLocalPublico(servico, cidade), getContatoContent()]);
+  if (!conteudo.proprio && !temPaginaLocal(servico.slug, cidade.slug)) return {};
   const preco = servico.preco_desde ? ` a partir de R$ ${servico.preco_desde}` : "";
   const titulo = `${tituloBase} em ${cidade.nome}${servico.preco_desde ? ` · R$ ${servico.preco_desde}` : ""} | Clean Car`;
-  const descricao = `${servico.nome} para quem é de ${cidade.nome}: ${servico.resumo}${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}, em Mogi das Cruzes, com hora marcada e leva e traz. Agende pelo WhatsApp.`;
+  const descricao = `${servico.nome} para quem é de ${cidade.nome}: ${servico.resumo}${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}, em Mogi das Cruzes, com hora marcada${contato.levaETraz ? " e leva e traz" : ""}. Agende pelo WhatsApp.`;
   return {
     title: { absolute: titulo },
     description: descricao,
-    alternates: { canonical: conteudo.proprio ? `${SITE_URL}/servicos/${servico.slug}/${cidade.slug}` : `${SITE_URL}/servicos/${servico.slug}` },
-    robots: conteudo.proprio ? undefined : { index: false, follow: true },
+    alternates: { canonical: `${SITE_URL}/servicos/${servico.slug}/${cidade.slug}` },
   };
 }
 
@@ -57,11 +64,22 @@ export default async function ServicoCidadePage({
   const cidade = await getCidadePublica(cidadeSlug);
   if (!servico || !cidade) return notFound();
 
-  const [conteudo, todos, cidades] = await Promise.all([
+  const [conteudoBruto, todos, cidades, contato] = await Promise.all([
     getConteudoLocalPublico(servico, cidade),
     getServicosPublicos(),
     getCidadesPublicas(),
+    getContatoContent(),
   ]);
+  // Sem texto próprio: não existe página local — leva para a página do serviço
+  if (!conteudoBruto.proprio && !temPaginaLocal(servico.slug, cidade.slug)) {
+    permanentRedirect(`/servicos/${servico.slug}`);
+  }
+  const conteudo = {
+    ...conteudoBruto,
+    paragrafos: conteudoBruto.paragrafos.map((p) => filtrarLevaETraz(p, contato.levaETraz)).filter(Boolean),
+  };
+  // Outras cidades: só as que têm página própria deste serviço
+  const outrasCidades = cidades.filter((c) => c.slug !== cidade.slug && temPaginaLocal(servico.slug, c.slug));
   const outros = todos.filter((x) => x.slug !== servico.slug).slice(0, 6);
   const imagemFundo = fotoServico(servico.slug, conteudo.imagemOverride || servico.imagem_url);
 
@@ -95,7 +113,7 @@ export default async function ServicoCidadePage({
             <h2 className="font-display font-bold text-xl text-steel mb-2">Bairros atendidos em {cidade.nome}</h2>
             <p className="text-sm text-steel-line leading-relaxed">{cidade.bairros.join(", ")}</p>
             <p className="mt-4 text-sm text-steel-line">
-              O serviço é feito no nosso espaço no Jardim Universo, em Mogi das Cruzes, com hora marcada. Também buscamos e devolvemos o carro (leva e traz): consulte o seu bairro pelo WhatsApp.
+              O serviço é feito no nosso espaço no Jardim Universo, em Mogi das Cruzes, com hora marcada.{contato.levaETraz ? " Também buscamos e devolvemos o carro (leva e traz): consulte o seu bairro pelo WhatsApp." : ""}
             </p>
           </aside>
         </section>
@@ -123,11 +141,11 @@ export default async function ServicoCidadePage({
         />
         <ServicosLista servicos={outros} titulo="Combina com outros cuidados" subtitulo="Aproveite a visita e cuide do carro por completo." />
 
-        {cidades.length > 1 && (
+        {outrasCidades.length > 0 && (
           <section className="mx-auto max-w-6xl px-6 pb-20">
             <h2 className="font-display font-bold text-3xl text-steel mb-6">{servico.nome} em outras cidades</h2>
             <div className="flex flex-wrap gap-3">
-              {cidades.filter((c) => c.slug !== cidade.slug).map((c) => (
+              {outrasCidades.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/servicos/${servico.slug}/${c.slug}`}

@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description:
     "Deixe sua avaliação sobre o atendimento da Clean Car Estética Automotiva em Mogi das Cruzes.",
   alternates: { canonical: `${SITE_URL}/avaliar` },
+  // Formulário de NPS para clientes: não é página de busca
+  robots: { index: false, follow: true },
 };
 
 export default function AvaliarLayout({ children }: { children: React.ReactNode }) {

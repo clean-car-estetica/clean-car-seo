@@ -7,6 +7,7 @@ import AgendarButton from "@/components/AgendarButton";
 import Faq from "@/components/Faq";
 import { getServicosPublicos, getCidadesPublicas, getFaqsPublicos } from "@/lib/site-data";
 import { SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
+import { temPaginaLocal } from "@/lib/paginas-locais";
 
 export const revalidate = 3600;
 
@@ -55,7 +56,7 @@ export default async function MogiHubPage() {
               .map((s) => (
                 <Link
                   key={s.slug}
-                  href={`/servicos/${s.slug}/mogi-das-cruzes`}
+                  href={temPaginaLocal(s.slug, "mogi-das-cruzes") ? `/servicos/${s.slug}/mogi-das-cruzes` : `/servicos/${s.slug}`}
                   className="rounded-xl bg-card border border-card-line px-4 py-3 text-sm font-display font-bold text-steel-line hover:border-verniz hover:text-verniz-shine"
                 >
                   {s.termo_popular || s.nome}

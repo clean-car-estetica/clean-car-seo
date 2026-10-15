@@ -22,7 +22,7 @@ import Faq from "@/components/Faq";
 import Bloco from "@/components/Bloco";
 import { paginaDaCidade } from "@/lib/paginas-locais";
 import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
-import { getTextosGerais } from "@/lib/site-content";
+import { getTextosGerais, getContatoContent } from "@/lib/site-content";
 
 export const revalidate = 60;
 
@@ -31,7 +31,7 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, contato] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -42,6 +42,7 @@ export default async function Home() {
     getProdutosLista(),
     getTextosGerais(),
     getFaqsPublicos(),
+    getContatoContent(),
   ]);
   const lavagens = ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"];
   const outros = servicos.filter((x) => !lavagens.includes(x.slug));
@@ -136,8 +137,9 @@ export default async function Home() {
             <div className="mt-5 space-y-4 text-steel-line leading-relaxed max-w-2xl">
               <p>
                 A Clean Car Estética Automotiva fica no Jardim Universo, em Mogi das Cruzes, e cuida de carros de toda a
-                região: Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema. Trabalhamos com hora marcada e,
-                se você não puder trazer o carro, buscamos e devolvemos com o leva e traz.
+                região: Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema. Trabalhamos com hora marcada{contato.levaETraz
+                  ? " e, se você não puder trazer o carro, buscamos e devolvemos com o leva e traz."
+                  : ", sem fila e sem surpresa no prazo."}
               </p>
               <p>
                 Do básico ao completo: a <Link href="/servicos/lavagem-bronze/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem de carro</Link> do dia a dia,
@@ -160,7 +162,7 @@ export default async function Home() {
               Rua Prefeito Sebastião Cascardo, 438<br />Jardim Universo, Mogi das Cruzes – SP<br />CEP 08740-450
             </address>
             <p className="mt-3 text-sm text-steel-line">Seg a sex, 9h às 18h · Sáb, 9h às 17h</p>
-            <p className="mt-3 text-sm text-steel-line">Leva e traz · Hora marcada · Avaliação grátis</p>
+            <p className="mt-3 text-sm text-steel-line">{contato.levaETraz ? "Leva e traz · " : ""}Hora marcada · Avaliação grátis</p>
           </aside>
         </section>
 

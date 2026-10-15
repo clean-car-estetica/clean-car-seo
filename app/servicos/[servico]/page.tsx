@@ -1,5 +1,5 @@
 import Bloco from "@/components/Bloco";
-import { SITE_URL } from "@/lib/config";
+import { SITE_URL, filtrarLevaETraz } from "@/lib/config";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import { servicos, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
+import { getContatoContent } from "@/lib/site-content";
 import { getServicoPublico, getCidadesPublicas, getServicosPublicos, getProcessoPassos, getTransformacoesPublicas, getFaqsPublicos } from "@/lib/site-data";
 import ServicoTopo from "@/components/ServicoTopo";
 import Diferenciais from "@/components/Diferenciais";
@@ -54,19 +55,23 @@ export default async function ServicoPage({
 }) {
   const { servico: servicoSlug } = await params;
   const semPaginasLocais = SERVICOS_SEM_PAGINAS_LOCAIS.includes(servicoSlug);
-  const [servico, cidades, todos, passos, transformacoes, faqs] = await Promise.all([
+  const [servico, cidades, todos, passos, transformacoes, faqs, contato] = await Promise.all([
     getServicoPublico(servicoSlug),
     semPaginasLocais ? Promise.resolve([]) : getCidadesPublicas(),
     getServicosPublicos(),
     getProcessoPassos(),
     getTransformacoesPublicas(),
     getFaqsPublicos(),
+    getContatoContent(),
   ]);
   if (!servico) return notFound();
   const outros = todos.filter((x) => x.slug !== servico.slug).slice(0, 6);
   const conteudo = CONTEUDO_SERVICO[servico.slug];
   const perguntas = [
-    ...(conteudo?.perguntas ?? []).map((p, i) => ({ id: -100 - i, pergunta: p.pergunta, resposta: p.resposta })),
+    ...(conteudo?.perguntas ?? [])
+      // Leva e traz desligado no console: some a pergunta sobre ele e as menções nas respostas
+      .filter((p) => contato.levaETraz || !/leva[\s-]+e[\s-]+tr/i.test(p.pergunta))
+      .map((p, i) => ({ id: -100 - i, pergunta: p.pergunta, resposta: filtrarLevaETraz(p.resposta, contato.levaETraz) })),
     ...faqs.slice(0, conteudo ? 2 : 4),
   ];
   // Cidades com página própria deste serviço aparecem primeiro
@@ -166,12 +171,13 @@ export default async function ServicoPage({
 
         <ServicosLista servicos={outros} titulo="Combina com outros cuidados" subtitulo="Aproveite a visita e cuide do carro por completo." />
 
-        {!semPaginasLocais && cidades.length > 0 && (
+        {!semPaginasLocais && cidades.some((c) => comPagina.has(c.slug)) && (
           <section className="mx-auto max-w-6xl px-6 pb-20">
             <h2 className="font-display font-bold text-3xl text-steel mb-2">{servico.nome} perto de você</h2>
-            <p className="text-steel-line mb-6">Nosso espaço fica no Jardim Universo, em Mogi das Cruzes, e recebe clientes de toda a região. Também temos leva e traz.</p>
+            <p className="text-steel-line mb-6">Nosso espaço fica no Jardim Universo, em Mogi das Cruzes, e recebe clientes de toda a região.{contato.levaETraz ? " Também temos leva e traz." : ""}</p>
             <div className="flex flex-wrap gap-3">
-              {[...cidades].sort((a, b) => Number(comPagina.has(b.slug)) - Number(comPagina.has(a.slug))).map((c) => (
+              {/* Só cidades com página própria: as demais redirecionam para esta página */}
+              {cidades.filter((c) => comPagina.has(c.slug)).map((c) => (
                 <Link
                   key={c.slug}
                   href={`/servicos/${servico.slug}/${c.slug}`}

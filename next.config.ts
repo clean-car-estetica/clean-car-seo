@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Serviços que saíram do catálogo: preserva o endereço antigo (e o Google) apontando para o mais próximo
   async redirects() {
     return [
       // Domínio próprio (07/10/2026): o endereço antigo da Vercel manda tudo
@@ -15,20 +14,12 @@ const nextConfig: NextConfig = {
       },
       // 08/10/2026: agenda online saiu do site — o agendamento é pelo WhatsApp (bot).
       { source: "/agendar-online", destination: "/contato", permanent: true },
-      // Serviços com outro nome no passado → o equivalente de hoje
-      { source: "/servicos/polimento", destination: "/servicos/enceramento-tecnico", permanent: true },
-      { source: "/servicos/polimento/:cidade", destination: "/servicos/enceramento-tecnico/:cidade", permanent: true },
-      { source: "/servicos/polimento/:cidade/:bairro", destination: "/servicos/enceramento-tecnico/:cidade/:bairro", permanent: true },
-      { source: "/servicos/lavagem-chassi", destination: "/servicos/lavagem-ouro", permanent: true },
-      { source: "/servicos/lavagem-chassi/:cidade", destination: "/servicos/lavagem-ouro/:cidade", permanent: true },
-      { source: "/servicos/lavagem-chassi/:cidade/:bairro", destination: "/servicos/lavagem-ouro/:cidade/:bairro", permanent: true },
-      // 08/10/2026: vitrificação, polimento e lavagem de chassi não são mais feitos
-      { source: "/servicos/vitrificacao", destination: "/servicos/enceramento-tecnico", permanent: true },
-      { source: "/servicos/vitrificacao/:cidade", destination: "/servicos/enceramento-tecnico/:cidade", permanent: true },
-      { source: "/servicos/vitrificacao/:cidade/:bairro", destination: "/servicos/enceramento-tecnico/:cidade/:bairro", permanent: true },
+      // Serviço "Ducha" virou a Lavagem Bronze (mesmo serviço, outro nome).
+      // Todas as variações vão direto ao destino final, sem cadeia de redirect.
       { source: "/servicos/ducha", destination: "/servicos/lavagem-bronze", permanent: true },
-      { source: "/servicos/ducha/:cidade", destination: "/servicos/lavagem-bronze/:cidade", permanent: true },
-      { source: "/servicos/ducha/:cidade/:bairro", destination: "/servicos/lavagem-bronze/:cidade/:bairro", permanent: true },
+      { source: "/servicos/ducha/:path*", destination: "/servicos/lavagem-bronze", permanent: true },
+      // 15/10/2026: lavagem de chassi, polimento e vitrificação NÃO são feitos.
+      // Não redirecionam mais para outro serviço — respondem 410 (ver proxy.ts).
     ];
   },
   // A arte de compartilhamento (opengraph-image) lê fontes e fotos do disco

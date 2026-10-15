@@ -7,7 +7,7 @@ const BASE_URL = SITE_URL;
 
 // Data de referência da "última modificação" das páginas do site.
 // Atualize quando fizer uma mudança grande de conteúdo.
-const ULTIMA_ATUALIZACAO = new Date("2026-10-08");
+const ULTIMA_ATUALIZACAO = new Date("2026-10-15");
 
 // Sitemap 100% estático (sem nenhuma consulta a banco de dados) — resposta
 // instantânea e confiável, sem risco de timeout na leitura do Google.
@@ -19,8 +19,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: BASE_URL, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE_URL}/orcamento`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/beneficios`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/avaliar`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.4 },
-    { url: `${BASE_URL}/blog`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 0.6 },
+    // 15/10/2026: /avaliar (formulário de NPS) e /blog (ainda sem artigos
+    // publicados) saíram: páginas sem conteúdo o Google marca como
+    // "rastreada, mas não indexada". O blog volta quando houver artigos.
     { url: `${BASE_URL}/faq`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/mogi-das-cruzes`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE_URL}/sobre`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.5 },

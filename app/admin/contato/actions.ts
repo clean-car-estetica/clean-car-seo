@@ -18,6 +18,7 @@ export async function salvarContato(formData: FormData) {
     horarioSabado: String(formData.get("horarioSabado")),
     observacaoHorario: String(formData.get("observacaoHorario")),
     formasPagamento: String(formData.get("formasPagamento") || ""),
+    levaETraz: formData.get("levaETraz") === "on",
   };
 
   const { error } = await supabaseAdmin

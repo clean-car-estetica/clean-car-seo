@@ -17,9 +17,40 @@ export const CONTATO_PADRAO = {
   horarioSabado: "Sábado: 9h às 17h",
   observacaoHorario: "Feriados e feriados prolongados sujeitos a alteração",
   formasPagamento: "",
+  /** Leva e traz ligado/desligado no console (Contato e endereço). Desligado:
+   * o site esconde toda menção ao serviço, inclusive nos textos cadastrados. */
+  levaETraz: false as boolean,
 };
 
 export type Contato = typeof CONTATO_PADRAO;
+
+const RE_LEVA = /leva[\s-]+e[\s-]+tr[aá][sz]|buscamos (o carro )?e devolvemos/i;
+
+/**
+ * Tira as menções ao leva e traz de um texto quando o serviço está desligado.
+ * Os textos cadastrados no banco ficam intactos: ao religar no console, tudo
+ * volta a aparecer sozinho.
+ */
+export function filtrarLevaETraz(texto: string, ativo: boolean): string {
+  if (ativo || !texto || !RE_LEVA.test(texto)) return texto;
+  let t = texto
+    // "... depois — ou pedir o leva e traz, conforme o bairro"
+    .replace(/\s*[—–,]\s*ou (peça |pedir |combinar )?o leva[\s-]+e[\s-]+tr[aá][sz][^.!?\n]*/gi, "")
+    // "Leva e traz, hora marcada..." / "Leva e traz · Hora marcada..."
+    .replace(/leva[\s-]+e[\s-]+tr[aá][sz]\s*[,·]\s*/gi, "")
+    // "... com hora marcada e leva e traz."
+    .replace(/\s+e\s+leva[\s-]+e[\s-]+tr[aá][sz]/gi, "");
+  // O que sobrar: tira a frase inteira, mantendo quebras de linha
+  t = t
+    .split(/(?<=[.!?])(\s+)/)
+    .filter((parte) => !RE_LEVA.test(parte))
+    .join("")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+(\r?\n)/g, "$1")
+    .trim();
+  // Primeira letra de cada frase em maiúscula (após cortes no começo)
+  return t.replace(/(^|[.!?]\s+)([a-zà-ú])/g, (_, a, b) => a + b.toUpperCase());
+}
 
 // 08/10/2026: a agenda online saiu do site — todo "Agendar" abre o WhatsApp
 // (o bot agenda) com a mensagem dizendo que veio do site e qual serviço.

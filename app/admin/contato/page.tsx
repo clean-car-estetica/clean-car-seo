@@ -15,6 +15,22 @@ export default async function ContatoAdminPage() {
       </p>
 
       <form action={salvarContato} className="bg-card border border-card-line rounded-2xl p-6 grid gap-4 max-w-2xl">
+        <label className="flex items-start gap-3 rounded-xl border border-verniz/40 bg-carbon p-4 cursor-pointer">
+          <input
+            type="checkbox"
+            name="levaETraz"
+            defaultChecked={contato.levaETraz}
+            className="mt-1 h-5 w-5 accent-verniz"
+          />
+          <span>
+            <span className="block font-display font-bold text-steel">Leva e traz ativo</span>
+            <span className="block text-xs text-steel-line mt-1">
+              Desmarcado: o site esconde toda menção ao leva e traz (páginas, perguntas, textos das cidades,
+              descrição do Google e arte de compartilhamento). Os textos ficam guardados — é só marcar de novo
+              e salvar que tudo volta.
+            </span>
+          </span>
+        </label>
         <div>
           <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Endereço completo</label>
           <input

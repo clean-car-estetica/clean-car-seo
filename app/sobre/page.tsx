@@ -1,9 +1,9 @@
-import { SITE_URL } from "@/lib/config";
+import { SITE_URL, filtrarLevaETraz } from "@/lib/config";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
-import { getSobre } from "@/lib/site-content";
+import { getSobre, getContatoContent } from "@/lib/site-content";
 
 export const revalidate = 3600;
 
@@ -14,7 +14,8 @@ export const metadata = {
 };
 
 export default async function SobrePage() {
-  const sobre = await getSobre();
+  const [sobreBruto, contato] = await Promise.all([getSobre(), getContatoContent()]);
+  const sobre = { ...sobreBruto, texto: filtrarLevaETraz(sobreBruto.texto, contato.levaETraz) };
 
   return (
     <>

@@ -8,11 +8,19 @@ import Midia from "@/components/Midia";
 
 export const revalidate = 60;
 
-export const metadata = {
-  title: "Blog",
-  description: "Dicas de cuidado automotivo da Clean Car Estética Automotiva.",
-  alternates: { canonical: `${SITE_URL}/blog` },
-};
+export async function generateMetadata() {
+  // Enquanto não houver artigo publicado, o blog não entra no Google
+  const { count } = await supabasePublico
+    .from("blog_posts")
+    .select("slug", { count: "exact", head: true })
+    .eq("status", "publicado");
+  return {
+    title: "Blog",
+    description: "Dicas de cuidado automotivo da Clean Car Estética Automotiva.",
+    alternates: { canonical: `${SITE_URL}/blog` },
+    ...(count ? {} : { robots: { index: false, follow: true } }),
+  };
+}
 
 export default async function BlogIndex() {
   const { data: posts } = await supabasePublico
