@@ -5,7 +5,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import ImageUploader from "@/components/ImageUploader";
 import { perguntasParaTexto, secoesParaTexto } from "@/lib/formato-console";
 import { caminhoGuia, NOME_TIPO, type Guia, type TipoGuia } from "@/lib/guias";
-import { salvarGuia, alternarPublicacao, excluirGuia } from "./actions";
+import { salvarGuia, definirStatusGuia, excluirGuia } from "./actions";
+import SeletorStatus from "@/components/admin/SeletorStatus";
 
 const campo = "w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm";
 const rotulo = "block text-xs font-bold uppercase tracking-wide text-steel-line mb-1";
@@ -197,9 +198,6 @@ export default async function GuiasAdminPage({
             <div className="min-w-0">
               <div className="font-display font-bold text-steel">
                 {g.titulo}
-                <span className={`text-xs ml-2 px-2 py-0.5 rounded-full ${g.status === "publicado" ? "bg-ok/15 text-ok" : "bg-steel-line/15 text-steel-line"}`}>
-                  {g.status === "publicado" ? "no ar" : "rascunho"}
-                </span>
               </div>
               <div className="text-xs text-steel-line">
                 {NOME_TIPO[g.tipo]} · {caminhoGuia(g)} · {g.servicos.length} serviço(s)
@@ -208,12 +206,7 @@ export default async function GuiasAdminPage({
             <div className="flex flex-wrap items-center gap-3 text-xs font-bold">
               <a href={`/admin/guias/previa/${g.slug}`} target="_blank" className="text-steel-line hover:underline">Prévia ↗</a>
               <Link href={`/admin/guias?editar=${g.slug}`} className="text-verniz-shine hover:underline">Editar</Link>
-              <form action={alternarPublicacao}>
-                <input type="hidden" name="slug" value={g.slug} />
-                <button type="submit" className={g.status === "publicado" ? "text-steel-line hover:underline" : "text-ok hover:underline"}>
-                  {g.status === "publicado" ? "Tirar do ar" : "Publicar"}
-                </button>
-              </form>
+              <SeletorStatus acao={definirStatusGuia} chave={g.slug} publicado={g.status === "publicado"} />
               <form action={excluirGuia}>
                 <input type="hidden" name="slug" value={g.slug} />
                 <button type="submit" className="text-warn hover:underline">Excluir</button>

@@ -53,3 +53,21 @@ export async function excluirPost(formData: FormData) {
   revalidatePath("/blog");
   revalidatePath("/admin/blog");
 }
+
+// Seletor da lista: muda só o status, sem abrir o post
+export async function definirStatusPost(formData: FormData) {
+  const slug = String(formData.get("slug"));
+  const status = String(formData.get("status")) === "publicado" ? "publicado" : "rascunho";
+  const { data: atual } = await supabaseAdmin.from("blog_posts").select("status").eq("slug", slug).single();
+  if (!atual || atual.status === status) return;
+  const agora = new Date().toISOString();
+  const { error } = await supabaseAdmin
+    .from("blog_posts")
+    .update({ status, atualizado_em: agora, ...(status === "publicado" ? { publicado_em: agora } : {}) })
+    .eq("slug", slug);
+  if (error) throw new Error(error.message);
+  revalidatePath("/blog");
+  revalidatePath(`/blog/${slug}`);
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/admin/blog");
+}

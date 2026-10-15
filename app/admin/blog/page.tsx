@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import ImageUploader from "@/components/ImageUploader";
-import { salvarPost, excluirPost } from "./actions";
+import { salvarPost, excluirPost, definirStatusPost } from "./actions";
+import SeletorStatus from "@/components/admin/SeletorStatus";
 
 export default async function BlogAdminPage({
   searchParams,
@@ -86,15 +87,11 @@ export default async function BlogAdminPage({
         {posts?.map((p) => (
           <div key={p.slug} className="bg-card border border-card-line rounded-xl p-4 flex items-center justify-between">
             <div>
-              <div className="font-display font-bold text-steel">
-                {p.titulo}{" "}
-                <span className={`text-xs ml-2 px-2 py-0.5 rounded-full ${p.status === "publicado" ? "bg-ok/15 text-ok" : "bg-steel-line/15 text-steel-line"}`}>
-                  {p.status}
-                </span>
-              </div>
+              <div className="font-display font-bold text-steel">{p.titulo}</div>
               <div className="text-xs text-steel-line">/{p.slug}</div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <SeletorStatus acao={definirStatusPost} chave={p.slug} publicado={p.status === "publicado"} />
               <a href={`/admin/blog/previa/${p.slug}`} target="_blank" className="text-xs font-bold text-steel-line hover:underline">Prévia ↗</a>
               <a href={`/admin/blog?editar=${p.slug}`} className="text-xs font-bold text-verniz-shine hover:underline">Editar</a>
               <form action={excluirPost}>

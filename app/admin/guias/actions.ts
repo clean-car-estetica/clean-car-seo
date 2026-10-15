@@ -72,3 +72,21 @@ export async function excluirGuia(formData: FormData) {
   if (g) revalidarSite(g.tipo as TipoGuia, slug);
   redirect("/admin/guias");
 }
+
+// Seletor da lista: muda só o status, sem abrir a guia
+export async function definirStatusGuia(formData: FormData) {
+  const slug = String(formData.get("slug"));
+  const status = String(formData.get("status")) === "publicado" ? "publicado" : "rascunho";
+  const { data: g } = await supabaseAdmin.from("guias").select("tipo, status, publicado_em").eq("slug", slug).single();
+  if (!g || g.status === status) return;
+  const { error } = await supabaseAdmin
+    .from("guias")
+    .update({
+      status,
+      publicado_em: status === "publicado" ? g.publicado_em ?? new Date().toISOString() : g.publicado_em,
+      atualizado_em: new Date().toISOString(),
+    })
+    .eq("slug", slug);
+  if (error) throw new Error(error.message);
+  revalidarSite(g.tipo as TipoGuia, slug);
+}
