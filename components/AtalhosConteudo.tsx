@@ -18,16 +18,16 @@ export default function AtalhosConteudo() {
         Tire suas <span className="text-verniz-shine">dúvidas</span>
       </h2>
       <p className="mt-2 mb-8 text-steel-line max-w-xl">Respostas para os problemas mais comuns do carro, sem precisar perguntar.</p>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
         {ATALHOS.map(({ href, titulo, texto, Icone }) => (
           <Link
             key={href}
             href={href}
-            className="group rounded-2xl bg-card border border-card-line p-5 hover:border-verniz transition-colors"
+            className="group rounded-2xl bg-card border border-card-line p-4 sm:p-5 hover:border-verniz transition-colors last:col-span-2 lg:last:col-span-1"
           >
             <Icone size={22} className="text-verniz-shine" aria-hidden />
             <div className="mt-3 font-display font-bold text-steel group-hover:text-verniz-shine">{titulo}</div>
-            <p className="mt-1 text-sm text-steel-line leading-snug">{texto}</p>
+            <p className="mt-1 text-xs sm:text-sm text-steel-line leading-snug">{texto}</p>
           </Link>
         ))}
       </div>

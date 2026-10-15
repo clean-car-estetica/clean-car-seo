@@ -22,3 +22,13 @@ export async function excluirDepoimento(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/admin/depoimentos");
 }
+
+export async function definirVideoCliente(formData: FormData) {
+  const publicado = String(formData.get("status")) === "publicado";
+  const { error } = await supabaseAdmin
+    .from("site_content")
+    .upsert({ section: "video_cliente", data: { publicado }, updated_at: new Date().toISOString() });
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/admin/depoimentos");
+}

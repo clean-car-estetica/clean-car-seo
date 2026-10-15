@@ -266,3 +266,16 @@ export async function getHeroContent(): Promise<HeroContent> {
     return heroPadrao;
   }
 }
+
+// Vídeo de cliente (depoimento gravado na retirada do carro). Fica pronto no
+// site e só aparece quando o console marca "Publicado" (autorização da cliente).
+export type VideoCliente = { publicado: boolean };
+
+export async function getVideoCliente(): Promise<VideoCliente> {
+  try {
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "video_cliente").maybeSingle();
+    return { publicado: Boolean((data?.data as Partial<VideoCliente> | undefined)?.publicado) };
+  } catch {
+    return { publicado: false };
+  }
+}

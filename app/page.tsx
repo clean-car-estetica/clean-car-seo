@@ -23,7 +23,8 @@ import Faq from "@/components/Faq";
 import Bloco from "@/components/Bloco";
 import { paginaDaCidade } from "@/lib/paginas-locais";
 import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
-import { getTextosGerais, getContatoContent } from "@/lib/site-content";
+import { getTextosGerais, getContatoContent, getVideoCliente } from "@/lib/site-content";
+import VideoCliente from "@/components/VideoCliente";
 
 export const revalidate = 60;
 
@@ -32,7 +33,7 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, contato] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, contato, videoCliente] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -44,6 +45,7 @@ export default async function Home() {
     getTextosGerais(),
     getFaqsPublicos(),
     getContatoContent(),
+    getVideoCliente(),
   ]);
   const lavagens = ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"];
   const outros = servicos.filter((x) => !lavagens.includes(x.slug));
@@ -221,6 +223,7 @@ export default async function Home() {
           </div>
         </section>
 
+        {videoCliente.publicado && <VideoCliente notaGoogle={contato.notaGoogle} />}
         <Bloco id="depoimentos"><Depoimentos itens={depoimentos} /></Bloco>
         <Bloco id="indicacao"><Indicacao /></Bloco>
 

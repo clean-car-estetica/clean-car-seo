@@ -1,10 +1,16 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { salvarDepoimento, excluirDepoimento } from "./actions";
+import { salvarDepoimento, excluirDepoimento, definirVideoCliente } from "./actions";
+import { getVideoCliente } from "@/lib/site-content";
+import { VIDEO_CLIENTE } from "@/components/VideoCliente";
 
 export default async function DepoimentosAdminPage() {
-  const { data: depoimentos } = await supabaseAdmin.from("depoimentos").select("*").order("ordem");
+  const [{ data: depoimentos }, video] = await Promise.all([
+    supabaseAdmin.from("depoimentos").select("*").order("ordem"),
+    getVideoCliente(),
+  ]);
+  const base = "px-4 py-1.5 text-sm font-bold transition-colors";
 
   return (
     <div>
@@ -13,6 +19,32 @@ export default async function DepoimentosAdminPage() {
         Copie e cole avaliações reais do seu Perfil da Empresa no Google aqui — não é automático
         (isso exigiria uma API paga do Google), mas leva 30 segundos por avaliação.
       </p>
+
+
+      {/* Vídeo de cliente: pronto no site, aparece só quando publicado */}
+      <div className="bg-card border border-card-line rounded-2xl p-6 max-w-3xl mb-10 flex flex-wrap gap-6 items-start">
+        <video src={VIDEO_CLIENTE.src} poster={VIDEO_CLIENTE.capa} controls playsInline preload="none" className="w-40 aspect-[9/16] rounded-xl bg-carbon object-cover" />
+        <div className="flex-1 min-w-[220px]">
+          <h2 className="font-display font-bold text-xl text-steel">Vídeo da cliente (placa coberta)</h2>
+          <p className="text-sm text-steel-line mt-1">
+            Aparece na página inicial, antes dos depoimentos do Google, com a frase “Não sei se saiu do lava rápido ou da
+            concessionária” e o que ela diz no vídeo. Só publique depois que a cliente autorizar.
+          </p>
+          <form action={definirVideoCliente} className="mt-4 inline-flex rounded-full border border-card-line overflow-hidden" role="group" aria-label="Status do vídeo">
+            <button type="submit" name="status" value="rascunho" disabled={!video.publicado}
+              className={`${base} ${!video.publicado ? "bg-steel-line/20 text-steel cursor-default" : "text-steel-line hover:bg-carbon"}`}>
+              Fora do site
+            </button>
+            <button type="submit" name="status" value="publicado" disabled={video.publicado}
+              className={`${base} ${video.publicado ? "bg-ok/20 text-ok cursor-default" : "text-steel-line hover:bg-ok/10 hover:text-ok"}`}>
+              Publicar no site
+            </button>
+          </form>
+          <p className={`mt-2 text-xs font-bold ${video.publicado ? "text-ok" : "text-steel-line"}`}>
+            {video.publicado ? "No ar na página inicial." : "Pronto, aguardando você publicar."}
+          </p>
+        </div>
+      </div>
 
       <form action={salvarDepoimento} className="bg-card border border-card-line rounded-2xl p-6 grid gap-3 max-w-xl mb-10">
         <input name="autor" placeholder="Nome do cliente (ou 'Cliente Google')" defaultValue="Cliente Google" className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
