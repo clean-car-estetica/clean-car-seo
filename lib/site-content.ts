@@ -40,38 +40,51 @@ export async function getPromocoes(): Promise<Record<"cupom" | "indicacao", Prom
   }
 }
 
-export type Campanha = {
-  /** Ligada no console E dentro da validade (calculado em getCampanha) */
+/** Uma campanha cadastrada na agenda do console */
+export type CampanhaItem = {
+  id: string;
+  /** Pausada = false (fica na agenda mas não aparece) */
   ativo: boolean;
-  /** Ligada no console, mesmo que vencida (para o aviso do console) */
-  ligada: boolean;
-  vencida: boolean;
   titulo: string;
-  texto: string;
-  imagem_url: string | null;
-  texto_botao: string;
-  link_botao: string;
   /** Selo grande, ex.: "20% OFF" */
   selo: string;
+  texto: string;
+  /** Letra miúda (aparece com * no site e em negrito no WhatsApp) */
+  observacao: string;
+  /** Serviço da campanha, ex.: "Higienização Interna VIP" (vai na mensagem do WhatsApp) */
+  servico: string;
   preco_de: number | null;
   preco_por: number | null;
-  /** Último dia da campanha (AAAA-MM-DD). Depois dele, some do site sozinha. */
+  /** Primeiro e último dia (AAAA-MM-DD). Vazio = sem limite. */
+  inicia_em: string | null;
   termina_em: string | null;
+  imagem_url: string | null;
+  texto_botao: string;
+  /** Vazio = WhatsApp com a mensagem da campanha */
+  link_botao: string;
+  /** Vazio = mensagem montada sozinha com nome, preço, validade e observação */
+  mensagem_whatsapp: string;
 };
 
-const CAMPANHA_PADRAO: Campanha = {
+/** Campanha que o site mostra agora (ou vazia) */
+export type Campanha = CampanhaItem & { /** true quando há uma campanha valendo hoje */ ativo: boolean };
+
+export const CAMPANHA_VAZIA: CampanhaItem = {
+  id: "",
   ativo: false,
-  ligada: false,
-  vencida: false,
   titulo: "",
+  selo: "",
   texto: "",
+  observacao: "",
+  servico: "",
+  preco_de: null,
+  preco_por: null,
+  inicia_em: null,
+  termina_em: null,
   imagem_url: null,
   texto_botao: "Quero aproveitar",
   link_botao: "",
-  selo: "",
-  preco_de: null,
-  preco_por: null,
-  termina_em: null,
+  mensagem_whatsapp: "",
 };
 
 /** Data de hoje em São Paulo, AAAA-MM-DD */
@@ -79,36 +92,43 @@ export function hojeSP(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
 }
 
-/** Dias até o fim (0 = termina hoje; negativo = vencida) */
-export function diasParaFim(termina_em: string | null): number | null {
-  if (!termina_em) return null;
-  const ms = Date.parse(termina_em + "T00:00:00Z") - Date.parse(hojeSP() + "T00:00:00Z");
+/** Dias de hoje até a data (0 = hoje; negativo = já passou) */
+export function diasAte(data: string | null): number | null {
+  if (!data) return null;
+  const ms = Date.parse(data + "T00:00:00Z") - Date.parse(hojeSP() + "T00:00:00Z");
   return Math.round(ms / 86400000);
 }
 
-export async function getCampanha(): Promise<Campanha> {
+export type SituacaoCampanha = "no_ar" | "agendada" | "encerrada" | "pausada";
+
+export function situacaoCampanha(c: CampanhaItem, hoje = hojeSP()): SituacaoCampanha {
+  if (!c.ativo) return "pausada";
+  if (c.termina_em && c.termina_em < hoje) return "encerrada";
+  if (c.inicia_em && c.inicia_em > hoje) return "agendada";
+  return "no_ar";
+}
+
+export async function getCampanhas(): Promise<CampanhaItem[]> {
   try {
-    const { data } = await supabasePublico.from("campanha").select("*").eq("id", 1).maybeSingle();
-    if (!data) return CAMPANHA_PADRAO;
-    const dias = diasParaFim(data.termina_em ?? null);
-    const vencida = dias !== null && dias < 0;
-    return {
-      ativo: Boolean(data.ativo) && !vencida,
-      ligada: Boolean(data.ativo),
-      vencida,
-      titulo: data.titulo ?? "",
-      texto: data.texto ?? "",
-      imagem_url: data.imagem_url,
-      texto_botao: data.texto_botao || "Quero aproveitar",
-      link_botao: data.link_botao ?? "",
-      selo: data.selo ?? "",
-      preco_de: data.preco_de != null ? Number(data.preco_de) : null,
-      preco_por: data.preco_por != null ? Number(data.preco_por) : null,
-      termina_em: data.termina_em ?? null,
-    };
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "campanhas").maybeSingle();
+    const lista = ((data?.data as { lista?: Partial<CampanhaItem>[] } | undefined)?.lista ?? []);
+    return lista.map((c) => ({ ...CAMPANHA_VAZIA, ...c, id: String(c.id ?? "") }));
   } catch {
-    return CAMPANHA_PADRAO;
+    return [];
   }
+}
+
+/** A campanha valendo hoje. Se houver mais de uma, a que começou por último. */
+export function campanhaDeHoje(lista: CampanhaItem[]): Campanha {
+  const hoje = hojeSP();
+  const valendo = lista
+    .filter((c) => situacaoCampanha(c, hoje) === "no_ar")
+    .sort((a, b) => (b.inicia_em ?? "").localeCompare(a.inicia_em ?? ""));
+  return valendo[0] ? { ...valendo[0], ativo: true } : { ...CAMPANHA_VAZIA, ativo: false };
+}
+
+export async function getCampanha(): Promise<Campanha> {
+  return campanhaDeHoje(await getCampanhas());
 }
 
 export type Tema = {

@@ -48,7 +48,7 @@ export default function CampanhaPopup({ campanha: c }: { campanha: Campanha }) {
           {c.preco_por != null && (
             <p className="mt-3 flex items-baseline gap-2">
               {c.preco_de != null && <span className="text-sm text-steel-line line-through">de {reais(c.preco_de)}</span>}
-              <span className="font-display font-extrabold text-3xl text-verniz-shine">por {reais(c.preco_por)}</span>
+              <span className="font-display font-extrabold text-3xl text-verniz-shine">por {reais(c.preco_por)}{c.observacao ? "*" : ""}</span>
             </p>
           )}
           <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -57,6 +57,7 @@ export default function CampanhaPopup({ campanha: c }: { campanha: Campanha }) {
             </CampanhaBotao>
             {validade && <span className="text-xs font-bold text-steel-line">{validade}</span>}
           </div>
+          {c.observacao && <p className="mt-3 text-[11px] text-steel-line">* {c.observacao}</p>}
         </div>
       </div>
     </div>

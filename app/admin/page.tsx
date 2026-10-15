@@ -1,5 +1,5 @@
 import AvisoCampanha from "@/components/admin/AvisoCampanha";
-import { getCampanha } from "@/lib/site-content";
+import { getCampanhas } from "@/lib/site-content";
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
@@ -161,7 +161,7 @@ export default async function Resultados({
 }) {
   const sp = await searchParams;
   const periodo = calcularPeriodo(sp.periodo || "28d", sp.inicio, sp.fim);
-  const [r, campanha] = await Promise.all([carregarResultados(periodo), getCampanha()]);
+  const [r, campanhas] = await Promise.all([carregarResultados(periodo), getCampanhas()]);
   const { google: g, analytics: a, site: s } = r;
 
   // Pessoas: o Analytics é a melhor fonte; sem ele, as contadas pelo próprio site.
@@ -183,7 +183,7 @@ export default async function Resultados({
 
   return (
     <div className="grid gap-6 max-w-6xl">
-      <AvisoCampanha campanha={campanha} compacto />
+      <AvisoCampanha lista={campanhas} compacto />
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display font-bold text-3xl text-steel">Resultados</h1>

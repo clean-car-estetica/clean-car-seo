@@ -24,7 +24,7 @@ export default function CampanhaFaixa({ campanha: c, contato }: { campanha: Camp
           {c.preco_por != null && (
             <p className="mt-4 flex items-baseline gap-3">
               {c.preco_de != null && <span className="text-steel-line line-through">de {reais(c.preco_de)}</span>}
-              <span className="font-display font-extrabold text-4xl text-verniz-shine">por {reais(c.preco_por)}</span>
+              <span className="font-display font-extrabold text-4xl text-verniz-shine">por {reais(c.preco_por)}{c.observacao ? "*" : ""}</span>
             </p>
           )}
           <div className="mt-6 flex flex-wrap items-center gap-4">
@@ -33,6 +33,7 @@ export default function CampanhaFaixa({ campanha: c, contato }: { campanha: Camp
             </CampanhaBotao>
             {validade && <span className="text-sm font-bold text-steel-line">{validade}</span>}
           </div>
+          {c.observacao && <p className="mt-4 text-xs text-steel-line">* {c.observacao}</p>}
         </div>
       </div>
     </section>
