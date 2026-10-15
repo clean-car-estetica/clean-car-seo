@@ -227,8 +227,10 @@ export default async function Home() {
           </div>
         </section>
 
-        {videoCliente.publicado && <VideoCliente notaGoogle={contato.notaGoogle} />}
-        <Bloco id="depoimentos"><Depoimentos itens={depoimentos} /></Bloco>
+        <div id="avaliacoes" className="scroll-mt-24">
+          {videoCliente.publicado && <VideoCliente notaGoogle={contato.notaGoogle} />}
+          <Bloco id="depoimentos"><Depoimentos itens={depoimentos} /></Bloco>
+        </div>
         <Bloco id="indicacao"><Indicacao /></Bloco>
 
         <AtalhosConteudo />

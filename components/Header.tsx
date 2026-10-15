@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 import AgendarButton from "@/components/AgendarButton";
 import { useContato } from "@/components/ContatoProvider";
 import { useTextos } from "@/components/TextosProvider";
@@ -34,22 +34,25 @@ export default function Header() {
 
   // 07/10/2026: topo enxuto — só o essencial na barra; o resto fica no menu
   // do celular e no rodapé.
+  // 15/10/2026: barra do topo = o que mais ajuda a decidir (serviços, preço,
+  // prova social) + o teste em destaque. "Sobre nós" e o resto ficam no menu.
   const LINKS = [
-    { href: "/#servicos", label: t.navServicos },
+    { href: "/#servicos", label: "Serviços" },
     { href: "/precos", label: "Preços" },
     { href: "/#planos", label: t.navPlanos },
-    { href: "/sobre", label: t.navSobre },
+    { href: "/#avaliacoes", label: "Avaliações" },
     { href: "/contato", label: t.navContato },
   ];
+  const TESTE = { href: "/qual-cuidado", label: "Qual cuidado meu carro precisa?" };
   const LINKS_MENU = [
     ...LINKS,
+    { href: "/sobre", label: t.navSobre },
     { href: "/faq", label: t.navFaq },
-    { href: "/#indicacao", label: t.navIndicacao },
-    { href: "/beneficios", label: t.navBeneficios },
-    { href: "/qual-cuidado", label: "Qual cuidado meu carro precisa?" },
     { href: "/problemas", label: "Problemas e soluções" },
     { href: "/perguntas", label: "Pergunte para a Clean Car" },
     { href: "/blog", label: t.navBlog },
+    { href: "/#indicacao", label: t.navIndicacao },
+    { href: "/beneficios", label: t.navBeneficios },
   ];
   const pathname = usePathname();
   // Clicar na marca sempre leva ao início da página inicial, de qualquer página.
@@ -99,10 +102,16 @@ export default function Header() {
             CLEAN <span className="text-verniz-shine glow-text">CAR</span>
           </span>
         </Link>
-        <nav className="hidden lg:flex gap-7 font-display text-lg tracking-wide text-steel">
+        <nav className="hidden lg:flex items-center gap-6 font-display text-lg tracking-wide text-steel">
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="hover:text-verniz-shine">{l.label}</Link>
           ))}
+          <Link
+            href={TESTE.href}
+            className="hidden xl:inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-verniz/60 px-3 py-1 text-base text-verniz-shine hover:bg-verniz/10"
+          >
+            <Sparkles size={15} aria-hidden /> Qual serviço eu preciso?
+          </Link>
         </nav>
         <div className="flex items-center gap-3">
                     <div className="hidden sm:flex items-center gap-2">{iconesSociais}</div>
@@ -121,6 +130,13 @@ export default function Header() {
 
       {aberto && (
         <nav className="bg-carbon border-t border-card-line px-6 py-4 flex flex-col gap-4 lg:absolute lg:right-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:top-full lg:w-72 lg:rounded-b-2xl lg:border lg:shadow-2xl font-display text-lg text-steel-line">
+          <Link
+            href={TESTE.href}
+            onClick={() => setAberto(false)}
+            className="xl:hidden inline-flex items-center gap-2 rounded-xl border border-verniz/60 bg-verniz/10 px-4 py-3 text-verniz-shine"
+          >
+            <Sparkles size={18} aria-hidden /> {TESTE.label}
+          </Link>
           {LINKS_MENU.map((l, i) => (
             <Link key={l.href} href={l.href} onClick={() => setAberto(false)} className={`hover:text-verniz-shine ${i < LINKS.length ? "lg:hidden" : ""}`}>
               {l.label}
