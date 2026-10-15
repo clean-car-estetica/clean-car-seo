@@ -72,7 +72,7 @@ export default async function RootLayout({
               "@type": ["AutoWash", "AutoRepair"],
               "@id": `${SITE_URL}/#empresa`,
               name: "Clean Car Estética Automotiva",
-              description: meta.descricao,
+              description: filtrarLevaETraz(meta.descricao, contato.levaETraz),
               image: `${SITE_URL}/opengraph-image`,
               logo: `${SITE_URL}/logo-clean-car.png`,
               telephone: `+${contato.whatsapp}`,
