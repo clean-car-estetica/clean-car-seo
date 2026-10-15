@@ -16,6 +16,7 @@ export default function ServicoTopo({
   preco,
   midia,
   textoAgendar = "Agendar este serviço",
+  domicilio = false,
 }: {
   titulo: string;
   nomeServico: string;
@@ -25,6 +26,8 @@ export default function ServicoTopo({
   preco?: number | null;
   midia?: string;
   textoAgendar?: string;
+  /** Serviço feito na casa do cliente, com valor só depois de avaliar */
+  domicilio?: boolean;
 }) {
   return (
     <section className="border-b border-card-line">
@@ -41,7 +44,12 @@ export default function ServicoTopo({
                 <dt className="text-sm text-steel-line">A partir de</dt>
                 <dd className="font-display font-extrabold text-4xl text-verniz-shine">R$ {preco}</dd>
               </div>
-            ) : null}
+            ) : (
+              <div>
+                <dt className="text-sm text-steel-line">Valor</dt>
+                <dd className="font-display font-extrabold text-2xl text-verniz-shine mt-1">Sob avaliação gratuita</dd>
+              </div>
+            )}
             {duracao && (
               <div>
                 <dt className="text-sm text-steel-line">Tempo de serviço</dt>
@@ -51,7 +59,13 @@ export default function ServicoTopo({
               </div>
             )}
           </dl>
-          <ObservacoesServicos className="mt-4 max-w-xl" />
+          {domicilio ? (
+            <p className="mt-4 max-w-xl text-sm text-steel-line">
+              Atendimento na sua casa. Mande fotos pelo WhatsApp: avaliamos antes e passamos um valor justo para o seu caso.
+            </p>
+          ) : (
+            <ObservacoesServicos className="mt-4 max-w-xl" />
+          )}
 
           <div className="mt-8 flex flex-wrap gap-3">
             <AgendarButton

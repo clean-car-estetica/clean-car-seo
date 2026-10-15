@@ -2,6 +2,9 @@ import { SITE_URL } from "@/lib/config";
 import type { MetadataRoute } from "next";
 import { servicos } from "@/lib/data";
 import { PAGINAS_LOCAIS } from "@/lib/paginas-locais";
+import { supabasePublico } from "@/lib/supabase";
+import { caminhoGuia, type TipoGuia } from "@/lib/guias";
+import { MINIMO_RESPOSTA_INDEXAVEL } from "@/lib/perguntas";
 
 const BASE_URL = SITE_URL;
 
@@ -9,12 +12,45 @@ const BASE_URL = SITE_URL;
 // Atualize quando fizer uma mudança grande de conteúdo.
 const ULTIMA_ATUALIZACAO = new Date("2026-10-15");
 
-// Sitemap 100% estático (sem nenhuma consulta a banco de dados) — resposta
-// instantânea e confiável, sem risco de timeout na leitura do Google.
-// Cidades/serviços novos criados só pelo console entram aqui no próximo deploy.
-export const revalidate = false;
+// Base estática (páginas fixas, serviços e cidades) + o conteúdo publicado
+// pelo console (guias, blog, perguntas). 15/10/2026: a parte do banco tem
+// limite de 4 s — se o banco demorar, o sitemap sai só com a base estática,
+// sem erro para o Google. Atualiza a cada hora e na hora de cada publicação.
+export const revalidate = 3600;
 
-export default function sitemap(): MetadataRoute.Sitemap {
+type Publicado = { url: string; lastModified: Date };
+
+type Linhas = { data: unknown[] | null };
+
+function comLimite(consulta: PromiseLike<Linhas>, ms = 4000): Promise<Linhas> {
+  const vazio: Linhas = { data: null };
+  return Promise.race([Promise.resolve(consulta).catch(() => vazio), new Promise<Linhas>((r) => setTimeout(() => r(vazio), ms))]);
+}
+
+async function conteudoPublicado(): Promise<Publicado[]> {
+  const [guias, posts, perguntas] = await Promise.all([
+    comLimite(supabasePublico.from("guias").select("slug, tipo, atualizado_em").eq("status", "publicado")),
+    comLimite(supabasePublico.from("blog_posts").select("slug, publicado_em, atualizado_em").eq("status", "publicado")),
+    comLimite(supabasePublico.from("perguntas_clientes").select("slug, resposta, respondido_em").eq("status", "publicada")),
+  ]);
+  const saida: Publicado[] = [];
+  const g = (guias.data ?? []) as { slug: string; tipo: TipoGuia; atualizado_em: string }[];
+  for (const x of g) saida.push({ url: `${BASE_URL}${caminhoGuia(x)}`, lastModified: new Date(x.atualizado_em) });
+  if (g.some((x) => x.tipo === "problema")) saida.push({ url: `${BASE_URL}/problemas`, lastModified: new Date() });
+  if (g.some((x) => x.tipo === "publico")) saida.push({ url: `${BASE_URL}/para`, lastModified: new Date() });
+
+  const b = (posts.data ?? []) as { slug: string; publicado_em: string; atualizado_em: string | null }[];
+  for (const x of b) saida.push({ url: `${BASE_URL}/blog/${x.slug}`, lastModified: new Date(x.atualizado_em || x.publicado_em) });
+  if (b.length) saida.push({ url: `${BASE_URL}/blog`, lastModified: new Date() });
+
+  const q = (perguntas.data ?? []) as { slug: string; resposta: string; respondido_em: string | null }[];
+  const qIndexaveis = q.filter((x) => x.slug && (x.resposta ?? "").length >= MINIMO_RESPOSTA_INDEXAVEL);
+  for (const x of qIndexaveis) saida.push({ url: `${BASE_URL}/perguntas/${x.slug}`, lastModified: new Date(x.respondido_em || Date.now()) });
+  if (q.length) saida.push({ url: `${BASE_URL}/perguntas`, lastModified: new Date() });
+  return saida;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entradas: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE_URL}/orcamento`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 0.9 },
@@ -41,6 +77,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // 08/10/2026: páginas de cidade com texto próprio voltam a ser indexadas
   for (const p of PAGINAS_LOCAIS) {
     entradas.push({ url: `${BASE_URL}/servicos/${p.servico}/${p.cidade}`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.7 });
+  }
+
+  for (const p of await conteudoPublicado()) {
+    entradas.push({ url: p.url, lastModified: p.lastModified, changeFrequency: "monthly", priority: 0.6 });
   }
 
   return entradas;

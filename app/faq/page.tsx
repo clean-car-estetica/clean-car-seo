@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import Faq from "@/components/Faq";
+import PerguntaForm from "@/components/PerguntaForm";
 import { getFaqsPublicos } from "@/lib/site-data";
 import { getTextosGerais } from "@/lib/site-content";
 
@@ -29,6 +30,11 @@ export default async function FaqPage() {
           </h1>
         </section>
         <Bloco id="faq"><Faq itens={faqs} /></Bloco>
+        <section className="mx-auto max-w-3xl px-6 py-16">
+          <h2 className="font-display font-bold text-3xl text-steel mb-2">Não achou a sua dúvida?</h2>
+          <p className="text-steel-line mb-6">Mande a sua pergunta: a equipe da Clean Car responde.</p>
+          <PerguntaForm />
+        </section>
       </main>
       <Footer />
       <WhatsappFloat />

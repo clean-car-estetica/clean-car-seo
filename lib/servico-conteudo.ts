@@ -200,4 +200,19 @@ export const CONTEUDO_SERVICO: Record<string, ConteudoServico> = {
       { pergunta: "Quanto tempo leva?", resposta: "Cerca de 3 horas." },
     ],
   },
+  "higienizacao-de-estofados": {
+    paraQuem:
+      "Para quem tem sofá, poltrona ou cadeira estofada encardida, manchada ou com cheiro, e prefere resolver em casa, sem desmontar nem transportar nada. Muito pedido por quem tem crianças e pets.",
+    etapas: [
+      { titulo: "Fotos pelo WhatsApp", texto: "Você manda fotos das peças e conta o que incomoda: mancha, cheiro, sujeira do dia a dia." },
+      { titulo: "Avaliação e valor justo", texto: "Avaliamos tamanho, tecido e estado de cada peça e passamos o valor antes de marcar." },
+      { titulo: "Atendimento na sua casa", texto: "Combinamos dia e horário e vamos até você com todo o equipamento." },
+      { titulo: "Estofado pronto para usar", texto: "Na entrega você confere o resultado e recebe as orientações de secagem e cuidado." },
+    ],
+    perguntas: [
+      { pergunta: "Quanto custa higienizar um sofá?", resposta: "Depende do tamanho, do tecido e do estado da peça, por isso não trabalhamos com preço fixo. Mande fotos pelo WhatsApp: a avaliação é gratuita e você recebe o valor antes de agendar." },
+      { pergunta: "Vocês vão até a minha casa?", resposta: "Sim. A higienização de estofados é feita na sua casa, em Mogi das Cruzes e região. Confirme o seu bairro pelo WhatsApp." },
+      { pergunta: "Toda mancha sai?", resposta: "A maioria das manchas do dia a dia sai, mas algumas, muito antigas ou que já tingiram o tecido, podem só clarear. Pelas fotos já dá para avisar o que esperar." },
+    ],
+  },
 };

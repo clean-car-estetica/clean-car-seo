@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { whatsappLink } from "@/lib/config";
 import { useContato } from "@/components/ContatoProvider";
 import { useTextos } from "@/components/TextosProvider";
@@ -60,6 +61,14 @@ export default function Footer() {
           )}
         </div>
       </div>
+      <nav aria-label="Conteúdo" className="mx-auto max-w-6xl px-6 pb-8 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <Link href="/problemas" className="hover:text-verniz-shine">Problemas e soluções</Link>
+        <Link href="/para" className="hover:text-verniz-shine">Para você</Link>
+        <Link href="/perguntas" className="hover:text-verniz-shine">Pergunte para a Clean Car</Link>
+        <Link href="/blog" className="hover:text-verniz-shine">Blog</Link>
+        <Link href="/faq" className="hover:text-verniz-shine">Perguntas frequentes</Link>
+        <Link href="/servicos/higienizacao-de-estofados" className="hover:text-verniz-shine">Estofados a domicílio</Link>
+      </nav>
       <div className="text-center text-xs text-steel-line py-4 border-t border-card-line">
         © {new Date().getFullYear()} Clean Car Estética Automotiva
       </div>

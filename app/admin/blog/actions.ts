@@ -20,6 +20,12 @@ export async function salvarPost(formData: FormData) {
   const imagem_url = String(formData.get("imagem_url") || "");
   const status = String(formData.get("status")) as "rascunho" | "publicado";
   const slug = slugExistente || slugify(titulo);
+  const servicos = formData.getAll("servicos").map(String);
+
+  // Data de publicação = quando foi publicado pela 1ª vez (não quando o rascunho nasceu)
+  const { data: atual } = await supabaseAdmin.from("blog_posts").select("status").eq("slug", slug).maybeSingle();
+  const agora = new Date().toISOString();
+  const estreia = status === "publicado" && atual?.status !== "publicado";
 
   const { error } = await supabaseAdmin.from("blog_posts").upsert({
     slug,
@@ -28,8 +34,12 @@ export async function salvarPost(formData: FormData) {
     conteudo,
     imagem_url: imagem_url || null,
     status,
+    servicos,
+    atualizado_em: agora,
+    ...(estreia || !atual ? { publicado_em: agora } : {}),
   });
   if (error) throw new Error(error.message);
+  revalidatePath("/sitemap.xml");
 
   revalidatePath("/blog");
   revalidatePath(`/blog/${slug}`);

@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
-import { servicos, SERVICOS_SEM_PAGINAS_LOCAIS } from "@/lib/data";
+import { servicos, SERVICOS_SEM_PAGINAS_LOCAIS, SERVICOS_DOMICILIO } from "@/lib/data";
 import { getContatoContent } from "@/lib/site-content";
 import { getServicoPublico, getCidadesPublicas, getServicosPublicos, getProcessoPassos, getTransformacoesPublicas, getFaqsPublicos } from "@/lib/site-data";
 import ServicoTopo from "@/components/ServicoTopo";
@@ -18,6 +18,7 @@ import BeforeAfter from "@/components/BeforeAfter";
 import Faq from "@/components/Faq";
 import { CONTEUDO_SERVICO } from "@/lib/servico-conteudo";
 import { PAGINAS_LOCAIS } from "@/lib/paginas-locais";
+import { getGuiasDoServico, caminhoGuia } from "@/lib/guias";
 
 export const revalidate = 60;
 
@@ -55,7 +56,9 @@ export default async function ServicoPage({
 }) {
   const { servico: servicoSlug } = await params;
   const semPaginasLocais = SERVICOS_SEM_PAGINAS_LOCAIS.includes(servicoSlug);
-  const [servico, cidades, todos, passos, transformacoes, faqs, contato] = await Promise.all([
+  // Serviço feito na casa do cliente: some o que é da loja e do carro
+  const domicilio = SERVICOS_DOMICILIO.includes(servicoSlug);
+  const [servico, cidades, todos, passos, transformacoes, faqs, contato, guias] = await Promise.all([
     getServicoPublico(servicoSlug),
     semPaginasLocais ? Promise.resolve([]) : getCidadesPublicas(),
     getServicosPublicos(),
@@ -63,6 +66,7 @@ export default async function ServicoPage({
     getTransformacoesPublicas(),
     getFaqsPublicos(),
     getContatoContent(),
+    getGuiasDoServico(servicoSlug),
   ]);
   if (!servico) return notFound();
   const outros = todos.filter((x) => x.slug !== servico.slug).slice(0, 6);
@@ -85,14 +89,16 @@ export default async function ServicoPage({
         <ServicoTopo
           titulo={servico.termo_popular || servico.nome}
           nomeServico={servico.nome}
-          contexto={servico.tag ? `${servico.tag} · Mogi das Cruzes` : "Mogi das Cruzes e Alto Tietê"}
+          contexto={domicilio ? "A domicílio · Mogi das Cruzes e região" : servico.tag ? `${servico.tag} · Mogi das Cruzes` : "Mogi das Cruzes e Alto Tietê"}
           descricao={servico.descricao}
           duracao={servico.duracao}
           preco={servico.preco_desde}
           midia={servico.imagem_url}
+          domicilio={domicilio}
+          textoAgendar={domicilio ? "Pedir avaliação" : undefined}
         />
         </Bloco>
-        <Diferenciais className="py-10" />
+        {!domicilio && <Diferenciais className="py-10" />}
 
         <script
           type="application/ld+json"
@@ -137,8 +143,10 @@ export default async function ServicoPage({
               </p>
               <p className="mt-4 text-sm text-steel-line">
                 {servico.duracao ? `Tempo médio: ${servico.duracao}. ` : ""}
-                {servico.preco_desde ? `A partir de R$ ${servico.preco_desde}. ` : ""}
-                Feito no Jardim Universo, em Mogi das Cruzes, com produtos Vonixx.
+                {servico.preco_desde ? `A partir de R$ ${servico.preco_desde}. ` : "Valor sob avaliação gratuita. "}
+                {domicilio
+                  ? "Feito na sua casa, em Mogi das Cruzes e região."
+                  : "Feito no Jardim Universo, em Mogi das Cruzes, com produtos Vonixx."}
               </p>
             </div>
             <ol className="grid gap-4">
@@ -155,9 +163,9 @@ export default async function ServicoPage({
           </section>
         )}
 
-        <Bloco id="processo"><ProcessoEtapas passos={passos} /></Bloco>
+        {!domicilio && <Bloco id="processo"><ProcessoEtapas passos={passos} /></Bloco>}
 
-        {transformacoes.length > 0 && (
+        {!domicilio && transformacoes.length > 0 && (
           <section className="mx-auto max-w-6xl px-6 py-20">
             <h2 className="font-display font-bold text-4xl md:text-5xl text-steel leading-none">Arraste e veja a diferença</h2>
             <p className="mt-3 text-steel-line max-w-xl mb-10">Resultados reais de carros que passaram pela Clean Car.</p>
@@ -184,6 +192,24 @@ export default async function ServicoPage({
                   className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
                 >
                   {c.nome}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {guias.length > 0 && (
+          <section className="mx-auto max-w-6xl px-6 pb-16">
+            <h2 className="font-display font-bold text-3xl text-steel mb-2">Problemas que este serviço resolve</h2>
+            <p className="text-steel-line mb-6">Veja o que causa cada um e o resultado que dá para esperar.</p>
+            <div className="flex flex-wrap gap-3">
+              {guias.map((g) => (
+                <Link
+                  key={`${g.tipo}/${g.slug}`}
+                  href={caminhoGuia(g)}
+                  className="rounded-full bg-card border border-card-line px-5 py-2 font-display font-bold text-steel-line hover:border-verniz hover:text-verniz-shine transition-colors"
+                >
+                  {g.chamada || g.titulo}
                 </Link>
               ))}
             </div>

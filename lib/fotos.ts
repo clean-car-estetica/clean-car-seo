@@ -23,6 +23,7 @@ export const FOTO_SERVICO: Record<string, string> = {
   "tratamento-anti-odor": "", // sem foto até o Glauber enviar uma real pelo painel
   "protecao-de-rodas": "/midia/roda-limpa.jpg", // foto real: roda limpa na Clean Car
   "enceramento-tecnico": pexels(11139244), // politriz espalhando a cera, brilho espelhado
+  "higienizacao-de-estofados": "", // sem foto até o Glauber enviar uma real do serviço na casa do cliente
 };
 
 export const FOTO_HERO = pexels(6872609, 1600); // carro preto recebendo espuma na loja

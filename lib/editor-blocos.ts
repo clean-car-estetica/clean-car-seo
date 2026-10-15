@@ -29,6 +29,8 @@ export const AJUSTES_GERAIS: { grupo: string; itens: { rotulo: string; caminho: 
     itens: [
       { rotulo: "Todos os serviços", caminho: "/admin/conteudo", dica: "Preços, tempos, fotos e ordem de todos os serviços." },
       { rotulo: "Blog", caminho: "/admin/blog", dica: "Escrever, revisar rascunhos e publicar artigos." },
+      { rotulo: "Guias", caminho: "/admin/guias", dica: "Páginas de problema → solução e por público." },
+      { rotulo: "Perguntas de clientes", caminho: "/admin/perguntas", dica: "Responder e publicar perguntas enviadas pelo site." },
       { rotulo: "Cidades", caminho: "/admin/cidades", dica: "Cidades e bairros atendidos." },
       { rotulo: "Textos por cidade", caminho: "/admin/paginas-locais", dica: "Texto próprio de um serviço numa cidade." },
       { rotulo: "Páginas extras", caminho: "/admin/paginas", dica: "Páginas personalizadas fora do menu." },

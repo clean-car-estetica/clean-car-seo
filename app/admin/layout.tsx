@@ -5,7 +5,7 @@ import { marcarNavegadorInterno } from "@/lib/track";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { LayoutDashboard, Search, LogOut, Smile, Inbox, Link2, Plug, UserSearch, Menu, X, MousePointerClick } from "lucide-react";
+import { LayoutDashboard, Search, LogOut, Smile, Inbox, Link2, Plug, UserSearch, Menu, X, MousePointerClick, BookOpen, Newspaper, MessageCircleQuestionMark } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -30,7 +30,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
-  if (pathname === "/admin/editor") {
+  if (pathname === "/admin/editor" || pathname.includes("/previa/")) {
+    // Editor e prévias de rascunho ocupam a tela inteira, sem o menu do console
     return <>{children}</>;
   }
 
@@ -55,6 +56,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin/editor", label: "Editor do site", icon: MousePointerClick },
         { href: "/admin/leads", label: "Contatos recebidos", icon: Inbox },
         { href: "/admin/nps", label: "Avaliações (NPS)", icon: Smile },
+      ],
+    },
+    {
+      titulo: "Conteúdo para o Google",
+      links: [
+        { href: "/admin/guias", label: "Guias (problemas e públicos)", icon: BookOpen },
+        { href: "/admin/blog", label: "Blog", icon: Newspaper },
+        { href: "/admin/perguntas", label: "Perguntas de clientes", icon: MessageCircleQuestionMark },
       ],
     },
     {
