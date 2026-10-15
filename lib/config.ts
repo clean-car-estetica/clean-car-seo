@@ -74,3 +74,7 @@ export function whatsappLink(contato: Contato, mensagem?: string) {
   const texto = encodeURIComponent(mensagem ?? contato.whatsappMsg);
   return `https://wa.me/${contato.whatsapp}?text=${texto}`;
 }
+
+/** Serviços que saem com brinde (lixinho descartável + cheirinho de retrovisor) */
+export const SERVICOS_COM_BRINDE = ["lavagem-prata", "lavagem-ouro", "higienizacao"];
+export const TEXTO_BRINDE = "Brinde: lixinho descartável para o carro e cheirinho para pendurar no retrovisor.";

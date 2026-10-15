@@ -1,3 +1,4 @@
+import { SERVICOS_COM_BRINDE } from "@/lib/config";
 import Bloco from "@/components/Bloco";
 import { SITE_URL, filtrarLevaETraz } from "@/lib/config";
 import { notFound } from "next/navigation";
@@ -97,6 +98,7 @@ export default async function ServicoPage({
           descricao={servico.descricao}
           duracao={servico.duracao}
           preco={servico.preco_desde}
+          brinde={SERVICOS_COM_BRINDE.includes(servico.slug)}
           midia={servico.imagem_url}
           domicilio={domicilio}
           textoAgendar={domicilio ? "Pedir avaliação" : undefined}

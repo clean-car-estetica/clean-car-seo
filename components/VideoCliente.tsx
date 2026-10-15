@@ -1,5 +1,6 @@
-import { Star, Quote } from "lucide-react";
-import { SITE_URL } from "@/lib/config";
+import Link from "next/link";
+import { Star, Quote, Gift } from "lucide-react";
+import { SITE_URL, TEXTO_BRINDE } from "@/lib/config";
 
 export const VIDEO_CLIENTE = {
   src: "/midia/lavagem-de-carro-mogi-das-cruzes-cliente.mp4",
@@ -23,8 +24,8 @@ export default function VideoCliente({ notaGoogle }: { notaGoogle?: string }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "VideoObject",
-    name: "Lavagem de carro em Mogi das Cruzes: cliente mostra o resultado na Clean Car",
-    description: "Resultado de lavagem de carro em Mogi das Cruzes. A cliente grava o carro na retirada e diz: \"não sei se saiu do lava rápido ou da concessionária\". Clean Car Estética Automotiva, Jardim Universo.",
+    name: "Lavagem Ouro em Mogi das Cruzes: cliente mostra o resultado na Clean Car",
+    description: "Resultado da Lavagem Ouro (lavagem detalhada) em Mogi das Cruzes. A cliente grava o carro na retirada e diz: \"não sei se saiu do lava rápido ou da concessionária\". Clean Car Estética Automotiva, Jardim Universo.",
     thumbnailUrl: `${SITE_URL}${VIDEO_CLIENTE.capa}`,
     contentUrl: `${SITE_URL}${VIDEO_CLIENTE.src}`,
     uploadDate: VIDEO_CLIENTE.data,
@@ -54,7 +55,11 @@ export default function VideoCliente({ notaGoogle }: { notaGoogle?: string }) {
             “Não sei se saiu do lava rápido ou da concessionária.”
           </h2>
           <p className="mt-4 text-steel-line max-w-xl">
-            Vídeo gravado pela própria cliente na hora de buscar o carro. Sem roteiro, do jeito que ela falou.
+            Vídeo gravado pela própria cliente na hora de buscar o carro depois da{" "}
+            <Link href="/servicos/lavagem-ouro" className="text-verniz-shine underline underline-offset-2">Lavagem Ouro</Link>. Sem roteiro, do jeito que ela falou.
+          </p>
+          <p className="mt-3 inline-flex items-center gap-2 text-sm text-cera">
+            <Gift size={16} aria-hidden /> {TEXTO_BRINDE}
           </p>
 
           <details className="mt-6 max-w-xl rounded-2xl bg-card border border-card-line p-5 group">

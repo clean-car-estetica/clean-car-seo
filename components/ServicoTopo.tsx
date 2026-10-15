@@ -1,4 +1,5 @@
-import { Clock } from "lucide-react";
+import { Clock, Gift } from "lucide-react";
+import { TEXTO_BRINDE } from "@/lib/config";
 import Midia from "@/components/Midia";
 import AgendarButton from "@/components/AgendarButton";
 import WhatsappCTA from "@/components/WhatsappCTA";
@@ -17,6 +18,7 @@ export default function ServicoTopo({
   midia,
   textoAgendar = "Agendar este serviço",
   domicilio = false,
+  brinde = false,
 }: {
   titulo: string;
   nomeServico: string;
@@ -28,6 +30,8 @@ export default function ServicoTopo({
   textoAgendar?: string;
   /** Serviço feito na casa do cliente, com valor só depois de avaliar */
   domicilio?: boolean;
+  /** Mostra o brinde (lixinho + cheirinho) */
+  brinde?: boolean;
 }) {
   return (
     <section className="border-b border-card-line">
@@ -59,6 +63,11 @@ export default function ServicoTopo({
               </div>
             )}
           </dl>
+          {brinde && (
+            <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-cera/40 bg-cera/10 px-4 py-1.5 text-sm text-cera">
+              <Gift size={16} aria-hidden /> {TEXTO_BRINDE}
+            </p>
+          )}
           {domicilio ? (
             <p className="mt-4 max-w-xl text-sm text-steel-line">
               Atendimento na sua casa. Mande fotos pelo WhatsApp: avaliamos antes e passamos um valor justo para o seu caso.

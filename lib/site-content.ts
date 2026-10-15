@@ -41,34 +41,70 @@ export async function getPromocoes(): Promise<Record<"cupom" | "indicacao", Prom
 }
 
 export type Campanha = {
+  /** Ligada no console E dentro da validade (calculado em getCampanha) */
   ativo: boolean;
+  /** Ligada no console, mesmo que vencida (para o aviso do console) */
+  ligada: boolean;
+  vencida: boolean;
   titulo: string;
   texto: string;
   imagem_url: string | null;
   texto_botao: string;
   link_botao: string;
+  /** Selo grande, ex.: "20% OFF" */
+  selo: string;
+  preco_de: number | null;
+  preco_por: number | null;
+  /** Último dia da campanha (AAAA-MM-DD). Depois dele, some do site sozinha. */
+  termina_em: string | null;
 };
 
 const CAMPANHA_PADRAO: Campanha = {
   ativo: false,
+  ligada: false,
+  vencida: false,
   titulo: "",
   texto: "",
   imagem_url: null,
-  texto_botao: "Saiba mais",
+  texto_botao: "Quero aproveitar",
   link_botao: "",
+  selo: "",
+  preco_de: null,
+  preco_por: null,
+  termina_em: null,
 };
+
+/** Data de hoje em São Paulo, AAAA-MM-DD */
+export function hojeSP(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+}
+
+/** Dias até o fim (0 = termina hoje; negativo = vencida) */
+export function diasParaFim(termina_em: string | null): number | null {
+  if (!termina_em) return null;
+  const ms = Date.parse(termina_em + "T00:00:00Z") - Date.parse(hojeSP() + "T00:00:00Z");
+  return Math.round(ms / 86400000);
+}
 
 export async function getCampanha(): Promise<Campanha> {
   try {
     const { data } = await supabasePublico.from("campanha").select("*").eq("id", 1).maybeSingle();
     if (!data) return CAMPANHA_PADRAO;
+    const dias = diasParaFim(data.termina_em ?? null);
+    const vencida = dias !== null && dias < 0;
     return {
-      ativo: data.ativo,
-      titulo: data.titulo,
-      texto: data.texto,
+      ativo: Boolean(data.ativo) && !vencida,
+      ligada: Boolean(data.ativo),
+      vencida,
+      titulo: data.titulo ?? "",
+      texto: data.texto ?? "",
       imagem_url: data.imagem_url,
-      texto_botao: data.texto_botao,
-      link_botao: data.link_botao,
+      texto_botao: data.texto_botao || "Quero aproveitar",
+      link_botao: data.link_botao ?? "",
+      selo: data.selo ?? "",
+      preco_de: data.preco_de != null ? Number(data.preco_de) : null,
+      preco_por: data.preco_por != null ? Number(data.preco_por) : null,
+      termina_em: data.termina_em ?? null,
     };
   } catch {
     return CAMPANHA_PADRAO;

@@ -4,61 +4,59 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import type { Campanha } from "@/lib/site-content";
-import { gtagEvent } from "@/lib/gtag";
-import { parseRota, obterOrigem, registrarEvento } from "@/lib/track";
+import { useContato } from "@/components/ContatoProvider";
+import { linkCampanha, validadeCampanha, reais } from "@/lib/campanha";
+import CampanhaBotao from "@/components/CampanhaBotao";
 import Midia from "@/components/Midia";
 
 const CHAVE_LOCAL = "cleancar_campanha_fechada";
 
-export default function CampanhaPopup({ campanha }: { campanha: Campanha }) {
+export default function CampanhaPopup({ campanha: c }: { campanha: Campanha }) {
   const pathname = usePathname();
+  const contato = useContato();
   const [visivel, setVisivel] = useState(false);
 
   useEffect(() => {
-    if (!campanha.ativo) return;
-    if (pathname.startsWith("/admin") || pathname === "/avaliar" || pathname === "/orcamento") return;
+    if (!c.ativo) return;
+    // Na página inicial a campanha já aparece na faixa do topo
+    if (pathname === "/" || pathname.startsWith("/admin") || pathname === "/avaliar" || pathname === "/orcamento") return;
     if (document.documentElement.classList.contains("cc-editar")) return;
-    if (sessionStorage.getItem(CHAVE_LOCAL)) return;
-    const t = setTimeout(() => setVisivel(true), 3000);
+    try { if (sessionStorage.getItem(CHAVE_LOCAL)) return; } catch {}
+    const t = setTimeout(() => setVisivel(true), 6000);
     return () => clearTimeout(t);
-  }, [pathname, campanha.ativo]);
+  }, [pathname, c.ativo]);
 
   function fechar() {
     setVisivel(false);
-    sessionStorage.setItem(CHAVE_LOCAL, "1");
-  }
-
-  function registrarClique() {
-    const { service_slug, city_slug } = parseRota(pathname);
-    const origem = obterOrigem();
-    registrarEvento("click_agendar", pathname, { service_slug, city_slug, origem });
-    gtagEvent("click_campanha");
-    fechar();
+    try { sessionStorage.setItem(CHAVE_LOCAL, "1"); } catch {}
   }
 
   if (!visivel) return null;
+  const validade = validadeCampanha(c.termina_em);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 px-4 pb-4 sm:pb-0">
-      <div className="relative w-full max-w-md bg-card border border-verniz/40 rounded-2xl overflow-hidden">
-        <button onClick={fechar} className="absolute top-3 right-3 z-10 text-steel-line hover:text-steel bg-black/40 rounded-full p-1" aria-label="Fechar">
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 px-4 pb-4 sm:pb-0" onClick={fechar}>
+      <div className="relative w-full max-w-md bg-card border border-verniz/40 rounded-3xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <button onClick={fechar} className="absolute top-3 right-3 z-10 text-steel bg-black/50 rounded-full p-1.5" aria-label="Fechar">
           <X size={18} />
         </button>
-        {campanha.imagem_url && (
-          <Midia src={campanha.imagem_url} className="h-40 w-full object-cover" />
-        )}
+        {c.imagem_url && <Midia src={c.imagem_url} alt={c.titulo} className="w-full aspect-[4/3] object-cover" />}
         <div className="p-6">
-          <h3 className="font-display font-bold text-xl text-steel mb-2">{campanha.titulo}</h3>
-          <p className="text-sm text-steel-line leading-relaxed mb-5">{campanha.texto}</p>
-          <a
-            href={campanha.link_botao || "#"}
-            onClick={registrarClique}
-            target={campanha.link_botao?.startsWith("http") ? "_blank" : undefined}
-            rel="noopener noreferrer"
-            className="inline-block rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2.5 text-sm hover:bg-verniz-shine transition-colors"
-          >
-            {campanha.texto_botao}
-          </a>
+          <p className="text-xs font-bold uppercase tracking-wide text-verniz-shine">{c.titulo}</p>
+          {c.selo && <p className="mt-1 font-display font-extrabold text-5xl leading-none text-steel">{c.selo}</p>}
+          {c.texto && <p className="mt-2 text-sm text-steel-line leading-relaxed">{c.texto}</p>}
+          {c.preco_por != null && (
+            <p className="mt-3 flex items-baseline gap-2">
+              {c.preco_de != null && <span className="text-sm text-steel-line line-through">de {reais(c.preco_de)}</span>}
+              <span className="font-display font-extrabold text-3xl text-verniz-shine">por {reais(c.preco_por)}</span>
+            </p>
+          )}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <CampanhaBotao href={linkCampanha(c, contato)} aoClicar={fechar} className="rounded-full bg-verniz text-carbon font-display font-bold px-6 py-2.5 text-sm hover:bg-verniz-shine transition-colors">
+              {c.texto_botao}
+            </CampanhaBotao>
+            {validade && <span className="text-xs font-bold text-steel-line">{validade}</span>}
+          </div>
         </div>
       </div>
     </div>

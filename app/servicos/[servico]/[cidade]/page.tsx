@@ -1,3 +1,4 @@
+import { SERVICOS_COM_BRINDE } from "@/lib/config";
 import Bloco from "@/components/Bloco";
 import { SITE_URL, filtrarLevaETraz } from "@/lib/config";
 import { getContatoContent } from "@/lib/site-content";
@@ -95,6 +96,7 @@ export default async function ServicoCidadePage({
           descricao={servico.descricao}
           duracao={servico.duracao}
           preco={servico.preco_desde}
+          brinde={SERVICOS_COM_BRINDE.includes(servico.slug)}
           midia={imagemFundo}
           textoAgendar={`Agendar ${servico.nome}`}
         />
