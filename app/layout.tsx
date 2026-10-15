@@ -4,6 +4,7 @@ import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
 import ModoEdicao from "@/components/ModoEdicao";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import MetaPixel from "@/components/MetaPixel";
 import CupomPopup from "@/components/CupomPopup";
 import CampanhaPopup from "@/components/CampanhaPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
@@ -96,7 +97,7 @@ export default async function RootLayout({
                 "Guararema",
               ],
               sameAs: [contato.instagramUrl, contato.googleUrl],
-              priceRange: "R$ 45 – R$ 380",
+              priceRange: "R$ 45 – R$ 420",
               openingHoursSpecification: [
                 {
                   "@type": "OpeningHoursSpecification",
@@ -128,6 +129,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-paper text-ink">
         <GoogleAnalytics />
         <ContatoProvider contato={contato}>
+          <MetaPixel />
           <PromoProvider promocoes={promocoes}>
             <TextosProvider textos={textos}>
               <PageviewTracker />

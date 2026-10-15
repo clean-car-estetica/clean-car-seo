@@ -131,6 +131,12 @@ export function registrarEvento(
     tela: window.innerWidth < 768 ? "celular" : "computador",
   };
   if (extra.detalhe) meta.detalhe = extra.detalhe;
+  // Pixel da Meta (se ligado no console): clique para o WhatsApp vira "Contact"
+  if (event_type !== "pageview") {
+    try {
+      (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq?.("track", "Contact");
+    } catch {}
+  }
 
   import("@/lib/supabase-browser").then(({ supabaseBrowser }) =>
     supabaseBrowser()

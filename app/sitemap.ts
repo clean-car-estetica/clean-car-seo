@@ -54,6 +54,8 @@ async function conteudoPublicado(): Promise<Publicado[]> {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entradas: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 1 },
+    { url: `${BASE_URL}/precos`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE_URL}/qual-cuidado`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE_URL}/orcamento`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/beneficios`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.6 },
     // 15/10/2026: /avaliar (formulário de NPS) e /blog (ainda sem artigos

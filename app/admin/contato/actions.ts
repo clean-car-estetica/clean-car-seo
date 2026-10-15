@@ -19,6 +19,9 @@ export async function salvarContato(formData: FormData) {
     observacaoHorario: String(formData.get("observacaoHorario")),
     formasPagamento: String(formData.get("formasPagamento") || ""),
     levaETraz: formData.get("levaETraz") === "on",
+    notaGoogle: String(formData.get("notaGoogle") || "").trim().replace(".", ","),
+    totalAvaliacoes: String(formData.get("totalAvaliacoes") || "").replace(/\D/g, ""),
+    metaPixelId: String(formData.get("metaPixelId") || "").replace(/\D/g, ""),
   };
 
   const { error } = await supabaseAdmin

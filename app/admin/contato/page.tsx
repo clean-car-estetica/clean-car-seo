@@ -31,6 +31,25 @@ export default async function ContatoAdminPage() {
             </span>
           </span>
         </label>
+        <fieldset className="rounded-xl border border-card-line p-4 grid gap-3">
+          <legend className="px-1 text-xs font-bold uppercase tracking-wide text-steel-line">Avaliações do Google (aparece no topo do site)</legend>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="notaGoogle" className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Nota</label>
+              <input id="notaGoogle" name="notaGoogle" defaultValue={contato.notaGoogle} placeholder="Ex.: 4,9" className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
+            </div>
+            <div>
+              <label htmlFor="totalAvaliacoes" className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Número de avaliações</label>
+              <input id="totalAvaliacoes" name="totalAvaliacoes" inputMode="numeric" defaultValue={contato.totalAvaliacoes} placeholder="Ex.: 37" className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
+            </div>
+          </div>
+          <p className="text-xs text-steel-line">Copie do seu Perfil da Empresa no Google. Deixe em branco para não mostrar. Atualize quando entrarem avaliações novas.</p>
+        </fieldset>
+        <div>
+          <label htmlFor="metaPixelId" className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">ID do Pixel da Meta (opcional)</label>
+          <input id="metaPixelId" name="metaPixelId" inputMode="numeric" defaultValue={contato.metaPixelId} placeholder="Só números, ex.: 1234567890123456" className="w-full px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm" />
+          <p className="text-xs text-steel-line mt-1">Fica em Gerenciador de Eventos da Meta → Fontes de dados. Vazio = desligado.</p>
+        </div>
         <div>
           <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Endereço completo</label>
           <input

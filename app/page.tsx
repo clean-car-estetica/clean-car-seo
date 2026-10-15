@@ -79,6 +79,20 @@ export default async function Home() {
               </AgendarButton>
               <WhatsappCTA />
             </div>
+            {contato.notaGoogle && (
+              <a
+                href={contato.googleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex flex-wrap items-center gap-2 rounded-full bg-carbon/60 backdrop-blur border border-card-line px-4 py-2 text-sm text-steel hover:border-verniz"
+              >
+                <span className="text-cera tracking-tight" aria-hidden>★★★★★</span>
+                <strong className="font-display text-base">{contato.notaGoogle}</strong>
+                <span className="text-steel-line">
+                  no Google{contato.totalAvaliacoes ? ` · ${contato.totalAvaliacoes} avaliações` : ""}
+                </span>
+              </a>
+            )}
           </div>
         </section>
 
@@ -86,6 +100,23 @@ export default async function Home() {
         <Diferenciais className="pt-14" />
 
         <Bloco id="servicos"><EscolhaLavagem servicos={servicos} /></Bloco>
+
+        {/* Ferramenta: teste rápido para quem não sabe qual serviço escolher */}
+        <section className="mx-auto max-w-6xl px-6 pb-6">
+          <Link
+            href="/qual-cuidado"
+            className="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-verniz/50 bg-card px-6 py-6 md:px-10 hover:border-verniz transition-colors"
+          >
+            <span className="grid gap-1">
+              <span className="font-display font-extrabold text-2xl md:text-3xl text-steel">Não sabe qual serviço escolher?</span>
+              <span className="text-steel-line">Responda 5 perguntas em 30 segundos e veja o cuidado certo para o seu carro, com preço.</span>
+            </span>
+            <span className="rounded-full bg-verniz text-carbon font-display font-bold px-6 py-3 group-hover:bg-verniz-shine">Fazer o teste</span>
+          </Link>
+          <p className="mt-3 text-sm text-steel-line">
+            Ou veja a <Link href="/precos" className="text-verniz-shine underline underline-offset-2">tabela completa de preços</Link>.
+          </p>
+        </section>
 
 
         {/* Antes e depois */}

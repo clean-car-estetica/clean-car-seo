@@ -20,6 +20,11 @@ export const CONTATO_PADRAO = {
   /** Leva e traz ligado/desligado no console (Contato e endereço). Desligado:
    * o site esconde toda menção ao serviço, inclusive nos textos cadastrados. */
   levaETraz: false as boolean,
+  /** Nota e número de avaliações do Google, digitados no console (prova social no topo do site) */
+  notaGoogle: "",
+  totalAvaliacoes: "",
+  /** ID do Pixel da Meta (Facebook/Instagram). Vazio = pixel desligado. */
+  metaPixelId: "",
 };
 
 export type Contato = typeof CONTATO_PADRAO;

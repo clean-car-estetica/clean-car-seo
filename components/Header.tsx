@@ -36,6 +36,7 @@ export default function Header() {
   // do celular e no rodapé.
   const LINKS = [
     { href: "/#servicos", label: t.navServicos },
+    { href: "/precos", label: "Preços" },
     { href: "/#planos", label: t.navPlanos },
     { href: "/sobre", label: t.navSobre },
     { href: "/contato", label: t.navContato },
@@ -45,6 +46,8 @@ export default function Header() {
     { href: "/faq", label: t.navFaq },
     { href: "/#indicacao", label: t.navIndicacao },
     { href: "/beneficios", label: t.navBeneficios },
+    { href: "/qual-cuidado", label: "Qual cuidado meu carro precisa?" },
+    { href: "/problemas", label: "Problemas e soluções" },
     { href: "/blog", label: t.navBlog },
   ];
   const pathname = usePathname();
