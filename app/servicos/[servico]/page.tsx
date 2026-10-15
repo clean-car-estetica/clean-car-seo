@@ -169,12 +169,12 @@ export default async function ServicoPage({
 
         {!domicilio && <Bloco id="processo"><ProcessoEtapas passos={passos} /></Bloco>}
 
-        {!domicilio && transformacoes.length > 0 && (
+        {(domicilio ? transformacoes.filter((t) => /sof[aá]|estofad/i.test(t.titulo)) : transformacoes).length > 0 && (
           <section className="mx-auto max-w-6xl px-6 py-20">
             <h2 className="font-display font-bold text-4xl md:text-5xl text-steel leading-none">Arraste e veja a diferença</h2>
-            <p className="mt-3 text-steel-line max-w-xl mb-10">Resultados reais de carros que passaram pela Clean Car.</p>
+            <p className="mt-3 text-steel-line max-w-xl mb-10">{domicilio ? "Resultado real de um sofá higienizado pela Clean Car." : "Resultados reais de carros que passaram pela Clean Car."}</p>
             <div className="grid md:grid-cols-2 gap-6">
-              {transformacoes.slice(0, 2).map((t) => (
+              {(domicilio ? transformacoes.filter((t) => /sof[aá]|estofad/i.test(t.titulo)) : transformacoes).slice(0, 2).map((t) => (
                 <BeforeAfter key={t.id} title={t.titulo} description={t.descricao} before={t.imagem_antes} after={t.imagem_depois} />
               ))}
             </div>
