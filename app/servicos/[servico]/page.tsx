@@ -40,7 +40,11 @@ export async function generateMetadata({
   const preco = servico.preco_desde ? ` a partir de R$ ${servico.preco_desde}` : "";
   // Título curto o bastante para o Google não cortar o preço.
   const titulo = `${tituloBase} em Mogi das Cruzes${servico.preco_desde ? ` · R$ ${servico.preco_desde}` : ""} | Clean Car`;
-  const descricao = `${servico.nome} na Clean Car, em Mogi das Cruzes: ${servico.resumo}${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}${servico.duracao ? ` (${servico.duracao})` : ""}. Produtos Vonixx e hora marcada. Agende pelo WhatsApp.`;
+  // 15/10/2026: sem ponto duplicado; serviço a domicílio tem descrição própria
+  const resumo = servico.resumo.replace(/[.\s]+$/, "");
+  const descricao = SERVICOS_DOMICILIO.includes(servico.slug)
+    ? `${servico.nome} em Mogi das Cruzes e região: ${resumo}. Vamos até a sua casa. Mande fotos pelo WhatsApp e receba o valor sem compromisso.`
+    : `${servico.nome} na Clean Car, em Mogi das Cruzes: ${resumo}.${preco ? ` A partir de R$ ${servico.preco_desde}` : ""}${servico.duracao ? ` (${servico.duracao})` : ""}${preco || servico.duracao ? "." : ""} Produtos Vonixx e hora marcada. Agende pelo WhatsApp.`;
   return {
     title: { absolute: titulo },
     description: descricao,
