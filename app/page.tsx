@@ -23,7 +23,8 @@ import Faq from "@/components/Faq";
 import Bloco from "@/components/Bloco";
 import { paginaDaCidade } from "@/lib/paginas-locais";
 import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
-import { getTextosGerais, getContatoContent, getVideoCliente, getCampanha } from "@/lib/site-content";
+import { getTextosGerais, getContatoContent, getVideoCliente } from "@/lib/site-content";
+import { getCampanha } from "@/lib/campanhas-servidor";
 import CampanhaFaixa from "@/components/CampanhaFaixa";
 import VideoCliente from "@/components/VideoCliente";
 

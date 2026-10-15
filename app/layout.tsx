@@ -10,7 +10,8 @@ import CampanhaPopup from "@/components/CampanhaPopup";
 import { ContatoProvider } from "@/components/ContatoProvider";
 import { PromoProvider } from "@/components/PromoProvider";
 import { TextosProvider } from "@/components/TextosProvider";
-import { getContatoContent, getPromocoes, getTema, getMetadados, getTextosGerais, getCampanha } from "@/lib/site-content";
+import { getContatoContent, getPromocoes, getTema, getMetadados, getTextosGerais } from "@/lib/site-content";
+import { getCampanha } from "@/lib/campanhas-servidor";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [metaBruto, contato] = await Promise.all([getMetadados(), getContatoContent()]);

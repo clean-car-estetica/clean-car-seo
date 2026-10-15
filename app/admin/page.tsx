@@ -1,5 +1,5 @@
 import AvisoCampanha from "@/components/admin/AvisoCampanha";
-import { getCampanhas } from "@/lib/site-content";
+import { getCampanhas } from "@/lib/campanhas-servidor";
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";

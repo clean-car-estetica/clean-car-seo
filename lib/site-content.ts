@@ -108,16 +108,6 @@ export function situacaoCampanha(c: CampanhaItem, hoje = hojeSP()): SituacaoCamp
   return "no_ar";
 }
 
-export async function getCampanhas(): Promise<CampanhaItem[]> {
-  try {
-    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "campanhas").maybeSingle();
-    const lista = ((data?.data as { lista?: Partial<CampanhaItem>[] } | undefined)?.lista ?? []);
-    return lista.map((c) => ({ ...CAMPANHA_VAZIA, ...c, id: String(c.id ?? "") }));
-  } catch {
-    return [];
-  }
-}
-
 /** A campanha valendo hoje. Se houver mais de uma, a que começou por último. */
 export function campanhaDeHoje(lista: CampanhaItem[]): Campanha {
   const hoje = hojeSP();
@@ -127,9 +117,6 @@ export function campanhaDeHoje(lista: CampanhaItem[]): Campanha {
   return valendo[0] ? { ...valendo[0], ativo: true } : { ...CAMPANHA_VAZIA, ativo: false };
 }
 
-export async function getCampanha(): Promise<Campanha> {
-  return campanhaDeHoje(await getCampanhas());
-}
 
 export type Tema = {
   carbon: string;

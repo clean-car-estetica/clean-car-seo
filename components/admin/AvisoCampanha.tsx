@@ -31,7 +31,7 @@ export default function AvisoCampanha({ lista, compacto = false }: { lista: Camp
     texto = `Nenhuma campanha no ar hoje. A próxima, “${proxima.titulo}”, entra em ${dataCurta(proxima.inicia_em)}.`;
   } else {
     cor = "border-warn/50 bg-warn/10 text-warn";
-    texto = "Nenhuma campanha no ar nem agendada. Programe a próxima para o site não ficar sem promoção.";
+    texto = "Nenhuma campanha no ar nem agendada. Programe a próxima no SAS para o site não ficar sem promoção.";
   }
 
   return (
