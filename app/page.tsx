@@ -11,6 +11,7 @@ import { getHeroContent } from "@/lib/site-content";
 import ProcessoEtapas from "@/components/ProcessoEtapas";
 import HeroMidia from "@/components/HeroMidia";
 import EscolhaLavagem from "@/components/EscolhaLavagem";
+import AtalhosConteudo from "@/components/AtalhosConteudo";
 import ServicosLista from "@/components/ServicosLista";
 import FaixaServicos from "@/components/FaixaServicos";
 import Diferenciais from "@/components/Diferenciais";
@@ -222,6 +223,8 @@ export default async function Home() {
 
         <Bloco id="depoimentos"><Depoimentos itens={depoimentos} /></Bloco>
         <Bloco id="indicacao"><Indicacao /></Bloco>
+
+        <AtalhosConteudo />
 
         {/* Prévia do FAQ — 3 primeiras perguntas, lista completa em /faq */}
         {faqs.length > 0 && (

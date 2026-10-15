@@ -48,6 +48,7 @@ export default function Header() {
     { href: "/beneficios", label: t.navBeneficios },
     { href: "/qual-cuidado", label: "Qual cuidado meu carro precisa?" },
     { href: "/problemas", label: "Problemas e soluções" },
+    { href: "/perguntas", label: "Pergunte para a Clean Car" },
     { href: "/blog", label: t.navBlog },
   ];
   const pathname = usePathname();
