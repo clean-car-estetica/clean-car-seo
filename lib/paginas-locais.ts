@@ -1,3 +1,5 @@
+import { SERVICOS_PAUSADOS } from "@/lib/data";
+
 // Páginas de serviço × cidade com texto próprio (tabela local_pages_content).
 // Só estas entram no sitemap e ficam indexáveis. Escolhidas pelos dados do
 // Search Console (08/10/2026): eram as que traziam aparições e cliques.
@@ -19,7 +21,7 @@ export const PAGINAS_LOCAIS: { servico: string; cidade: string }[] = [
 
 /** Melhor página para uma cidade (usada nos links da página inicial). */
 export function paginaDaCidade(cidade: string): string {
-  const p = PAGINAS_LOCAIS.find((x) => x.cidade === cidade);
+  const p = PAGINAS_LOCAIS.find((x) => x.cidade === cidade && !SERVICOS_PAUSADOS.includes(x.servico));
   return p ? `/servicos/${p.servico}/${p.cidade}` : `/servicos/lavagem-bronze`;
 }
 

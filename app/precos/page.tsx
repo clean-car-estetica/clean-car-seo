@@ -21,8 +21,8 @@ export const metadata: Metadata = {
 // Grupos da tabela, na ordem em que o cliente costuma procurar
 const GRUPOS: { titulo: string; slugs: string[] }[] = [
   { titulo: "Lavagens", slugs: ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"] },
-  { titulo: "Interior e higienização", slugs: ["higienizacao", "higienizacao-banco-dianteiro", "higienizacao-banco-traseiro", "tratamento-anti-odor", "hidratacao-de-couro"] },
-  { titulo: "Por fora: proteção e acabamento", slugs: ["revitalizacao-plastico", "restauracao-de-farol", "cristalizacao-de-vidros", "protecao-de-rodas", "enceramento-tecnico"] },
+  { titulo: "Interior e higienização", slugs: ["higienizacao", "higienizacao-banco-dianteiro", "higienizacao-banco-traseiro", "revitalizacao-plastico", "tratamento-anti-odor", "hidratacao-de-couro"] },
+  { titulo: "Por fora: proteção e acabamento", slugs: ["revitalizacao-plastico-externo", "restauracao-de-farol", "cristalizacao-de-vidros", "lavagem-pesada-de-rodas", "enceramento-tecnico"] },
   { titulo: "Motor", slugs: ["lavagem-motor"] },
   { titulo: "Na sua casa", slugs: ["higienizacao-de-estofados"] },
 ];
@@ -45,7 +45,7 @@ export default async function PrecosPage() {
           <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm mb-4">Tabela de preços</p>
           <h1 className="font-display font-extrabold text-4xl md:text-6xl text-steel text-balance leading-[0.95]">Quanto custa cada serviço na Clean Car</h1>
           <p className="mt-5 text-lg text-steel-line max-w-2xl">
-            Preços de referência para carros de porte médio, na loja do Jardim Universo, em Mogi das Cruzes. Atualizado em {atualizado}.
+            Preços na loja do Jardim Universo, em Mogi das Cruzes. Atualizado em {atualizado}.
             {precos.length ? ` Serviços de R$ ${Math.min(...precos)} a R$ ${Math.max(...precos)}.` : ""}
           </p>
           <ul className="mt-5 grid gap-1 text-sm text-steel-line">
@@ -107,8 +107,8 @@ export default async function PrecosPage() {
           <section className="rounded-2xl bg-card border border-card-line p-6 md:p-8 grid gap-4">
             <h2 className="font-display font-bold text-2xl text-steel">Quer saber o valor exato do seu carro?</h2>
             <p className="text-steel-line max-w-2xl">
-              Mande o modelo e uma foto pelo WhatsApp. A avaliação é gratuita e você recebe o valor antes de agendar. O serviço tem
-              garantia de execução de 48 horas.
+              Mande o modelo e uma foto pelo WhatsApp. A avaliação é gratuita e você recebe o valor antes de agendar. Cada serviço tem
+              garantia: 24 horas nas lavagens e 72 horas nas higienizações.
             </p>
             <div className="flex flex-wrap gap-3">
               <WhatsappCTA texto="Pedir o valor do meu carro" />

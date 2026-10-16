@@ -10,10 +10,10 @@ export default function Planos({ itens }: { itens: PlanoDB[] }) {
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center mb-12">
           <h2 className="font-display font-bold text-3xl md:text-4xl text-steel">
-            Planos <span className="text-verniz-shine">mensais</span>
+            Pacotes <span className="text-verniz-shine">Clean Car</span>
           </h2>
           <p className="mt-2 text-steel-line max-w-xl mx-auto">
-            Cuide do seu carro com regularidade e economize no plano certo pra sua rotina.
+            Cuide do seu carro com regularidade e economize no pacote certo para a sua rotina.
           </p>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -29,8 +29,12 @@ export default function Planos({ itens }: { itens: PlanoDB[] }) {
               )}
               <h3 className="font-display font-bold text-xl text-steel">{p.nome}</h3>
               <p className="mt-3">
-                <span className="font-display font-extrabold text-3xl text-verniz-shine">R$ {p.preco}</span>
-                <span className="text-steel-line text-sm">/mês</span>
+                <span className="font-display font-extrabold text-3xl text-verniz-shine">
+                  R$ {Number(p.preco).toLocaleString("pt-BR", { minimumFractionDigits: Number(p.preco) % 1 ? 2 : 0, maximumFractionDigits: 2 })}
+                </span>
+                <span className="text-steel-line text-sm">
+                  {!p.validadeDias || p.validadeDias === 30 ? "/mês" : ` · usar em até ${p.validadeDias} dias`}
+                </span>
               </p>
               <p className="mt-3 text-sm text-steel-line leading-relaxed">{p.descricao}</p>
               {p.itens.length > 0 && (

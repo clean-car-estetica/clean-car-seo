@@ -22,9 +22,10 @@ import Depoimentos from "@/components/Depoimentos";
 import Faq from "@/components/Faq";
 import Bloco from "@/components/Bloco";
 import { paginaDaCidade } from "@/lib/paginas-locais";
-import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getPlanosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
+import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
 import { getTextosGerais, getContatoContent, getVideoCliente } from "@/lib/site-content";
 import { getCampanha } from "@/lib/campanhas-servidor";
+import { getPacotes } from "@/lib/pacotes-servidor";
 import CampanhaFaixa from "@/components/CampanhaFaixa";
 import VideoCliente from "@/components/VideoCliente";
 
@@ -41,7 +42,7 @@ export default async function Home() {
     getTransformacoesPublicas(),
     getCidadesPublicas(),
     getDepoimentosPublicos(),
-    getPlanosPublicos(),
+    getPacotes(),
     getProcessoPassos(),
     getProdutosLista(),
     getTextosGerais(),
@@ -182,16 +183,16 @@ export default async function Home() {
               </p>
               <p>
                 Do básico ao completo: a <Link href="/servicos/lavagem-bronze/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem de carro</Link> do dia a dia,
-                a <Link href="/servicos/lavagem-prata/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem com enceramento</Link>,
+                a <Link href="/servicos/lavagem-prata/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem com selante</Link>,
                 a <Link href="/servicos/lavagem-ouro/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem detalhada</Link>,
                 a <Link href="/servicos/higienizacao/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">higienização interna</Link> com extratora,
-                a <Link href="/servicos/lavagem-motor/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lavagem de motor a seco</Link>
+                a <Link href="/servicos/cristalizacao-de-vidros/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">cristalização de vidros</Link>
                 e a <Link href="/servicos/restauracao-de-farol/mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">restauração de faróis</Link>.
               </p>
               <p>
                 Em todas as etapas usamos produtos profissionais Vonixx e um processo pensado para não riscar: pré-lavagem
-                com espuma, shampoo neutro e luvas de microfibra exclusivas. A avaliação é gratuita e o serviço tem garantia
-                de execução de 48 horas.
+                com espuma, shampoo neutro e luvas de microfibra exclusivas. A avaliação é gratuita e cada serviço tem garantia:
+                24 horas nas lavagens e 72 horas nas higienizações.
               </p>
             </div>
           </div>

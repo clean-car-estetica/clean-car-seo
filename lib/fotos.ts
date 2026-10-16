@@ -16,12 +16,13 @@ export const FOTO_SERVICO: Record<string, string> = {
   "higienizacao-banco-dianteiro": pexels(31389821), // limpeza do interior com pano, detalhamento
   "higienizacao-banco-traseiro": "/midia/banco-traseiro-limpo.jpg", // foto real: banco traseiro depois da higienização
   "revitalizacao-plastico": pexels(31390691), // acabamento interno sendo limpo e tratado
+  "revitalizacao-plastico-externo": "", // sem foto até o Glauber enviar uma real pelo painel
   "restauracao-de-farol": pexels(5233268), // farol sendo polido com máquina
   "lavagem-motor": pexels(24819303), // cofre do motor limpo
   "cristalizacao-de-vidros": pexels(10961473), // gotas de chuva no para-brisa
   "hidratacao-de-couro": pexels(17339319), // bancos de couro em close
   "tratamento-anti-odor": "", // sem foto até o Glauber enviar uma real pelo painel
-  "protecao-de-rodas": "/midia/roda-limpa.jpg", // foto real: roda limpa na Clean Car
+  "lavagem-pesada-de-rodas": "/midia/roda-limpa.jpg", // foto real: roda limpa na Clean Car
   "enceramento-tecnico": pexels(11139244), // politriz espalhando a cera, brilho espelhado
   "higienizacao-de-estofados": "/midia/sofa-suede-higienizado.jpg", // foto real: sofá de suede depois da higienização (vídeo do Glauber, 15/10/2026)
 };

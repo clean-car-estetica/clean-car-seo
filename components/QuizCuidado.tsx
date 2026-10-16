@@ -7,6 +7,7 @@ import { useContato } from "@/components/ContatoProvider";
 import { whatsappLink } from "@/lib/config";
 import { obterOrigem, registrarEvento } from "@/lib/track";
 import { gtagEvent } from "@/lib/gtag";
+import { SERVICOS_COM_ACRESCIMO_PORTE } from "@/lib/data";
 
 // "Qual cuidado o seu carro precisa?" (15/10/2026): 4 perguntas rápidas e uma
 // recomendação com os serviços reais, preço "a partir de" e o WhatsApp já com
@@ -119,7 +120,7 @@ function recomendar(r: Required<Resposta>) {
       porque = "A restauração remove o amarelado da lente e aplica proteção UV, sem precisar trocar o farol.";
       break;
     case "plastico":
-      principal.push("revitalizacao-plastico");
+      principal.push("revitalizacao-plastico-externo");
       porque = "O sol resseca o plástico. A revitalização devolve a cor escura e protege contra novos raios UV.";
       break;
     case "vidro":
@@ -127,7 +128,7 @@ function recomendar(r: Required<Resposta>) {
       porque = "A cristalização remove as manchas de chuva ácida e faz a água escorrer sozinha, melhorando a visão na chuva.";
       break;
     case "vender":
-      principal.push("lavagem-ouro", "restauracao-de-farol", "revitalizacao-plastico");
+      principal.push("lavagem-ouro", "restauracao-de-farol", "revitalizacao-plastico-externo");
       porque = "É o que mais muda a cara do carro na foto do anúncio: limpeza completa, farol transparente e plástico preto.";
       break;
     default:
@@ -142,9 +143,8 @@ function recomendar(r: Required<Resposta>) {
   const tem = (s: string) => principal.includes(s);
   const temLavagem = principal.some((s) => s.startsWith("lavagem-"));
   if (!temLavagem && ["interior", "cheiro", "farol", "plastico", "vidro"].includes(r.incomoda)) extra.push(lavagem === "lavagem-bronze" ? "lavagem-prata" : lavagem);
-  if (r.onde === "sol" && !tem("revitalizacao-plastico") && r.incomoda !== "vender") extra.push("revitalizacao-plastico");
+  if (r.onde === "sol" && !tem("revitalizacao-plastico-externo") && r.incomoda !== "vender") extra.push("revitalizacao-plastico-externo");
   if (r.uso === "pet" && !tem("tratamento-anti-odor")) extra.push("tratamento-anti-odor");
-  if (r.incomoda === "vender") extra.push("lavagem-motor");
 
   const frequencia =
     r.uso === "diario"
@@ -164,7 +164,6 @@ export default function QuizCuidado({ servicos, guiasPublicadas }: { servicos: S
   const porSlug = useMemo(() => new Map(servicos.map((s) => [s.slug, s])), [servicos]);
   const completo = PERGUNTAS.every((p) => r[p.chave]);
   const res = completo ? recomendar(r as Required<Resposta>) : null;
-  const fator = r.porte === "grande" ? 1.25 : 1;
 
   function escolher(chave: keyof Resposta, valor: string) {
     const novo = { ...r, [chave]: valor };
@@ -178,7 +177,10 @@ export default function QuizCuidado({ servicos, guiasPublicadas }: { servicos: S
   }
 
   const linha = (slug: string) => porSlug.get(slug);
-  const total = (lista: string[]) => lista.reduce((t, s) => t + Number(linha(s)?.preco ?? 0), 0) * fator;
+  // Acréscimo de 25% para carro grande só nos serviços que têm acréscimo
+  // (lavagens, higienizações e vidros); os demais têm valor fixo (16/10/2026).
+  const fator = (slug: string) => (r.porte === "grande" && SERVICOS_COM_ACRESCIMO_PORTE.includes(slug) ? 1.25 : 1);
+  const total = (lista: string[]) => lista.reduce((t, s) => t + Number(linha(s)?.preco ?? 0) * fator(s), 0);
   const nomes = (lista: string[]) => lista.map((s) => linha(s)?.nome).filter(Boolean).join(" + ");
 
   const mensagem = res
@@ -248,7 +250,7 @@ export default function QuizCuidado({ servicos, guiasPublicadas }: { servicos: S
                       {sv.nome}
                     </Link>
                     <span className="text-steel-line tabular-nums">
-                      {sv.preco ? `a partir de R$ ${Math.round(Number(sv.preco) * fator)}` : "sob avaliação"}
+                      {sv.preco ? `a partir de R$ ${Math.round(Number(sv.preco) * fator(s))}` : "sob avaliação"}
                       {sv.duracao ? ` · ${sv.duracao}` : ""}
                     </span>
                   </li>
@@ -259,7 +261,7 @@ export default function QuizCuidado({ servicos, guiasPublicadas }: { servicos: S
             {res.principal.length > 1 && (
               <p className="font-display font-bold text-xl text-steel tabular-nums">
                 Juntos: a partir de R$ {Math.round(total(res.principal))}
-                {fator > 1 ? <span className="text-sm text-steel-line font-sans font-normal"> (valor aproximado para SUV/picape)</span> : null}
+                {res.principal.some((s) => fator(s) > 1) ? <span className="text-sm text-steel-line font-sans font-normal"> (valor aproximado para SUV/picape)</span> : null}
               </p>
             )}
             {res.extra.length > 0 && (
@@ -271,7 +273,7 @@ export default function QuizCuidado({ servicos, guiasPublicadas }: { servicos: S
                     return sv ? (
                       <Link key={s} href={`/servicos/${s}`} className="rounded-full border border-card-line px-4 py-1.5 text-sm text-steel hover:border-verniz">
                         {sv.nome}
-                        {sv.preco ? ` · R$ ${Math.round(Number(sv.preco) * fator)}` : ""}
+                        {sv.preco ? ` · R$ ${Math.round(Number(sv.preco) * fator(s))}` : ""}
                       </Link>
                     ) : null;
                   })}

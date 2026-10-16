@@ -134,6 +134,8 @@ export type PlanoDB = {
   descricao: string;
   itens: string[];
   destaque: boolean;
+  /** Pacotes do SAS: prazo para usar os serviços (30 = mensal) */
+  validadeDias?: number;
 };
 
 export async function getPlanosPublicos(): Promise<PlanoDB[]> {
@@ -208,7 +210,7 @@ export const faqsPadrao: FaqDB[] = [
     id: -4,
     pergunta: "O que é hidrofobia e por que ela protege o carro?",
     resposta:
-      "Hidrofobia é a propriedade que faz a água escorregar da pintura ou do vidro em vez de grudar. Com produtos Vonixx como Hidrox e Glasy, conseguimos essa repelência — o que reduz manchas de chuva ácida, facilita a limpeza e ajuda a manter a proteção da pintura por mais tempo.",
+      "Hidrofobia é a propriedade que faz a água escorregar da pintura ou do vidro em vez de grudar. Com selantes e cristalizadores profissionais Vonixx, conseguimos essa repelência — o que reduz manchas de chuva ácida, facilita a limpeza e ajuda a manter a proteção da pintura por mais tempo.",
   },
   {
     id: -5,
@@ -220,7 +222,7 @@ export const faqsPadrao: FaqDB[] = [
     id: -6,
     pergunta: "Vocês dão garantia do serviço?",
     resposta:
-      "Sim, cobrimos falhas na execução técnica, desde que comunicadas em até 48h após a entrega do veículo. A garantia não cobre danos pré-existentes, desgaste natural, uso inadequado ou fatores externos ao serviço realizado.",
+      "Sim. Lavagens: 24 horas para qualquer sujeira que tenha ficado do serviço. Higienizações: 72 horas para mancha ou odor que já existia e persistiu. Restauração de faróis: 48 horas para manchas que persistirem. A garantia não cobre sujeira nova, danos pré-existentes, desgaste natural ou uso inadequado.",
   },
   {
     id: -7,

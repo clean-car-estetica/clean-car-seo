@@ -2,7 +2,7 @@
 // (estão nas observações e no FAQ), sem promessa vaga.
 const ITENS = [
   { titulo: "Avaliação gratuita", texto: "Olhamos o carro com você antes de começar e confirmamos o valor." },
-  { titulo: "Garantia de execução", texto: "Notou alguma falha? Avise em até 48h e a gente corrige." },
+  { titulo: "Garantia em cada serviço", texto: "24h nas lavagens e 72h nas higienizações: avise com foto e a gente refaz." },
   { titulo: "Produtos Vonixx", texto: "Química profissional em todas as etapas, do shampoo ao acabamento." },
   { titulo: "Hora marcada", texto: "Sem fila: você agenda pelo WhatsApp e já sabe quando buscar." },
 ];

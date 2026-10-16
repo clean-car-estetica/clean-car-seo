@@ -15,6 +15,6 @@ export default async function Image() {
     titulo: "Clean Car",
     subtitulo: "Seu carro limpo de verdade,",
     destaque: "com hora marcada.",
-    selos: [contato?.levaETraz ? "Leva e traz" : "Hora marcada", "Avaliação grátis", "Garantia 48 h"],
+    selos: [contato?.levaETraz ? "Leva e traz" : "Hora marcada", "Avaliação grátis", "Com garantia"],
   });
 }

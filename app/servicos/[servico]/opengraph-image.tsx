@@ -23,7 +23,7 @@ export default async function Image({ params }: { params: Promise<{ servico: str
     titulo: nomeCurto(nome),
     subtitulo: s?.preco_desde ? "Com hora marcada," : "Com hora marcada",
     destaque: s?.preco_desde ? `a partir de R$ ${s.preco_desde}` : "e avaliação grátis",
-    selos: ["Produtos Vonixx", contato?.levaETraz ? "Leva e traz" : "Avaliação grátis", "Garantia 48 h"],
+    selos: ["Produtos Vonixx", contato?.levaETraz ? "Leva e traz" : "Avaliação grátis", "Com garantia"],
     foto: foto && !/\.(mp4|webm|mov)/i.test(foto) ? foto : null,
   });
 }

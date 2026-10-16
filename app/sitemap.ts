@@ -78,7 +78,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entradas.push({ url: `${BASE_URL}/servicos/${slug}`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.8 });
   }
   // 08/10/2026: páginas de cidade com texto próprio voltam a ser indexadas
-  for (const p of PAGINAS_LOCAIS) {
+  // 16/10/2026: só as de serviço ativo (pausado/removido fica de fora).
+  for (const p of PAGINAS_LOCAIS.filter((x) => slugs.has(x.servico))) {
     entradas.push({ url: `${BASE_URL}/servicos/${p.servico}/${p.cidade}`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.7 });
   }
 
