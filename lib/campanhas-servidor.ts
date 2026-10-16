@@ -16,7 +16,7 @@ type CampanhaSas = {
   imagemUrl: string | null; textoBotao: string; mensagemWhatsapp: string;
 };
 
-export type OrigemCampanhas = "sas" | "reserva";
+export type OrigemCampanhas = "sas" | "reserva" | "sas-vazio";
 
 function doSas(c: CampanhaSas): CampanhaItem {
   return {
@@ -71,7 +71,8 @@ export async function getCampanhasComOrigem(): Promise<{ lista: CampanhaItem[]; 
   // SAS ainda sem nenhuma campanha cadastrada (logo depois do PATCH-57):
   // segura a reserva para a campanha atual não sumir do site no meio do mês.
   if (sas && sas.length) return { lista: sas, origem: "sas" };
-  return { lista: await lerReserva(), origem: "reserva" };
+  // 16/10/2026: distingue "SAS respondeu, mas sem campanha" de "SAS fora do ar".
+  return { lista: await lerReserva(), origem: sas ? "sas-vazio" : "reserva" };
 }
 
 export async function getCampanhas(): Promise<CampanhaItem[]> {

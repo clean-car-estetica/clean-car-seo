@@ -43,6 +43,13 @@ export default async function CampanhaAdminPage() {
         </p>
       )}
 
+      {origem === "sas-vazio" && (
+        <p className="mb-6 max-w-4xl rounded-lg border border-cera/50 bg-cera/10 px-4 py-2 text-sm text-cera">
+          O SAS está conectado, mas ainda não tem nenhuma campanha cadastrada. Até você cadastrar a primeira, o site usa a lista
+          reserva antiga.
+        </p>
+      )}
+
       <AvisoCampanha lista={lista} />
 
       <div className="grid gap-3 max-w-4xl">
