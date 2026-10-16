@@ -33,7 +33,7 @@ export default function Planos({ itens }: { itens: PlanoDB[] }) {
                   R$ {Number(p.preco).toLocaleString("pt-BR", { minimumFractionDigits: Number(p.preco) % 1 ? 2 : 0, maximumFractionDigits: 2 })}
                 </span>
                 <span className="text-steel-line text-sm">
-                  {!p.validadeDias || p.validadeDias === 30 ? "/mês" : ` · usar em até ${p.validadeDias} dias`}
+                  {p.validadeDias ? ` · pagamento único, usar em até ${p.validadeDias} dias` : "/mês"}
                 </span>
               </p>
               <p className="mt-3 text-sm text-steel-line leading-relaxed">{p.descricao}</p>
