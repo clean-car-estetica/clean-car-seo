@@ -62,6 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // publicados) saíram: páginas sem conteúdo o Google marca como
     // "rastreada, mas não indexada". O blog volta quando houver artigos.
     { url: `${BASE_URL}/faq`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/lava-rapido-mogi-das-cruzes`, lastModified: new Date("2026-10-17"), changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE_URL}/mogi-das-cruzes`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.85 },
     { url: `${BASE_URL}/sobre`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/contato`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.6 },

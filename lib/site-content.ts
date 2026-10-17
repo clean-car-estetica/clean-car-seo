@@ -160,7 +160,7 @@ export type Metadados = {
 };
 
 export const METADADOS_PADRAO: Metadados = {
-  titulo: "Clean Car | Estética Automotiva em Mogi das Cruzes e Alto Tietê",
+  titulo: "Clean Car | Lava-Rápido e Estética Automotiva em Mogi das Cruzes",
   descricao: "Lavagem profissional, higienização, enceramento e restauração. Produtos Vonixx e atendimento em toda região.",
   palavrasChave:
     "lava rapido Mogi das Cruzes, lava-rápido Mogi das Cruzes, estetica automotiva Mogi das Cruzes, limpeza de carro Mogi das Cruzes, lavagem de carro Mogi das Cruzes, proteção de pintura Mogi das Cruzes, higienização Mogi das Cruzes, higienização de banco Mogi das Cruzes, Alto Tietê, Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba, Guararema",

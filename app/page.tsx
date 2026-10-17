@@ -177,7 +177,8 @@ export default async function Home() {
             <div className="mt-5 space-y-4 text-steel-line leading-relaxed max-w-2xl">
               <p>
                 A Clean Car Estética Automotiva fica no Jardim Universo, em Mogi das Cruzes, e cuida de carros de toda a
-                região: Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema. Trabalhamos com hora marcada{contato.levaETraz
+                região: Suzano, Poá, Ferraz de Vasconcelos, Itaquaquecetuba e Guararema. Quem procura um <Link href="/lava-rapido-mogi-das-cruzes" className="text-verniz-shine underline underline-offset-2">lava-rápido em Mogi das Cruzes</Link> encontra
+                aqui a lavagem completa com hora marcada{contato.levaETraz
                   ? " e, se você não puder trazer o carro, buscamos e devolvemos com o leva e traz."
                   : ", sem fila e sem surpresa no prazo."}
               </p>

@@ -14,7 +14,7 @@ export const revalidate = 3600;
 export const metadata = {
   title: "Estética Automotiva em Mogi das Cruzes | Clean Car",
   description:
-    "Lavagem de carro, higienização, remoção de chuva ácida e recuperação de plásticos em Mogi das Cruzes. Loja física, produtos Vonixx, hora marcada.",
+    "Lava-rápido e lavagem de carro, higienização, remoção de chuva ácida e recuperação de plásticos em Mogi das Cruzes. Loja física, produtos Vonixx, hora marcada.",
   alternates: { canonical: `${SITE_URL}/mogi-das-cruzes` },
 };
 
@@ -39,7 +39,7 @@ export default async function MogiHubPage() {
               Estética Automotiva em Mogi das Cruzes
             </h1>
             <p className="mt-6 text-lg text-steel-line max-w-2xl leading-relaxed">
-              Lavagem de carro, higienização de estofados, remoção de chuva ácida e recuperação de
+              Lava-rápido com hora marcada, lavagem de carro, higienização de estofados, remoção de chuva ácida e recuperação de
               plásticos — tudo em um só lugar, perto de você, com produtos Vonixx e hora marcada.
             </p>
             <AgendarButton className="inline-block mt-8 rounded-full bg-verniz text-carbon font-display font-bold px-8 py-3 tracking-wide hover:bg-verniz-shine transition-colors">
