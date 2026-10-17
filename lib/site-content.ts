@@ -1,5 +1,7 @@
 import { FOTO_HERO, fotoHero, VIDEO_HERO, VIDEO_HERO_CELULAR } from "@/lib/fotos";
-import { aplicarFuncionamentoSas, type ContatoSincronizado } from "@/lib/gbr-sync";
+// Só o TIPO aqui: este arquivo também é usado no navegador (PromoProvider/TextosProvider),
+// e gbr-sync carrega o cliente Supabase com chave de servidor. O código entra por import dinâmico.
+import type { ContatoSincronizado } from "@/lib/gbr-sync";
 import { supabasePublico } from "@/lib/supabase";
 import { CONTATO_PADRAO, type Contato } from "@/lib/config";
 
@@ -279,6 +281,7 @@ export async function getContatoDoConsole(): Promise<Contato> {
 // integração está ligada (lib/gbr-sync.ts) — o site para de depender de
 // alguém lembrar de mudar nos dois lugares.
 export async function getContatoContent(): Promise<ContatoSincronizado<Contato>> {
+  const { aplicarFuncionamentoSas } = await import("@/lib/gbr-sync");
   return aplicarFuncionamentoSas(await getContatoDoConsole());
 }
 
