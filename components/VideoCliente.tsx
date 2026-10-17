@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { Star, Quote, Gift } from "lucide-react";
+import { Star, Gift, CheckCircle2 } from "lucide-react";
 import { SITE_URL, TEXTO_BRINDE } from "@/lib/config";
+import VideoStoryPlayer from "@/components/VideoStoryPlayer";
+import WhatsappCTA from "@/components/WhatsappCTA";
 
 export const VIDEO_CLIENTE = {
   src: "/midia/lavagem-de-carro-mogi-das-cruzes-cliente.mp4",
   capa: "/midia/lavagem-de-carro-mogi-das-cruzes-cliente.jpg",
   data: "2026-10-15",
   duracao: "PT33S",
+  // Primeiro nome só — a cliente autorizou o uso do vídeo no site.
+  cliente: "Juliana",
 };
 
 // Falas da cliente, do jeito que ela disse (sem corrigir).
@@ -25,7 +29,7 @@ export default function VideoCliente({ notaGoogle }: { notaGoogle?: string }) {
     "@context": "https://schema.org",
     "@type": "VideoObject",
     name: "Lavagem Ouro em Mogi das Cruzes: cliente mostra o resultado na Clean Car",
-    description: "Resultado da Lavagem Ouro (lavagem detalhada) em Mogi das Cruzes. A cliente grava o carro na retirada e diz: \"não sei se saiu do lava rápido ou da concessionária\". Clean Car Estética Automotiva, Jardim Universo.",
+    description: "Resultado da Lavagem Ouro (lavagem detalhada) em Mogi das Cruzes. A cliente grava o carro na retirada, posta no Instagram dela e diz: \"não sei se saiu do lava rápido ou da concessionária\". Clean Car Estética Automotiva, Jardim Universo.",
     thumbnailUrl: `${SITE_URL}${VIDEO_CLIENTE.capa}`,
     contentUrl: `${SITE_URL}${VIDEO_CLIENTE.src}`,
     uploadDate: VIDEO_CLIENTE.data,
@@ -36,53 +40,74 @@ export default function VideoCliente({ notaGoogle }: { notaGoogle?: string }) {
   };
 
   return (
-    <section aria-labelledby="video-cliente-titulo" className="mx-auto max-w-6xl px-6 py-20">
+    <section
+      id="video-cliente"
+      aria-labelledby="video-cliente-titulo"
+      className="relative isolate overflow-hidden border-y border-card-line bg-carbon-soft py-20 md:py-28 scroll-mt-24"
+    >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="grid gap-10 md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] items-center">
-        <video
-          src={VIDEO_CLIENTE.src}
-          poster={VIDEO_CLIENTE.capa}
-          controls
-          playsInline
-          preload="none"
-          aria-label="Vídeo: cliente mostra o carro depois da lavagem na Clean Car, em Mogi das Cruzes"
-          className="w-full max-w-[320px] mx-auto aspect-[9/16] rounded-3xl border border-card-line bg-card object-cover"
-        />
+      {/* fundo com brilho suave pra seção se destacar das vizinhas */}
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_30%_50%,color-mix(in_srgb,var(--verniz)_14%,transparent),transparent)]" />
 
-        <div>
-          <p className="text-sm font-bold uppercase tracking-wide text-verniz-shine">Quem já passou pela Clean Car</p>
-          <h2 id="video-cliente-titulo" className="mt-2 font-display font-bold text-3xl md:text-4xl text-steel leading-tight text-balance">
-            “Não sei se saiu do lava rápido ou da concessionária.”
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 md:grid-cols-[minmax(0,380px)_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-x-16 md:gap-y-0">
+        {/* celular: título → vídeo → resto. Computador: vídeo à esquerda ocupando as duas linhas */}
+        <div className="md:row-span-2 md:self-center">
+          <VideoStoryPlayer
+            src={VIDEO_CLIENTE.src}
+            capa={VIDEO_CLIENTE.capa}
+            nome={VIDEO_CLIENTE.cliente}
+            legenda="Story no Instagram dela · marcou @cleancar_est26"
+            ariaLabel="Vídeo: cliente mostra o carro depois da lavagem na Clean Car, em Mogi das Cruzes"
+          />
+        </div>
+
+        <div className="-order-1 md:order-none md:col-start-2 md:row-start-1 md:self-end">
+          <p className="inline-flex items-center gap-2 rounded-full border border-cera/30 bg-carbon/60 px-4 py-1.5 text-xs font-display font-bold uppercase tracking-wide text-cera">
+            <span className="h-2 w-2 rounded-full bg-cera" aria-hidden /> Vídeo real de cliente
+          </p>
+          <h2 id="video-cliente-titulo" className="mt-4 font-display font-extrabold text-4xl md:text-5xl text-steel leading-[1.05] text-balance">
+            Ela buscou o carro e <span className="text-verniz-shine glow-text">postou no Instagram</span>
           </h2>
-          <p className="mt-4 text-steel-line max-w-xl">
-            Vídeo gravado pela própria cliente na hora de buscar o carro depois da{" "}
-            <Link href="/servicos/lavagem-ouro" className="text-verniz-shine underline underline-offset-2">Lavagem Ouro</Link>. Sem roteiro, do jeito que ela falou.
+          <p className="mt-4 max-w-xl text-steel-line">
+            A {VIDEO_CLIENTE.cliente} gravou com o próprio celular na hora da retirada, depois de uma{" "}
+            <Link href="/servicos/lavagem-ouro" className="text-verniz-shine underline underline-offset-2">Lavagem Ouro</Link>,
+            e marcou a Clean Car no story dela. A gente só pediu pra mostrar aqui.
           </p>
-          <p className="mt-3 inline-flex items-center gap-2 text-sm text-cera">
-            <Gift size={16} aria-hidden /> {TEXTO_BRINDE}
-          </p>
+        </div>
 
-          <details className="mt-6 max-w-xl rounded-2xl bg-card border border-card-line p-5 group">
-            <summary className="cursor-pointer font-display font-bold text-steel flex items-center gap-2">
-              <Quote size={16} className="text-verniz-shine" aria-hidden /> O que ela diz no vídeo
-            </summary>
-            <ul className="mt-3 space-y-1.5 text-sm text-steel-line">
-              {FALAS.map((f) => (
-                <li key={f}>“{f}”</li>
-              ))}
-            </ul>
+        <div className="md:col-start-2 md:row-start-2">
+          <figure className="max-w-xl md:mt-8 border-l-4 border-cera pl-5">
+            <blockquote className="font-display text-2xl md:text-3xl font-bold italic leading-snug text-steel">
+              “Não sei se saiu do lava rápido ou da concessionária.”
+            </blockquote>
+            <figcaption className="mt-2 text-sm text-steel-line">— {VIDEO_CLIENTE.cliente}, cliente em Mogi das Cruzes</figcaption>
+          </figure>
+
+          <ul className="mt-8 grid max-w-xl gap-2 text-sm text-steel-line sm:grid-cols-2">
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-verniz-shine" aria-hidden /> Gravado pela cliente, não por nós</li>
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-verniz-shine" aria-hidden /> Do jeito que ela postou</li>
+            <li className="flex items-center gap-2 sm:col-span-2"><Gift size={16} className="text-cera" aria-hidden /> {TEXTO_BRINDE}</li>
+          </ul>
+
+          <div className="mt-8 flex flex-wrap items-center gap-5">
+            <WhatsappCTA texto="Quero meu carro assim" />
+            {notaGoogle && (
+              <p className="inline-flex items-center gap-2 text-sm text-steel-line">
+                <span className="flex gap-0.5">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Star key={i} size={14} className="fill-cera text-cera" aria-hidden />
+                  ))}
+                </span>
+                Nota {notaGoogle} no Google
+              </p>
+            )}
+          </div>
+
+          {/* Transcrição: discreta pro visitante, mas no HTML pro Google e IAs */}
+          <details className="mt-6 max-w-xl text-sm text-steel-line">
+            <summary className="cursor-pointer underline underline-offset-2 hover:text-steel">Ler a transcrição do vídeo</summary>
+            <p className="mt-2 leading-relaxed">{FALAS.join(" ")}</p>
           </details>
-
-          {notaGoogle && (
-            <p className="mt-6 inline-flex items-center gap-2 text-sm text-steel-line">
-              <span className="flex gap-0.5">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <Star key={i} size={14} className="fill-cera text-cera" aria-hidden />
-                ))}
-              </span>
-              Nota {notaGoogle} no Google
-            </p>
-          )}
         </div>
       </div>
     </section>

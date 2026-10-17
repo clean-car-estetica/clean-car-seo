@@ -155,6 +155,9 @@ export default async function Home() {
           </section>
         )}
 
+        {/* Vídeo real de cliente — logo depois do antes/depois, onde a prova pesa mais */}
+        {videoCliente.publicado && <VideoCliente notaGoogle={contato.notaGoogle} />}
+
         <Bloco id="processo"><ProcessoEtapas passos={passos} /></Bloco>
 
         <Bloco id="servicos">
@@ -230,7 +233,6 @@ export default async function Home() {
         </section>
 
         <div id="avaliacoes" className="scroll-mt-24">
-          {videoCliente.publicado && <VideoCliente notaGoogle={contato.notaGoogle} />}
           <Bloco id="depoimentos"><Depoimentos itens={depoimentos} /></Bloco>
         </div>
         <Bloco id="indicacao"><Indicacao /></Bloco>
