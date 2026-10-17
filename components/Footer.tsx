@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { whatsappLink } from "@/lib/config";
+import { whatsappLink, linhasHorario } from "@/lib/config";
 import { useContato } from "@/components/ContatoProvider";
 import { useTextos } from "@/components/TextosProvider";
 
@@ -31,8 +31,12 @@ export default function Footer() {
           <div className="font-display font-bold text-sm uppercase tracking-wide text-verniz-shine mb-3">
             Horário
           </div>
-          <p className="text-sm leading-relaxed">{contato.horarioSemana}</p>
-          <p className="text-sm leading-relaxed">{contato.horarioSabado}</p>
+          {contato.horarioAvisoHoje ? (
+            <p className="text-sm leading-relaxed font-bold text-warn mb-1">{contato.horarioAvisoHoje}</p>
+          ) : null}
+          {linhasHorario(contato).map((l) => (
+            <p key={l} className="text-sm leading-relaxed">{l}</p>
+          ))}
           <p className="text-sm leading-relaxed text-steel-line/80 mt-1">
             {contato.observacaoHorario}
           </p>

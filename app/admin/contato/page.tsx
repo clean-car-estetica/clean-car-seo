@@ -1,10 +1,14 @@
 export const dynamic = "force-dynamic";
 
-import { getContatoContent } from "@/lib/site-content";
+import { getContatoDoConsole } from "@/lib/site-content";
+import { getFuncionamentoSas, linhasSemana } from "@/lib/gbr-sync";
 import { salvarContato } from "./actions";
 
 export default async function ContatoAdminPage() {
-  const contato = await getContatoContent();
+  // Lê o que está salvo no console (sem o SAS por cima), para salvar não
+  // gravar no banco o horário que veio do sistema.
+  const contato = await getContatoDoConsole();
+  const sas = await getFuncionamentoSas();
 
   return (
     <div>
@@ -13,6 +17,17 @@ export default async function ContatoAdminPage() {
         Esses dados aparecem no rodapé, no botão de WhatsApp, no botão de Agendar e nos dados
         estruturados que o Google e assistentes de IA leem.
       </p>
+
+      {sas && (
+        <div className="bg-ok/10 border border-ok/30 rounded-xl p-4 mb-6 text-sm text-steel max-w-2xl">
+          <b>Horário e leva e traz vêm do GBR SAS.</b> Para mudar, altere no sistema (Admin › Regras e Admin › Empresa) — o site
+          atualiza sozinho em até 5 minutos. Os campos de horário e o leva e traz abaixo só valem se a integração for desligada.
+          <span className="block mt-2 text-steel-line">
+            Agora no site: {sas.configurado ? linhasSemana(sas.semana).join(" · ") : "horário não cadastrado no SAS (usando o daqui)"} · Leva e traz:{" "}
+            {sas.levaTras.disponivel ? "ativo" : "pausado"}
+          </span>
+        </div>
+      )}
 
       <form action={salvarContato} className="bg-card border border-card-line rounded-2xl p-6 grid gap-4 max-w-2xl">
         <label className="flex items-start gap-3 rounded-xl border border-verniz/40 bg-carbon p-4 cursor-pointer">

@@ -1,4 +1,4 @@
-import { SITE_URL, filtrarLevaETraz, whatsappLink } from "@/lib/config";
+import { SITE_URL, filtrarLevaETraz, whatsappLink, linhasHorario } from "@/lib/config";
 import { getContatoContent } from "@/lib/site-content";
 import { getServicosPublicos, getFaqsPublicos } from "@/lib/site-data";
 import { getGuiasPublicadas, caminhoGuia } from "@/lib/guias";
@@ -36,7 +36,7 @@ export async function GET() {
   L.push("## Contato e localização");
   L.push(`- Endereço: ${contato.endereco}`);
   L.push(`- WhatsApp (agendamento e orçamento): +${contato.whatsapp} — ${whatsappLink(contato)}`);
-  L.push(`- Horário: ${contato.horarioSemana}; ${contato.horarioSabado}. Domingo fechado. ${contato.observacaoHorario}`.trim());
+  L.push(`- Horário: ${linhasHorario(contato).join("; ")}${contato.horarioLinhas ? "" : ". Domingo fechado"}. ${contato.observacaoHorario}`.trim());
   L.push(`- Instagram: ${contato.instagramUrl}`);
   L.push(`- Google Maps e avaliações: ${contato.googleUrl}`);
   if (contato.formasPagamento) L.push(`- Pagamento: ${contato.formasPagamento}`);

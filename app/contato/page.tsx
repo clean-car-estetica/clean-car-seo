@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import AgendarButton from "@/components/AgendarButton";
 import { useContato } from "@/components/ContatoProvider";
-import { whatsappLink } from "@/lib/config";
+import { whatsappLink, linhasHorario } from "@/lib/config";
 
 export default function ContatoPage() {
   const contato = useContato();
@@ -25,8 +25,11 @@ export default function ContatoPage() {
             </div>
             <div className="bg-card border border-card-line rounded-2xl p-5">
               <div className="text-xs font-bold uppercase tracking-wide text-verniz-shine mb-1">Horário</div>
-              <p className="text-steel-line">{contato.horarioSemana}</p>
-              <p className="text-steel-line">{contato.horarioSabado}</p>
+              {contato.horarioAvisoHoje ? <p className="font-bold text-warn mb-1">{contato.horarioAvisoHoje}</p> : null}
+              {linhasHorario(contato).map((l) => (
+                <p key={l} className="text-steel-line">{l}</p>
+              ))}
+              {contato.horarioLinhas && contato.observacaoHorario ? <p className="text-steel-line/80 text-sm mt-1">{contato.observacaoHorario}</p> : null}
             </div>
             <a href={whatsappLink(contato)} target="_blank" rel="noopener noreferrer" className="bg-card border border-card-line rounded-2xl p-5 hover:border-verniz transition-colors">
               <div className="text-xs font-bold uppercase tracking-wide text-verniz-shine mb-1">WhatsApp</div>

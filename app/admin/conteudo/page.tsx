@@ -4,12 +4,16 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { importarDadosPadrao, atualizarOrdemPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
 import ImageUploader from "@/components/ImageUploader";
 import AplicarCatalogoButton from "@/components/AplicarCatalogoButton";
+import { getServicosSas, getVinculos, casarServicos, limparNome, duracaoSite } from "@/lib/gbr-sync";
 
 export default async function ConteudoPage() {
   const { data: servicos, error } = await supabaseAdmin
     .from("services")
     .select("*")
     .order("nome");
+  // 17/10/2026: serviços ligados ao GBR SAS mostram o que vem do sistema.
+  const sas = await getServicosSas();
+  const doSas = sas && servicos ? casarServicos(servicos, sas, await getVinculos()) : new Map();
 
   return (
     <div>
@@ -70,6 +74,17 @@ export default async function ConteudoPage() {
       <div className="grid gap-5">
         {servicos?.map((s) => (
           <div key={s.slug} id={`servico-${s.slug}`} className="bg-card border border-card-line rounded-2xl p-6 scroll-mt-4 target:border-verniz">
+            {doSas.get(s.slug) && (() => {
+              const v = doSas.get(s.slug)!;
+              return (
+                <div className="mb-4 rounded-xl border border-ok/30 bg-ok/10 px-4 py-3 text-xs text-steel">
+                  <b>Ligado ao GBR SAS ({limparNome(v.nome)}).</b> No site aparece: {v.preco == null ? "sob avaliação" : `R$ ${v.preco}`}
+                  {duracaoSite(v.duracao) ? ` · ${duracaoSite(v.duracao)}` : ""}{v.destaque ? " · Mais pedido" : ""}
+                  {v.ativo ? "" : " · PAUSADO no sistema (fora do site)"}. Nome, preço, duração, destaque e pausa mudam no
+                  sistema; foto e textos, aqui. <a href="/admin/integracao-gbr" className="underline">Trocar vínculo</a>
+                </div>
+              );
+            })()}
             <form action={atualizarServico} className="grid md:grid-cols-[160px_1fr] gap-5">
               <input type="hidden" name="slug" value={s.slug} />
               <img src={s.imagem_url} alt={s.nome} className="w-full h-32 object-cover rounded-xl" />

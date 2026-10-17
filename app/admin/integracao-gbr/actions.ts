@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function salvarIntegracaoGbr(formData: FormData) {
@@ -18,4 +18,7 @@ export async function salvarIntegracaoGbr(formData: FormData) {
     .upsert({ id: 1, api_url, api_key, ativo, atualizado_em: new Date().toISOString() });
   if (error) throw new Error(error.message);
   revalidatePath("/admin/integracao-gbr");
+  // Credencial nova = buscar de novo no SAS (lib/gbr-sync.ts).
+  revalidateTag("gbr-sync", { expire: 0 });
+  revalidatePath("/", "layout");
 }

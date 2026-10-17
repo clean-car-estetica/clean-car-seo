@@ -1,4 +1,5 @@
-import { SITE_URL, filtrarLevaETraz } from "@/lib/config";
+import { SITE_URL, filtrarLevaETraz, type Contato } from "@/lib/config";
+import type { ContatoSincronizado } from "@/lib/gbr-sync";
 import type { Metadata } from "next";
 import "./globals.css";
 import PageviewTracker from "@/components/PageviewTracker";
@@ -38,6 +39,35 @@ export async function generateMetadata(): Promise<Metadata> {
       title: meta.titulo,
       description: meta.descricao,
     },
+  };
+}
+
+// 17/10/2026: com o GBR SAS ligado, o horário do Google (dados estruturados)
+// sai do sistema, inclusive feriados e horários especiais.
+const DIAS_SCHEMA: Record<string, string> = { seg: "Monday", ter: "Tuesday", qua: "Wednesday", qui: "Thursday", sex: "Friday", sab: "Saturday", dom: "Sunday" };
+function horarioJsonLd(contato: ContatoSincronizado<Contato>) {
+  const f = contato.horarioSas;
+  if (!f?.configurado) {
+    return {
+      openingHoursSpecification: [
+        { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "09:00", closes: "18:00" },
+        { "@type": "OpeningHoursSpecification", dayOfWeek: ["Saturday"], opens: "09:00", closes: "17:00" },
+      ],
+    };
+  }
+  const grupos = new Map<string, string[]>();
+  for (const d of f.semana) if (d.aberto && d.inicio && d.fim) grupos.set(`${d.inicio}|${d.fim}`, [...(grupos.get(`${d.inicio}|${d.fim}`) || []), DIAS_SCHEMA[d.dia]]);
+  const especiais = f.excecoes.filter((e) => e.tipo !== "pausa").map((e) => ({
+    "@type": "OpeningHoursSpecification",
+    validFrom: e.data,
+    validThrough: e.dataFim || e.data,
+    // Fechado o dia todo: opens = closes = 00:00 (padrão do schema.org/Google)
+    opens: e.tipo === "fechado" ? "00:00" : e.inicio,
+    closes: e.tipo === "fechado" ? "00:00" : e.fim,
+  }));
+  return {
+    openingHoursSpecification: [...grupos].map(([k, dias]) => ({ "@type": "OpeningHoursSpecification", dayOfWeek: dias, opens: k.split("|")[0], closes: k.split("|")[1] })),
+    ...(especiais.length ? { specialOpeningHoursSpecification: especiais } : {}),
   };
 }
 
@@ -99,20 +129,7 @@ export default async function RootLayout({
               ],
               sameAs: [contato.instagramUrl, contato.googleUrl],
               priceRange: "R$ 45 – R$ 420",
-              openingHoursSpecification: [
-                {
-                  "@type": "OpeningHoursSpecification",
-                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                  opens: "09:00",
-                  closes: "18:00",
-                },
-                {
-                  "@type": "OpeningHoursSpecification",
-                  dayOfWeek: ["Saturday"],
-                  opens: "09:00",
-                  closes: "17:00",
-                },
-              ],
+              ...horarioJsonLd(contato),
             }),
           }}
         />

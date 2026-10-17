@@ -1,4 +1,5 @@
 import { FOTO_HERO, fotoHero, VIDEO_HERO, VIDEO_HERO_CELULAR } from "@/lib/fotos";
+import { aplicarFuncionamentoSas, type ContatoSincronizado } from "@/lib/gbr-sync";
 import { supabasePublico } from "@/lib/supabase";
 import { CONTATO_PADRAO, type Contato } from "@/lib/config";
 
@@ -263,7 +264,8 @@ export async function getSobre(): Promise<Sobre> {
   }
 }
 
-export async function getContatoContent(): Promise<Contato> {
+/** Contato como digitado no console, sem nada do SAS (usado pelo próprio console). */
+export async function getContatoDoConsole(): Promise<Contato> {
   try {
     const { data } = await supabasePublico.from("site_content").select("data").eq("section", "contato").single();
     if (!data?.data) return CONTATO_PADRAO;
@@ -271,6 +273,13 @@ export async function getContatoContent(): Promise<Contato> {
   } catch {
     return CONTATO_PADRAO;
   }
+}
+
+// 17/10/2026: horário, feriados e leva e traz vêm do GBR SAS quando a
+// integração está ligada (lib/gbr-sync.ts) — o site para de depender de
+// alguém lembrar de mudar nos dois lugares.
+export async function getContatoContent(): Promise<ContatoSincronizado<Contato>> {
+  return aplicarFuncionamentoSas(await getContatoDoConsole());
 }
 
 export type HeroContent = {

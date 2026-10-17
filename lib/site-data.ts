@@ -1,6 +1,7 @@
 import { supabasePublico } from "@/lib/supabase";
 import { servicos as servicosPadrao, cidades as cidadesPadrao } from "@/lib/data";
 import { fotoServico } from "@/lib/fotos";
+import { aplicarServicosSas } from "@/lib/gbr-sync";
 
 export type CidadeDB = {
   slug: string;
@@ -39,7 +40,13 @@ export type ServicoDB = {
   ativo: boolean;
 };
 
+// 17/10/2026: nome, preço, duração, destaque e pausa vêm do GBR SAS quando a
+// integração está ligada (lib/gbr-sync.ts). Fotos e textos seguem do console.
 export async function getServicosPublicos(): Promise<ServicoDB[]> {
+  return aplicarServicosSas(await getServicosDoConsole());
+}
+
+async function getServicosDoConsole(): Promise<ServicoDB[]> {
   try {
     const { data, error } = await supabasePublico.from("services").select("*").eq("ativo", true).order("ordem");
     if (error || !data || data.length === 0) throw error ?? new Error("vazio");

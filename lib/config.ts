@@ -27,7 +27,11 @@ export const CONTATO_PADRAO = {
   metaPixelId: "",
 };
 
-export type Contato = typeof CONTATO_PADRAO;
+export type Contato = typeof CONTATO_PADRAO & {
+  /** Preenchidos pelo GBR SAS quando a integração está ligada (lib/gbr-sync.ts). */
+  horarioLinhas?: string[];
+  horarioAvisoHoje?: string;
+};
 
 const RE_LEVA = /leva[\s-]+e[\s-]+tr[aá][sz]|buscamos (o carro )?e devolvemos/i;
 
@@ -78,3 +82,13 @@ export function whatsappLink(contato: Contato, mensagem?: string) {
 /** Serviços que saem com brinde (lixinho descartável + cheirinho de retrovisor) */
 export const SERVICOS_COM_BRINDE = ["lavagem-prata", "lavagem-ouro", "higienizacao"];
 export const TEXTO_BRINDE = "Brinde: lixinho descartável para o carro e cheirinho para pendurar no retrovisor.";
+
+/**
+ * Linhas de horário para mostrar no site. Com a integração do GBR SAS ligada
+ * vêm do sistema (lib/gbr-sync.ts → horarioLinhas); sem ela, dos dois campos
+ * digitados no console.
+ */
+export function linhasHorario(contato: Contato): string[] {
+  if (contato.horarioLinhas?.length) return contato.horarioLinhas;
+  return [contato.horarioSemana, contato.horarioSabado].filter(Boolean);
+}
