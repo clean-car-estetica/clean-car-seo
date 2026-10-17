@@ -30,7 +30,7 @@ export const FOTO_SERVICO: Record<string, string> = {
 export const FOTO_HERO = pexels(6872609, 1600); // carro preto recebendo espuma na loja
 export const FOTO_PADRAO = pexels(6872591, 800);
 
-const ehFotoAntiga = (url?: string | null) => !url || /images\.unsplash\.com/.test(url);
+export const ehFotoAntiga = (url?: string | null) => !url || /images\.unsplash\.com/.test(url);
 
 /** Foto do serviço: a do painel se for real; senão a escolhida aqui. */
 export function fotoServico(slug: string, url?: string | null): string {

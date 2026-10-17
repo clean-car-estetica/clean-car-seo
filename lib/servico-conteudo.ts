@@ -19,14 +19,15 @@ const GARANTIA_HIGIENIZACAO =
 export const CONTEUDO_SERVICO: Record<string, ConteudoServico> = {
   "lavagem-bronze": {
     paraQuem:
-      "Para quem usa o carro todo dia e quer mantê-lo limpo com frequência, gastando pouco e sem arriscar a pintura com escova ou pano reaproveitado.",
+      "Para quem quer tirar a sujeira de fora do carro rapidinho, em até 45 minutos, sem arriscar a pintura com escova ou pano reaproveitado. É só por fora: para limpar por dentro também, a lavagem certa é a Prata.",
     etapas: [
       { titulo: "Espuma densa", texto: "Lavagem com snow foam e shampoo neutro, que soltam a sujeira sem agredir o verniz." },
       { titulo: "Luva de microfibra", texto: "Esfregação com luva própria, que não deixa riscos finos na pintura." },
       { titulo: "Rodas e pneus", texto: "Limpeza das rodas e caixas de roda e pretinho nos pneus." },
-      { titulo: "Secagem e interior", texto: "Secagem com toalha macia, aspiração de manutenção e limpeza interna básica." },
+      { titulo: "Secagem", texto: "Secagem com toalha macia. Não inclui aspiração nem limpeza interna (isso começa na Lavagem Prata)." },
     ],
     perguntas: [
+      { pergunta: "A Lavagem Bronze limpa por dentro?", resposta: "Não. A Bronze é só externa, pronta em até 45 minutos. Para aspiração e limpeza interna, escolha a Lavagem Prata, que cuida do carro por dentro e por fora." },
       { pergunta: "Qual a diferença para um lava-rápido comum?", resposta: "O cuidado com a pintura: espuma densa, luva de microfibra e toalha macia, sem escova de nylon nem pano reaproveitado, que são o que causa os riscos finos no verniz." },
       { pergunta: "De quanto em quanto tempo devo lavar?", resposta: "Para quem usa o carro todo dia, a cada 1 ou 2 semanas. Quem lava com frequência economiza com os planos mensais." },
       { pergunta: "Preciso agendar?", resposta: "Sim, trabalhamos com hora marcada para você não esperar. O agendamento é rápido pelo WhatsApp." },

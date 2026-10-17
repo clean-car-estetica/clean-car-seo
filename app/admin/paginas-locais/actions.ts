@@ -6,7 +6,11 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 export async function salvarPaginaLocal(formData: FormData) {
   const service_slug = String(formData.get("service_slug"));
   const city_slug = String(formData.get("city_slug"));
-  const imagem_url = String(formData.get("imagem_url") || "");
+  // Mesma foto do serviço = sem foto própria (null): se a foto do serviço mudar
+  // depois, a página da cidade acompanha. Foto antiga do Unsplash também vira null.
+  const imagemEnviada = String(formData.get("imagem_url") || "");
+  const fotoDoServico = String(formData.get("imagem_servico") || "");
+  const imagem_url = imagemEnviada && imagemEnviada !== fotoDoServico && !/images\.unsplash\.com/.test(imagemEnviada) ? imagemEnviada : "";
   const paragrafos = [
     String(formData.get("paragrafo1") || ""),
     String(formData.get("paragrafo2") || ""),

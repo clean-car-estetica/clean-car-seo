@@ -1,5 +1,5 @@
 "use server";
-import { FOTO_PADRAO } from "@/lib/fotos";
+import { FOTO_PADRAO, fotoServico, ehFotoAntiga } from "@/lib/fotos";
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -14,7 +14,7 @@ export async function importarDadosPadrao() {
     descricao: s.descricao,
     duracao: s.duracao ?? null,
     preco_desde: s.precoDesde ?? null,
-    imagem_url: s.imagem,
+    imagem_url: fotoServico(s.slug, s.imagem),
     tag: s.tag ?? null,
     ordem: s.ordem,
     termo_popular: s.termoPopular ?? null,
@@ -74,7 +74,7 @@ export async function aplicarCatalogoNovo(
         if (error) throw new Error(`${s.nome}: ${error.message}`);
         atualizados += data?.length ?? 0;
       } else {
-        const { error } = await supabaseAdmin.from("services").insert({ slug: s.slug, imagem_url: s.imagem, ...campos });
+        const { error } = await supabaseAdmin.from("services").insert({ slug: s.slug, imagem_url: fotoServico(s.slug, s.imagem), ...campos });
         if (error) throw new Error(`${s.nome}: ${error.message}`);
         criados += 1;
       }
@@ -149,7 +149,8 @@ export async function atualizarServico(formData: FormData) {
   const nome = String(formData.get("nome"));
   const resumo = String(formData.get("resumo"));
   const descricao = String(formData.get("descricao"));
-  const imagem_url = String(formData.get("imagem_url"));
+  // Nunca grava de volta uma foto antiga do Unsplash: troca pela que o site mostra.
+  const imagem_url = fotoServico(slug, String(formData.get("imagem_url") || ""));
   const precoRaw = formData.get("preco_desde");
   const preco_desde = precoRaw ? Number(precoRaw) : null;
   const pontos_fidelidade = Number(formData.get("pontos_fidelidade") || 0);
@@ -164,4 +165,25 @@ export async function atualizarServico(formData: FormData) {
 
   if (error) throw new Error(error.message);
   revalidatePath("/admin/conteudo");
+}
+
+/**
+ * 17/10/2026: o site mostra as fotos novas (lib/fotos.ts) quando o banco ainda
+ * tem a foto antiga do Unsplash (ou nenhuma), mas o admin mostrava a do banco
+ * e, ao salvar, gravava a antiga de novo. Aqui o banco passa a guardar a mesma
+ * foto que aparece no site, para o admin mostrar e trocar a foto certa.
+ * Roda ao abrir a aba Serviços; não mexe em foto enviada pelo painel.
+ */
+export async function gravarFotosDoSiteNoBanco(): Promise<number> {
+  const { data, error } = await supabaseAdmin.from("services").select("slug, imagem_url");
+  if (error || !data) return 0;
+  let n = 0;
+  for (const s of data as { slug: string; imagem_url: string | null }[]) {
+    if (!ehFotoAntiga(s.imagem_url)) continue;
+    const nova = fotoServico(s.slug, s.imagem_url);
+    if (nova === (s.imagem_url || "")) continue;
+    const { error: e } = await supabaseAdmin.from("services").update({ imagem_url: nova }).eq("slug", s.slug);
+    if (!e) n++;
+  }
+  return n;
 }

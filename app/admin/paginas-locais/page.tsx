@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { getServicosPublicos, getCidadesPublicas, getConteudoLocalPublico } from "@/lib/site-data";
 import ImageUploader from "@/components/ImageUploader";
+import { fotoServico } from "@/lib/fotos";
 import { salvarPaginaLocal } from "./actions";
 
 export default async function PaginasLocaisPage({
@@ -72,10 +73,11 @@ export default async function PaginasLocaisPage({
       <form action={salvarPaginaLocal} className="bg-card border border-card-line rounded-2xl p-6 grid gap-4 max-w-2xl">
         <input type="hidden" name="service_slug" value={servicoSlug} />
         <input type="hidden" name="city_slug" value={cidadeSlug} />
+        <input type="hidden" name="imagem_servico" value={servico.imagem_url} />
 
         <ImageUploader
           name="imagem_url"
-          initialUrl={override?.imagem_url || servico.imagem_url}
+          initialUrl={fotoServico(servico.slug, override?.imagem_url || servico.imagem_url)}
           label={`Imagem de topo (${servico.nome} em ${cidade.nome})`}
           nomeArquivo={`${servico.nome} ${cidade.nome}`}
         />

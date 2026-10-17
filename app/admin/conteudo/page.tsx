@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { importarDadosPadrao, atualizarOrdemPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
+import { importarDadosPadrao, atualizarOrdemPadrao, atualizarServico, criarServico, excluirServico, gravarFotosDoSiteNoBanco } from "./actions";
+import { fotoServico } from "@/lib/fotos";
 import ImageUploader from "@/components/ImageUploader";
 import AplicarCatalogoButton from "@/components/AplicarCatalogoButton";
 import { getServicosSas, getVinculos, casarServicos, limparNome, duracaoSite, materializarServicosSas } from "@/lib/gbr-sync";
@@ -9,6 +10,7 @@ import { getServicosSas, getVinculos, casarServicos, limparNome, duracaoSite, ma
 export default async function ConteudoPage() {
   // 17/10/2026: serviço novo no SAS ganha cadastro aqui sozinho (para foto e texto).
   const criadosDoSas = await materializarServicosSas().catch(() => 0);
+  await gravarFotosDoSiteNoBanco().catch(() => 0);
   const { data: servicos, error } = await supabaseAdmin
     .from("services")
     .select("*")
@@ -97,7 +99,7 @@ export default async function ConteudoPage() {
             })()}
             <form action={atualizarServico} className="grid md:grid-cols-[160px_1fr] gap-5">
               <input type="hidden" name="slug" value={s.slug} />
-              <img src={s.imagem_url} alt={s.nome} className="w-full h-32 object-cover rounded-xl" />
+              <img src={fotoServico(s.slug, s.imagem_url)} alt={s.nome} className="w-full h-32 object-cover rounded-xl" />
               <div className="grid gap-3">
                 <input
                   name="nome"
@@ -116,7 +118,7 @@ export default async function ConteudoPage() {
                   className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm"
                 />
                 <div className="grid grid-cols-[1fr_140px] gap-3 items-end">
-                  <ImageUploader name="imagem_url" initialUrl={s.imagem_url} label="Foto do serviço" aspect={3 / 2} specTexto="1200x800px (proporção 3:2) — aparece em card e como banner da página do serviço" nomeArquivo={s.nome} />
+                  <ImageUploader name="imagem_url" initialUrl={fotoServico(s.slug, s.imagem_url)} label="Foto do serviço" aspect={3 / 2} specTexto="1200x800px (proporção 3:2) — aparece em card e como banner da página do serviço" nomeArquivo={s.nome} />
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wide text-steel-line mb-1">Preço "a partir de" (R$)</label>
                     <input
