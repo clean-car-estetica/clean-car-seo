@@ -1,6 +1,6 @@
 import { SITE_URL } from "@/lib/config";
 import type { MetadataRoute } from "next";
-import { servicos } from "@/lib/data";
+import { getServicosPublicos } from "@/lib/site-data";
 import { PAGINAS_LOCAIS } from "@/lib/paginas-locais";
 import { supabasePublico } from "@/lib/supabase";
 import { caminhoGuia, type TipoGuia } from "@/lib/guias";
@@ -73,7 +73,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // avaliação do site para baixo. Os bairros agora redirecionam para a
   // página do serviço; as cidades ficam acessíveis, mas sem indexar,
   // a menos que tenham texto próprio cadastrado em Páginas locais.
-  const slugs = new Set(servicos.map((s) => s.slug));
+  // 17/10/2026: os serviços vêm do SAS (novos entram, pausados saem).
+  const slugs = new Set((await getServicosPublicos()).map((s) => s.slug));
   for (const slug of slugs) {
     entradas.push({ url: `${BASE_URL}/servicos/${slug}`, lastModified: ULTIMA_ATUALIZACAO, changeFrequency: "monthly", priority: 0.8 });
   }

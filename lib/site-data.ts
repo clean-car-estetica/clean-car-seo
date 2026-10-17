@@ -43,16 +43,29 @@ export type ServicoDB = {
 // 17/10/2026: nome, preço, duração, destaque e pausa vêm do GBR SAS quando a
 // integração está ligada (lib/gbr-sync.ts). Fotos e textos seguem do console.
 export async function getServicosPublicos(): Promise<ServicoDB[]> {
-  return aplicarServicosSas(await getServicosDoConsole());
+  return apenasAtivos(await aplicarServicosSas(await getServicosDoConsole(), (slug) => fotoServico(slug, "")));
 }
 
+// Com a integração do SAS ligada, traz também os desligados no console:
+// quem decide se aparece é o SAS.
 async function getServicosDoConsole(): Promise<ServicoDB[]> {
   try {
-    const { data, error } = await supabasePublico.from("services").select("*").eq("ativo", true).order("ordem");
+    const { data, error } = await supabasePublico.from("services").select("*").order("ordem");
     if (error || !data || data.length === 0) throw error ?? new Error("vazio");
     return (data as ServicoDB[]).map((s) => ({ ...s, imagem_url: fotoServico(s.slug, s.imagem_url) }));
   } catch {
-    // Fallback: dados fixos do código, usados até a tabela ser populada no console
+    return padraoDoCodigo();
+  }
+}
+
+/** Sem SAS: só os ativos no console (como sempre foi). */
+export function apenasAtivos<T extends { ativo: boolean; sincronizadoSas?: boolean }>(lista: T[]): T[] {
+  return lista.filter((s) => s.sincronizadoSas || s.ativo !== false);
+}
+
+// Fallback: dados fixos do código, usados até a tabela ser populada no console
+function padraoDoCodigo(): ServicoDB[] {
+  {
     return [...servicosPadrao]
       .sort((a, b) => a.ordem - b.ordem)
       .map((s) => ({

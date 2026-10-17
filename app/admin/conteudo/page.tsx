@@ -4,9 +4,11 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { importarDadosPadrao, atualizarOrdemPadrao, atualizarServico, criarServico, excluirServico } from "./actions";
 import ImageUploader from "@/components/ImageUploader";
 import AplicarCatalogoButton from "@/components/AplicarCatalogoButton";
-import { getServicosSas, getVinculos, casarServicos, limparNome, duracaoSite } from "@/lib/gbr-sync";
+import { getServicosSas, getVinculos, casarServicos, limparNome, duracaoSite, materializarServicosSas } from "@/lib/gbr-sync";
 
 export default async function ConteudoPage() {
+  // 17/10/2026: serviço novo no SAS ganha cadastro aqui sozinho (para foto e texto).
+  const criadosDoSas = await materializarServicosSas().catch(() => 0);
   const { data: servicos, error } = await supabaseAdmin
     .from("services")
     .select("*")
@@ -20,7 +22,10 @@ export default async function ConteudoPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display font-bold text-3xl text-steel mb-1">Serviços</h1>
-          <p className="text-steel-line text-sm">Edite, crie ou remova serviços sem mexer em código.</p>
+          <p className="text-steel-line text-sm">
+            {doSas.size ? "Nome, preço, duração, destaque, ordem e pausa vêm do GBR SAS. Aqui você cuida da foto, do resumo, da descrição e dos textos de busca." : "Edite, crie ou remova serviços sem mexer em código."}
+          </p>
+          {criadosDoSas > 0 && <p className="text-ok text-sm mt-1">{criadosDoSas} serviço(s) novo(s) do sistema apareceram aqui. Coloque foto e descrição.</p>}
         </div>
         <div className="flex flex-wrap gap-2 justify-end">
           <AplicarCatalogoButton />
@@ -74,6 +79,11 @@ export default async function ConteudoPage() {
       <div className="grid gap-5">
         {servicos?.map((s) => (
           <div key={s.slug} id={`servico-${s.slug}`} className="bg-card border border-card-line rounded-2xl p-6 scroll-mt-4 target:border-verniz">
+            {sas && !doSas.get(s.slug) && (
+              <div className="mb-4 rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-xs text-steel">
+                <b>Não está no sistema</b> — não aparece no site. Cadastre o serviço no SAS (ou ligue a um existente em <a href="/admin/integracao-gbr" className="underline">Integração GBR</a>).
+              </div>
+            )}
             {doSas.get(s.slug) && (() => {
               const v = doSas.get(s.slug)!;
               return (

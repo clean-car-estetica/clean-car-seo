@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { supabasePublico } from "@/lib/supabase";
+import { slugify } from "@/lib/slug";
 
 /**
  * Sincronização com o GBR SAS (17/10/2026).
@@ -26,6 +27,7 @@ const CACHE_SEGUNDOS = 300;
 export type ServicoSas = {
   id: string;
   nome: string;
+  descricao?: string | null;
   preco: number | null;
   duracao: string | null;
   destaque: boolean;
@@ -125,17 +127,33 @@ export function duracaoSite(tempo: string | null): string | null {
 
 /**
  * Para cada serviço do site, qual serviço do SAS corresponde: o vínculo
- * escolhido no console ou, sem vínculo, o de mesmo nome.
+ * escolhido no console ou, sem vínculo, o de mesmo nome — ou nome parecido
+ * ("Higienização Interna VIP" × "Higienização Interna"), se só um servir.
  */
 export function casarServicos<T extends { slug: string; nome: string }>(site: T[], sas: ServicoSas[], vinculos: Vinculos): Map<string, ServicoSas> {
   const porId = new Map(sas.map((s) => [s.id, s]));
-  const porNome = new Map(sas.map((s) => [normalizarNome(limparNome(s.nome)), s]));
+  const nomeSas = new Map(sas.map((s) => [s.id, normalizarNome(limparNome(s.nome))]));
   const mapa = new Map<string, ServicoSas>();
+  const usados = new Set<string>();
+  // 1) vínculos escolhidos à mão
   for (const s of site) {
     const v = vinculos[s.slug];
-    if (v === "nenhum") continue;
-    const achado = v ? porId.get(v) : porNome.get(normalizarNome(s.nome));
-    if (achado) mapa.set(s.slug, achado);
+    if (v && v !== "nenhum" && porId.has(v) && !usados.has(v)) { mapa.set(s.slug, porId.get(v)!); usados.add(v); }
+  }
+  // 2) mesmo nome
+  for (const s of site) {
+    if (mapa.has(s.slug) || vinculos[s.slug]) continue;
+    const n = normalizarNome(s.nome);
+    const achado = sas.find((x) => !usados.has(x.id) && nomeSas.get(x.id) === n);
+    if (achado) { mapa.set(s.slug, achado); usados.add(achado.id); }
+  }
+  // 3) nome parecido: um contém o outro, palavra por palavra, e só há um candidato
+  const contem = (a: string, b: string) => (` ${a} `).includes(` ${b} `);
+  for (const s of site) {
+    if (mapa.has(s.slug) || vinculos[s.slug]) continue;
+    const n = normalizarNome(s.nome);
+    const cands = sas.filter((x) => !usados.has(x.id) && (contem(n, nomeSas.get(x.id)!) || contem(nomeSas.get(x.id)!, n)));
+    if (cands.length === 1) { mapa.set(s.slug, cands[0]); usados.add(cands[0].id); }
   }
   return mapa;
 }
@@ -145,42 +163,82 @@ const TAG_DESTAQUE = "Mais pedido";
 type ServicoSite = {
   slug: string;
   nome: string;
+  resumo: string;
+  descricao: string;
   duracao: string | null;
   preco_desde: number | null;
+  imagem_url: string;
   tag: string | null;
+  pontos_fidelidade: number;
+  ordem: number;
+  termo_popular: string | null;
   ativo: boolean;
 };
 
+function slugUnico(nome: string, ocupados: Set<string>): string {
+  const base = slugify(limparNome(nome)) || "servico";
+  let s = base, i = 2;
+  while (ocupados.has(s)) s = `${base}-${i++}`;
+  ocupados.add(s);
+  return s;
+}
+
+/** Primeira frase da descrição do SAS, para o resumo do card. */
+function resumoDe(descricao: string | null | undefined): string {
+  const t = String(descricao || "").replace(/\s+/g, " ").trim();
+  if (!t) return "";
+  const m = /^(.{20,160}?[.!?])(\s|$)/.exec(t);
+  return (m ? m[1] : t.slice(0, 140)).trim();
+}
+
 /**
- * Aplica o que vem do SAS por cima do cadastro do site. Pausado no SAS =
- * fora da lista. Sem integração ou com erro, devolve a lista como estava.
+ * 17/10/2026 (Glauber): o SAS manda nos serviços. Com a integração ligada,
+ * o site mostra exatamente os serviços ativos do SAS, na ordem do SAS, com
+ * nome, preço, duração e destaque do SAS. Do cadastro do site vêm só foto,
+ * descrição, resumo e textos de SEO (e o endereço da página, quando já
+ * existia). Serviço novo no SAS aparece sozinho (com a descrição do SAS até
+ * alguém escrever uma no console). Serviço que só existe no site some —
+ * a não ser que esteja marcado no console para continuar ("nenhum").
+ * Sem integração ou com erro, devolve a lista como estava.
  */
-export async function aplicarServicosSas<T extends ServicoSite>(lista: T[]): Promise<(T & { sincronizadoSas?: boolean })[]> {
+export async function aplicarServicosSas<T extends ServicoSite>(lista: T[], fotoPadrao?: (slug: string) => string): Promise<(T & { sincronizadoSas?: boolean; gbrServicoId?: string })[]> {
   const sas = await getServicosSas();
-  if (!sas) return lista;
-  const mapa = casarServicos(lista, sas, await getVinculos());
-  if (!mapa.size) return lista;
-  const algumDestaque = [...mapa.values()].some((s) => s.destaque);
-  return lista
-    .map((s) => {
-      const v = mapa.get(s.slug);
-      if (!v) return s;
-      let tag = s.tag;
-      if (algumDestaque) {
-        if (v.destaque && !tag) tag = TAG_DESTAQUE;
-        if (!v.destaque && tag === TAG_DESTAQUE) tag = null;
-      }
-      return {
-        ...s,
-        nome: limparNome(v.nome) || s.nome,
-        preco_desde: v.preco == null ? null : Math.round(Number(v.preco) * 100) / 100,
-        duracao: duracaoSite(v.duracao) ?? s.duracao,
-        tag,
-        ativo: v.ativo,
-        sincronizadoSas: true,
-      };
-    })
-    .filter((s) => s.ativo !== false);
+  if (!sas || !sas.length) return lista;
+  const vinculos = await getVinculos();
+  const mapa = casarServicos(lista, sas, vinculos);
+  const siteDoSas = new Map([...mapa.entries()].map(([slug, v]) => [v.id, lista.find((s) => s.slug === slug)!]));
+  const ocupados = new Set(lista.map((s) => s.slug));
+  const algumDestaque = sas.some((s) => s.destaque);
+  const saida: (T & { sincronizadoSas?: boolean; gbrServicoId?: string })[] = [];
+  sas.forEach((v, i) => {
+    if (!v.ativo) return;
+    const base = siteDoSas.get(v.id) ?? ({
+      slug: slugUnico(v.nome, ocupados), nome: limparNome(v.nome), resumo: resumoDe(v.descricao), descricao: v.descricao || "",
+      duracao: null, preco_desde: null, imagem_url: "", tag: null, pontos_fidelidade: 0, ordem: 0, termo_popular: null, ativo: true,
+    } as unknown as T);
+    let tag = base.tag;
+    if (algumDestaque) {
+      if (v.destaque && !tag) tag = TAG_DESTAQUE;
+      if (!v.destaque && tag === TAG_DESTAQUE) tag = null;
+    }
+    saida.push({
+      ...base,
+      nome: limparNome(v.nome) || base.nome,
+      preco_desde: v.preco == null ? null : Math.round(Number(v.preco) * 100) / 100,
+      duracao: duracaoSite(v.duracao) ?? base.duracao,
+      descricao: base.descricao || v.descricao || "",
+      resumo: base.resumo || resumoDe(v.descricao),
+      imagem_url: base.imagem_url || (fotoPadrao ? fotoPadrao(base.slug) : ""),
+      tag,
+      ordem: i + 1,
+      ativo: true,
+      sincronizadoSas: true,
+      gbrServicoId: v.id,
+    });
+  });
+  // Mantidos de propósito no console mesmo sem existir no SAS
+  for (const s of lista) if (vinculos[s.slug] === "nenhum" && s.ativo !== false) saida.push({ ...s, ordem: saida.length + 1 });
+  return saida;
 }
 
 // ── Horário de funcionamento ────────────────────────────────────────
@@ -257,4 +315,37 @@ export async function aplicarFuncionamentoSas<T extends ContatoBase>(contato: T)
     out.horarioAvisoHoje = avisoHoje(f);
   }
   return out;
+}
+
+/**
+ * Cria no cadastro do site (tabela services) os serviços do SAS que ainda
+ * não têm entrada, para o console poder pôr foto e descrição neles. Também
+ * grava o vínculo, para a página manter o mesmo endereço se o nome mudar.
+ * Só roda no console (usa a chave service_role). Devolve quantos criou.
+ */
+export async function materializarServicosSas(): Promise<number> {
+  const sas = await getServicosSas();
+  if (!sas?.length) return 0;
+  const { data: site } = await supabaseAdmin.from("services").select("slug, nome");
+  const lista = (site || []) as { slug: string; nome: string }[];
+  const vinculos = await getVinculos();
+  const mapa = casarServicos(lista, sas, vinculos);
+  const ligados = new Set([...mapa.values()].map((v) => v.id));
+  const ocupados = new Set(lista.map((s) => s.slug));
+  const novosVinculos: Vinculos = { ...vinculos };
+  for (const [slug, v] of mapa) if (!vinculos[slug]) novosVinculos[slug] = v.id; // fixa os ligados pelo nome
+  let criados = 0;
+  for (const [i, v] of sas.entries()) {
+    if (ligados.has(v.id) || !v.ativo) continue;
+    const slug = slugUnico(v.nome, ocupados);
+    const { error } = await supabaseAdmin.from("services").insert({
+      slug, nome: limparNome(v.nome), resumo: resumoDe(v.descricao), descricao: v.descricao || "",
+      imagem_url: "", ordem: i + 1, ativo: true, pontos_fidelidade: 0,
+    });
+    if (!error) { novosVinculos[slug] = v.id; criados++; }
+  }
+  if (JSON.stringify(novosVinculos) !== JSON.stringify(vinculos)) {
+    await supabaseAdmin.from("site_content").upsert({ section: "gbr_vinculos", data: novosVinculos, updated_at: new Date().toISOString() });
+  }
+  return criados;
 }

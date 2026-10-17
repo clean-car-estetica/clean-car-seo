@@ -43,7 +43,7 @@ globalThis.fetch = (async (url: string | URL | Request) => {
   return json({}, 404);
 }) as typeof fetch;
 
-const G = await import("../lib/gbr-sync.ts");
+const G = await import("../lib/gbr-sync" + ".ts");
 
 t("normaliza nome com emoji e acento", G.normalizarNome("🥇 Lavagem Ouro") === "lavagem ouro" && G.normalizarNome("Higienização") === "higienizacao");
 t("limpa emoji do nome", G.limparNome("🥉 Lavagem Bronze") === "Lavagem Bronze");
@@ -52,23 +52,35 @@ t("duração 45min", G.duracaoSite("45min") === "45min");
 t("duração 2h", G.duracaoSite("2h") === "2h");
 t("duração vazia", G.duracaoSite(null) === null && G.duracaoSite("abc") === null);
 
+const base = { resumo: "", descricao: "", imagem_url: "", pontos_fidelidade: 0, ordem: 0, termo_popular: null };
 const site = [
-  { slug: "lavagem-bronze", nome: "Lavagem Bronze", duracao: "45min", preco_desde: 45, tag: null, ativo: true },
-  { slug: "lavagem-ouro", nome: "Lavagem Ouro", duracao: "3h", preco_desde: 220, tag: "Mais pedido", ativo: true },
-  { slug: "higienizacao", nome: "Higienização Interna VIP", duracao: "8h", preco_desde: 420, tag: "Saúde da família", ativo: true },
-  { slug: "polimento", nome: "Polimento", duracao: "6h", preco_desde: 400, tag: null, ativo: true },
-  { slug: "estofados", nome: "Estofado", duracao: null, preco_desde: null, tag: "A domicílio", ativo: true },
-  { slug: "faróis", nome: "Restauração de Faróis", duracao: "2h", preco_desde: 200, tag: null, ativo: true },
+  { ...base, slug: "lavagem-bronze", nome: "Lavagem Bronze", duracao: "45min", preco_desde: 45, tag: null, ativo: true, descricao: "texto do site", imagem_url: "foto.jpg" },
+  { ...base, slug: "lavagem-ouro", nome: "Lavagem Ouro", duracao: "3h", preco_desde: 220, tag: "Mais pedido", ativo: true },
+  { ...base, slug: "higienizacao", nome: "Higienização Interna VIP", duracao: "8h", preco_desde: 420, tag: "Saúde da família", ativo: false },
+  { ...base, slug: "polimento", nome: "Polimento", duracao: "6h", preco_desde: 400, tag: null, ativo: true },
+  { ...base, slug: "estofados", nome: "Estofado a domicílio", duracao: null, preco_desde: null, tag: "A domicílio", ativo: true },
+  { ...base, slug: "farois", nome: "Restauração de Faróis", duracao: "2h", preco_desde: 200, tag: null, ativo: true },
 ];
-const r = await G.aplicarServicosSas(site);
+SAS_SERV.push({ id: "a6", nome: "✨ Cristalização de Vidros", preco: 180, duracao: "2h", destaque: false, ativo: true, descricao: "Remove manchas de chuva ácida dos vidros. Água escorre sozinha." } as never);
+vinculos = { estofados: "nenhum" };
+const r = await G.aplicarServicosSas(site, (slug) => `padrao-${slug}.jpg`);
 const por = (slug: string) => r.find((s) => s.slug === slug);
-t("preço e duração vêm do SAS", por("lavagem-bronze")?.preco_desde === 50 && por("lavagem-bronze")?.duracao === "1h");
-t("vínculo escolhido no console vence o nome", por("higienizacao")?.preco_desde === 450 && por("higienizacao")?.nome === "Higienização Interna");
+t("preço e duração vêm do SAS; foto e descrição do site", por("lavagem-bronze")?.preco_desde === 50 && por("lavagem-bronze")?.duracao === "1h" && por("lavagem-bronze")?.descricao === "texto do site" && por("lavagem-bronze")?.imagem_url === "foto.jpg");
+t("nome parecido liga sozinho (Higienização Interna VIP × Higienização Interna)", por("higienizacao")?.preco_desde === 450 && por("higienizacao")?.nome === "Higienização Interna");
+t("desligado no site mas ativo no SAS aparece", !!por("higienizacao"));
 t("pausado no SAS some do site", !por("polimento"));
-t("'não sincronizar' respeitado", por("estofados")?.preco_desde === null && por("estofados")?.sincronizadoSas !== true);
-t("sem par no SAS fica como estava", por("faróis")?.preco_desde === 200 && !por("faróis")?.sincronizadoSas);
+t("só no site some", !por("farois"));
+t("marcado para continuar sem SAS fica", por("estofados")?.preco_desde === null && !por("estofados")?.sincronizadoSas);
+t("serviço novo no SAS vira página sozinho", por("cristalizacao-de-vidros")?.preco_desde === 180 && por("cristalizacao-de-vidros")?.nome === "Cristalização de Vidros");
+t("serviço novo usa resumo e descrição do SAS e foto padrão", por("cristalizacao-de-vidros")?.resumo === "Remove manchas de chuva ácida dos vidros." && por("cristalizacao-de-vidros")?.imagem_url === "padrao-cristalizacao-de-vidros.jpg");
+t("ordem do SAS", r[0].slug === "lavagem-bronze" && r[1].slug === "lavagem-ouro" && r[2].slug === "higienizacao");
+t("serviço do SAS sem par no site também entra (Estofado, por estar 'nenhum' no site)", r.some((s) => s.gbrServicoId === "a5"));
 t("destaque do SAS tira 'Mais pedido' de quem não é destaque", por("lavagem-ouro")?.tag === null);
 t("destaque não apaga outra etiqueta", por("higienizacao")?.tag === "Saúde da família");
+vinculos = { farois: "a2" };
+const r1 = await G.aplicarServicosSas(site);
+t("vínculo à mão vence o nome", r1.find((s) => s.slug === "farois")?.preco_desde === 240 && !r1.find((s) => s.slug === "lavagem-ouro"));
+vinculos = {};
 
 sasFora = true;
 const r2 = await G.aplicarServicosSas(site);

@@ -105,8 +105,8 @@ export default async function IntegracaoGbrPage() {
             <div>
               <div className="font-display font-bold text-steel">Serviços do site × serviços do sistema</div>
               <p className="text-xs text-steel-line mt-1">
-                Nome, preço, duração, destaque e pausa vêm do serviço ligado. Por padrão o site liga pelo nome; troque aqui se o nome
-                for diferente nos dois. Foto e textos continuam em Serviços.
+                O site mostra só os serviços do sistema. Cada página do site é ligada sozinha ao serviço de mesmo nome (ou nome parecido);
+                serviço novo no sistema ganha página sozinho. Use esta lista só se uma página antiga ligou no serviço errado.
               </p>
             </div>
             {servicosSite.map((s) => {
@@ -117,7 +117,7 @@ export default async function IntegracaoGbrPage() {
                   <div>
                     <div className="text-steel font-bold text-sm">{s.nome}</div>
                     <div className="text-xs text-steel-line">
-                      {v ? `${v.preco == null ? "sob avaliação" : `R$ ${v.preco}`}${duracaoSite(v.duracao) ? ` · ${duracaoSite(v.duracao)}` : ""}${v.ativo ? "" : " · pausado (fora do site)"}` : "sem vínculo — usa o cadastro do site"}
+                      {v ? `${v.preco == null ? "sob avaliação" : `R$ ${v.preco}`}${duracaoSite(v.duracao) ? ` · ${duracaoSite(v.duracao)}` : ""}${v.ativo ? "" : " · pausado (fora do site)"}` : "não está no sistema — fora do site"}
                     </div>
                   </div>
                   <select name={`vinculo:${s.slug}`} defaultValue={escolhido} className="px-3 py-2 rounded-lg bg-carbon border border-card-line text-steel text-sm">
@@ -125,7 +125,7 @@ export default async function IntegracaoGbrPage() {
                     {sas.map((x) => (
                       <option key={x.id} value={x.id}>{limparNome(x.nome)}{x.ativo ? "" : " (pausado)"}</option>
                     ))}
-                    <option value="nenhum">Não sincronizar este serviço</option>
+                    <option value="nenhum">Manter no site mesmo sem estar no sistema</option>
                   </select>
                 </div>
               );
