@@ -122,6 +122,8 @@ export type Resultados = {
     ok: boolean;
     erro?: string;
     legado: boolean;
+    /** 18/10/2026: indicadores de mercado, pela contagem do site */
+    visitas_: { sessoes: number; sessoesUmaPagina: number; pessoasNovas: number };
     pessoas: number;
     visitas: number;
     contatos: number;
@@ -170,7 +172,7 @@ type Evento = {
   page_path: string;
   origem: string | null;
   created_at: string;
-  meta: { v?: number; vid?: string } | null;
+  meta: { v?: number; vid?: string; sid?: string; novo?: boolean } | null;
 };
 
 async function lerEventos(inicio: Date, fim: Date): Promise<Evento[]> {
@@ -206,11 +208,21 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
   const paginas = new Map<string, { visitas: number; contatos: number }>();
   const origens = new Map<string, { visitas: number; contatos: number }>();
   const canais = new Map<Canal, NumerosCanal & { vids: Set<string>; vidsContato: Set<string> }>();
+  const sessoes = new Map<string, { paginas: number; contato: boolean }>();
+  const novasSet = new Set<string>();
   let visitas = 0, whatsapp = 0, agendar = 0, formularios = 0;
 
   for (const e of base) {
     const dia = diaSP(e.created_at);
     const vid = e.meta?.vid;
+    const sid = e.meta?.sid;
+    if (sid) {
+      const ss = sessoes.get(sid) ?? { paginas: 0, contato: false };
+      if (e.event_type === "pageview") ss.paginas++;
+      if (ehContato(e.event_type)) ss.contato = true;
+      sessoes.set(sid, ss);
+    }
+    if (vid && e.meta?.novo) novasSet.add(vid);
     const contato = ehContato(e.event_type);
     const doGoogle = (e.origem || "").startsWith("Google");
     if (vid) pessoasSet.add(vid);
@@ -257,6 +269,12 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
 
   return {
     legado,
+    visitas_: {
+      sessoes: sessoes.size,
+      // "rejeição": visita que abriu uma página só e não clicou em nada
+      sessoesUmaPagina: [...sessoes.values()].filter((x) => x.paginas <= 1 && !x.contato).length,
+      pessoasNovas: novasSet.size,
+    },
     pessoas: pessoasSet.size,
     visitas,
     contatos: whatsapp + agendar + formularios,
@@ -410,7 +428,7 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
         return { ok: true, ...r, porCanalAntes: a.porCanal, contatosAntes: a.contatos, pessoasAntes: a.pessoas, visitasAntes: a.visitas, cliquesWhatsAntes: a.whatsapp + a.agendar, formulariosAntes: a.formularios };
       } catch (e) {
         return {
-          ok: false, erro: (e as Error).message, legado: false, pessoas: 0, pessoasAntes: 0, visitasAntes: 0, cliquesWhatsAntes: 0, formulariosAntes: 0, visitas: 0, contatos: 0, contatosAntes: 0,
+          ok: false, erro: (e as Error).message, legado: false, visitas_: { sessoes: 0, sessoesUmaPagina: 0, pessoasNovas: 0 }, pessoas: 0, pessoasAntes: 0, visitasAntes: 0, cliquesWhatsAntes: 0, formulariosAntes: 0, visitas: 0, contatos: 0, contatosAntes: 0,
           whatsapp: 0, agendar: 0, formularios: 0, pessoasGoogle: 0, porCanal: {}, porCanalAntes: {}, porDia: [], paginas: [], origens: [], recentes: [],
         };
       }

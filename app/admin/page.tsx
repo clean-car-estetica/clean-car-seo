@@ -305,18 +305,34 @@ function PorOrigem({ r }: { r: Resultados }) {
     const x = s.porCanal[k], y = a.porCanal[k];
     return Boolean((x && (x.pessoas || x.paginas)) || (y && (y.pessoas || y.paginas)));
   };
-  const canais = CANAIS_ORDEM.filter((k) => temDado(k) || (k === "google" && g.ok) || (k === "instagram" && ig?.ok))
+  const canaisOrdenados = () => CANAIS_ORDEM.filter((k) => temDado(k) || (k === "google" && g.ok) || (k === "instagram" && ig?.ok))
     .sort((x, y) => (s.porCanal[y]?.pessoas ?? 0) - (s.porCanal[x]?.pessoas ?? 0) || (a.porCanal[y]?.pessoas ?? 0) - (a.porCanal[x]?.pessoas ?? 0));
+  const canais = canaisOrdenados();
 
-  // Taxas do total: o que mais interessa no dia a dia
+  // Indicadores que empresas que medem resultado acompanham (pela contagem do site,
+  // que é a fonte sempre ligada), mais os do Google e do Instagram quando ligados.
   const tot = soma(s.porCanal);
   const pct1 = (x: number, y: number) => (y ? `${((x / y) * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%` : "—");
-  const taxas: [string, string][] = [
-    ["Das pessoas que abriram o site, clicaram no WhatsApp ou Agendar", pct1(tot.pessoasContato, tot.pessoas)],
-    ["Páginas abertas por pessoa", tot.pessoas ? (tot.paginas / tot.pessoas).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) : "—"],
-    ...(g.ok ? [["Das vezes que apareceu no Google, clicaram", pct1(g.cliques, g.aparicoes)] as [string, string]] : []),
-    ...(ig?.ok ? [["Das visitas ao perfil do Instagram, clicaram no link do site", pct1(ig.cliquesLinkSite ?? 0, ig.visitasPerfil ?? 0)] as [string, string]] : []),
+  const dec = (x: number) => x.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+  const vi = s.visitas_;
+  const indicadores: { nome: string; valor: string; ajuda: string }[] = [
+    { nome: "Taxa de conversão do site", valor: pct1(tot.pessoasContato, tot.pessoas), ajuda: "das pessoas que abriram o site, quantas clicaram no WhatsApp ou Agendar" },
+    { nome: "Contatos por dia", valor: dec(tot.pessoasContato / Math.max(1, dias)), ajuda: "pessoas que chamaram, em média, por dia" },
+    { nome: "Taxa de rejeição", valor: pct1(vi.sessoesUmaPagina, vi.sessoes), ajuda: "visitas que abriram uma página só e saíram sem clicar em nada (menor é melhor)" },
+    { nome: "Páginas por visita", valor: vi.sessoes ? dec(tot.paginas / vi.sessoes) : "—", ajuda: "quanto a pessoa navega antes de sair" },
+    { nome: "Visitantes novos", valor: pct1(vi.pessoasNovas, tot.pessoas), ajuda: "pessoas que entraram no site pela primeira vez" },
+    ...(g.ok ? [
+      { nome: "CTR no Google", valor: pct1(g.cliques, g.aparicoes), ajuda: "das vezes que o site apareceu na pesquisa, quantas viraram clique" },
+      { nome: "Posição média no Google", valor: g.posicao ? dec(g.posicao) : "—", ajuda: "1 a 10 = primeira página (menor é melhor)" },
+    ] : []),
+    ...(ig?.ok ? [{ nome: "Instagram: perfil → site", valor: pct1(ig.cliquesLinkSite ?? 0, ig.visitasPerfil ?? 0), ajuda: "das visitas ao perfil, quantas clicaram no link do site" }] : []),
   ];
+
+  // Resumo por canal: uma linha por origem, para comparar de relance
+  const resumo = canaisOrdenados().map((k) => {
+    const st = s.porCanal[k] ?? vazio, stA = s.porCanalAntes[k] ?? vazio;
+    return { k, pessoas: st.pessoas, va: variacao(st.pessoas, stA.pessoas), contato: st.pessoasContato, conv: pct1(st.pessoasContato, st.pessoas) };
+  }).filter((x) => x.pessoas || x.contato);
 
   const faltando = [
     !a.ok && "Google Analytics",
@@ -341,14 +357,47 @@ function PorOrigem({ r }: { r: Resultados }) {
         destaque
         linhas={[...linhasConsole(), ...linhasMeta(), ...linhasSite({ st: tot, stA: soma(s.porCanalAntes), an: soma(a.porCanal), anA: soma(a.porCanalAntes) })]}
         rodape={
-          <div className="mt-3 rounded-xl bg-carbon/60 p-3 grid gap-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-steel-line">Taxas (contagem do site)</p>
-            {taxas.map(([nome, v]) => (
-              <p key={nome} className="flex justify-between gap-3 text-sm"><span className="text-steel-line">{nome}</span><b className="text-steel tabular-nums shrink-0">{v}</b></p>
+          <div className="mt-3 rounded-xl bg-carbon/60 p-3 grid gap-2">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-steel-line">Indicadores (os que empresas que medem resultado acompanham)</p>
+            {indicadores.map((x) => (
+              <div key={x.nome} className="grid grid-cols-[1fr_auto] gap-x-3 items-baseline">
+                <span className="text-sm text-steel">{x.nome}</span>
+                <b className="font-display text-lg text-steel tabular-nums">{x.valor}</b>
+                <span className="col-span-2 text-[11px] text-steel-line leading-snug">{x.ajuda}</span>
+              </div>
             ))}
           </div>
         }
       />
+      {resumo.length > 0 && (
+        <div className="rounded-2xl border border-card-line bg-card p-4">
+          <h3 className="font-display font-bold text-lg text-steel mb-2">Resumo por canal</h3>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-[10px] uppercase tracking-wide text-steel-line">
+                <th className="pb-1 text-left font-bold">Canal</th>
+                <th className="pb-1 text-right font-bold">Pessoas</th>
+                <th className="pb-1 text-right font-bold">Chamaram</th>
+                <th className="pb-1 text-right font-bold">Conversão</th>
+              </tr>
+            </thead>
+            <tbody>
+              {resumo.map((x) => (
+                <tr key={x.k} className="border-t border-card-line">
+                  <td className="py-2 text-steel">{TITULO_CANAL[x.k].replace("Vieram do ", "").replace("Vieram de ", "")}</td>
+                  <td className="py-2 text-right tabular-nums">
+                    <b className="text-steel">{n(x.pessoas)}</b>
+                    {x.va && <span className={`ml-1 text-[11px] font-bold ${x.va.cor}`}>{x.va.texto}</span>}
+                  </td>
+                  <td className="py-2 text-right tabular-nums text-steel">{n(x.contato)}</td>
+                  <td className="py-2 text-right tabular-nums text-steel">{x.conv}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="text-[11px] text-steel-line mt-2">Contagem do site. &quot;Chamaram&quot; = pessoas que clicaram no WhatsApp ou Agendar. A % ao lado das pessoas compara com o período anterior.</p>
+        </div>
+      )}
       <div className="grid gap-4 lg:grid-cols-2">
         {canais.map((k) => (
           <CartaoOrigem
@@ -551,12 +600,20 @@ export default async function Resultados({
       {/* ═════════ TUDO POR ORIGEM ═════════ */}
       <Secao
         cor="neutro"
-        titulo="Tudo por origem"
-        sub="Uma visão só: de onde cada pessoa veio e o que fez no site. Em cada número, o que o Site, o Analytics e o Search Console contaram."
+        titulo="Resultado do período"
+        sub="Tudo numa visão só: o resultado geral, os indicadores, o resumo por canal e o detalhe de cada origem. Vale para o período escolhido no topo, comparado com o período anterior do mesmo tamanho."
       >
         <PorOrigem r={r} />
       </Secao>
 
+      {/* 18/10/2026: os detalhes de cada fonte ficam recolhidos; a visão unificada fica no topo */}
+      <details className="group grid gap-6">
+        <summary className="cursor-pointer list-none rounded-2xl border border-card-line bg-card px-5 py-4 font-display font-bold text-steel flex items-center justify-between">
+          Ver os detalhes de cada fonte (gráficos, buscas, páginas, últimos cliques)
+          <span className="text-xs font-sans text-steel-line group-open:hidden">abrir</span>
+          <span className="text-xs font-sans text-steel-line hidden group-open:inline">fechar</span>
+        </summary>
+        <div className="grid gap-6 mt-6">
       {/* ═════════ 1. CONTADO PELO PRÓPRIO SITE ═════════ */}
       <Secao
         cor="ok"
@@ -787,6 +844,9 @@ export default async function Resultados({
       >
         <Comparacao r={r} />
       </Secao>
+
+        </div>
+      </details>
 
       <p className="text-xs text-steel-line">
         Os números do Google são atualizados a cada 30 minutos; os do próprio site, a cada vez que você abre esta página.
