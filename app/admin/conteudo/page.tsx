@@ -25,7 +25,7 @@ export default async function ConteudoPage() {
         <div>
           <h1 className="font-display font-bold text-3xl text-steel mb-1">Serviços</h1>
           <p className="text-steel-line text-sm">
-            {doSas.size ? "Nome, preço, duração, destaque, ordem e pausa vêm do GBR SAS. Aqui você cuida da foto, do resumo, da descrição e dos textos de busca." : "Edite, crie ou remova serviços sem mexer em código."}
+            {doSas.size ? "Nome, preço, duração, pontos de fidelidade, destaque, ordem e pausa vêm do GBR SAS. Aqui você cuida da foto, do resumo, da descrição e dos textos de busca." : "Edite, crie ou remova serviços sem mexer em código."}
           </p>
           {criadosDoSas > 0 && <p className="text-ok text-sm mt-1">{criadosDoSas} serviço(s) novo(s) do sistema apareceram aqui. Coloque foto e descrição.</p>}
         </div>
@@ -92,7 +92,8 @@ export default async function ConteudoPage() {
                 <div className="mb-4 rounded-xl border border-ok/30 bg-ok/10 px-4 py-3 text-xs text-steel">
                   <b>Ligado ao GBR SAS ({limparNome(v.nome)}).</b> No site aparece: {v.preco == null ? "sob avaliação" : `R$ ${v.preco}`}
                   {duracaoSite(v.duracao) ? ` · ${duracaoSite(v.duracao)}` : ""}{v.destaque ? " · Mais pedido" : ""}
-                  {v.ativo ? "" : " · PAUSADO no sistema (fora do site)"}. Nome, preço, duração, destaque e pausa mudam no
+                  {typeof v.pontos === "number" ? ` · ${v.pontos} pontos de fidelidade` : ""}
+                  {v.ativo ? "" : " · PAUSADO no sistema (fora do site)"}. Nome, preço, duração, pontos, destaque e pausa mudam no
                   sistema; foto e textos, aqui. <a href="/admin/integracao-gbr" className="underline">Trocar vínculo</a>
                 </div>
               );

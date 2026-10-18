@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getPromocoes } from "@/lib/site-content";
+import { getPromocoesDoConsole } from "@/lib/site-content";
 import { salvarPromocao } from "./actions";
 
 function FormPromo({
@@ -49,14 +49,16 @@ function FormPromo({
 }
 
 export default async function PromocoesAdminPage() {
-  const promocoes = await getPromocoes();
+  const promocoes = await getPromocoesDoConsole();
 
   return (
     <div>
       <h1 className="font-display font-bold text-3xl text-steel mb-1">Promoções</h1>
       <p className="text-steel-line text-sm mb-6">
         Edite o benefício e as regras do cupom de primeira visita e do Indique e Ganhe.
-        Se a regra do GBR Sistemas mudar, atualize aqui também pra manter tudo igual.
+        Os pontos do Indique e Ganhe vêm do GBR SAS (Fidelidade → Indique e Ganhe) quando a integração
+        está ligada: o número que você escrever aqui é trocado pelo do SAS no site. Se quiser, use{" "}
+        <code>{"{pontos_indicador}"}</code> e <code>{"{pontos_indicado}"}</code> no texto.
       </p>
       <div className="grid gap-6 max-w-2xl">
         <FormPromo chave="cupom" titulo="Cupom de primeira visita" promo={promocoes.cupom} mostrarPausa />

@@ -47,9 +47,12 @@ export default async function BeneficiosPage() {
               <h2 className="font-display font-bold text-xl text-steel mb-4">Benefícios</h2>
               <div className="bg-card border border-card-line rounded-2xl overflow-hidden">
                 {beneficios.map((b, i) => (
-                  <div key={b.id} className={`flex justify-between px-5 py-3 text-sm ${i > 0 ? "border-t border-card-line" : ""}`}>
-                    <span className="text-steel-line">{b.nome}</span>
-                    <span className="font-display font-bold text-cera">{b.pontos_necessarios} pontos</span>
+                  <div key={b.id} className={`flex justify-between gap-4 px-5 py-3 text-sm ${i > 0 ? "border-t border-card-line" : ""}`}>
+                    <span className="text-steel-line">
+                      {b.nome}
+                      {b.descricao && <span className="block text-xs text-steel-line/70 mt-0.5">{b.descricao}</span>}
+                    </span>
+                    <span className="font-display font-bold text-cera whitespace-nowrap">{b.pontos_necessarios} pontos</span>
                   </div>
                 ))}
               </div>

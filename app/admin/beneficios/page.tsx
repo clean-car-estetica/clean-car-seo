@@ -14,6 +14,13 @@ export default async function BeneficiosAdminPage() {
         ficam na aba <strong>Serviços</strong>.
       </p>
 
+      <div className="bg-verniz/10 border border-verniz/30 text-steel rounded-xl p-4 mb-6 text-sm">
+        <strong>Com a integração do GBR SAS ligada</strong>, o site mostra os benefícios cadastrados no SAS
+        (Fidelidade → Regras) e os pontos de cada serviço do SAS — mude lá e o site acompanha em até 5 minutos
+        (ou na hora, pelo botão &quot;Atualizar agora&quot; em Integração GBR). A lista abaixo só vale se a
+        integração estiver desligada.
+      </div>
+
       {error && (
         <div className="bg-warn/10 border border-warn/30 text-warn rounded-xl p-4 mb-6 text-sm">
           Não consegui ler `beneficios` ({error.message}). Confirme se rodou o schema.sql atualizado.

@@ -1,7 +1,7 @@
 import { supabasePublico } from "@/lib/supabase";
 import { servicos as servicosPadrao, cidades as cidadesPadrao } from "@/lib/data";
 import { fotoServico } from "@/lib/fotos";
-import { aplicarServicosSas } from "@/lib/gbr-sync";
+import { aplicarServicosSas, getProgramaFidelidadeSas, type BeneficioSas } from "@/lib/gbr-sync";
 
 export type CidadeDB = {
   slug: string;
@@ -170,9 +170,29 @@ export async function getPlanosPublicos(): Promise<PlanoDB[]> {
   }
 }
 
-export type BeneficioDB = { id: number; nome: string; pontos_necessarios: number };
+export type BeneficioDB = { id: number | string; nome: string; pontos_necessarios: number; descricao?: string | null; sincronizadoSas?: boolean };
 
+/** Texto curto do benefício a partir do tipo cadastrado no SAS. */
+function detalheBeneficio(b: BeneficioSas): string | null {
+  if (b.descricao) return b.descricao;
+  if (b.tipo === "servico_gratis" && b.servicoGratis) return `${b.servicoGratis} grátis`;
+  if (b.tipo === "desconto_pct" && b.descontoValor) return `${b.descontoValor}% de desconto`;
+  if (b.tipo === "desconto_valor" && b.descontoValor) return `R$ ${b.descontoValor.toFixed(2).replace(".", ",")} de desconto`;
+  return null;
+}
+
+/**
+ * 18/10/2026: com a integração do SAS ligada, os benefícios são os do SAS
+ * (Fidelidade → Regras). Sem integração ou com erro, os do console.
+ */
 export async function getBeneficiosPublicos(): Promise<BeneficioDB[]> {
+  const sas = await getProgramaFidelidadeSas();
+  if (sas) {
+    return sas.beneficios.map((b) => {
+      const detalhe = detalheBeneficio(b);
+      return { id: b.id, nome: b.nome, pontos_necessarios: b.pontos, descricao: detalhe && detalhe !== b.nome ? detalhe : null, sincronizadoSas: true };
+    });
+  }
   try {
     const { data, error } = await supabasePublico.from("beneficios").select("*").order("pontos_necessarios");
     if (error) throw error;

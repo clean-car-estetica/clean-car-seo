@@ -22,7 +22,32 @@ export const PROMOCOES_PADRAO: Record<"cupom" | "indicacao", Promocao> = {
   },
 };
 
+/**
+ * 18/10/2026: o que o site mostra. Com a integração do SAS ligada, os pontos
+ * do Indique e Ganhe são os do SAS (os textos continuam os do console).
+ */
 export async function getPromocoes(): Promise<Record<"cupom" | "indicacao", Promocao>> {
+  const promocoes = await getPromocoesDoConsole();
+  try {
+    const { getProgramaFidelidadeSas, pontosNoTexto } = await import("@/lib/gbr-sync");
+    const ind = (await getProgramaFidelidadeSas())?.indicacao;
+    if (!ind) return promocoes;
+    const i = promocoes.indicacao;
+    return {
+      ...promocoes,
+      indicacao: {
+        ...i,
+        texto: pontosNoTexto(i.texto, ind.pontosIndicador, "pontos_indicador"),
+        regras: pontosNoTexto(i.regras, ind.pontosIndicado, "pontos_indicado"),
+      },
+    };
+  } catch {
+    return promocoes;
+  }
+}
+
+/** Como está cadastrado no console, sem os números do SAS (é o que o console edita). */
+export async function getPromocoesDoConsole(): Promise<Record<"cupom" | "indicacao", Promocao>> {
   try {
     const { data, error } = await supabasePublico.from("promocoes").select("*");
     if (error) throw error;

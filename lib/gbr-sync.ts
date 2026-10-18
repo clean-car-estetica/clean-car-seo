@@ -9,7 +9,9 @@ import { slugify } from "@/lib/slug";
  * - serviços: nome, preço, duração, destaque ("Mais pedido") e pausa
  *   (serviço pausado no SAS some do site);
  * - horário de funcionamento, feriados, horários especiais e fechamentos;
- * - leva e traz (pausado no SAS = some do site).
+ * - leva e traz (pausado no SAS = some do site);
+ * - fidelidade (18/10/2026): pontos por serviço, benefícios (regras de
+ *   resgate) e pontos do Indique e Ganhe.
  *
  * O que continua SÓ no console do site: fotos, descrições, textos de SEO.
  *
@@ -34,6 +36,8 @@ export type ServicoSas = {
   duracao: string | null;
   destaque: boolean;
   ativo: boolean;
+  /** Pontos de fidelidade que o serviço credita (18/10/2026). Ausente em SAS antigo. */
+  pontos?: number;
 };
 
 export type DiaSemanaSas = { dia: string; nome: string; aberto: boolean; inicio: string | null; fim: string | null };
@@ -234,6 +238,8 @@ export async function aplicarServicosSas<T extends ServicoSite>(lista: T[], foto
       resumo: base.resumo || resumoDe(v.descricao),
       imagem_url: base.imagem_url || (fotoPadrao ? fotoPadrao(base.slug) : ""),
       tag,
+      // 18/10/2026: os pontos que aparecem no site são os mesmos que o Caixa credita.
+      pontos_fidelidade: typeof v.pontos === "number" ? v.pontos : base.pontos_fidelidade,
       ordem: i + 1,
       ativo: true,
       sincronizadoSas: true,
@@ -243,6 +249,40 @@ export async function aplicarServicosSas<T extends ServicoSite>(lista: T[], foto
   // Mantidos de propósito no console mesmo sem existir no SAS
   for (const s of lista) if (vinculos[s.slug] === "nenhum" && s.ativo !== false) saida.push({ ...s, ordem: saida.length + 1 });
   return saida;
+}
+
+// ── Fidelidade (18/10/2026) ─────────────────────────────────────────
+
+export type BeneficioSas = {
+  id: string;
+  nome: string;
+  pontos: number;
+  tipo: string | null;
+  descontoValor: number | null;
+  servicoGratis: string | null;
+  descricao: string | null;
+};
+export type ProgramaFidelidadeSas = {
+  beneficios: BeneficioSas[];
+  indicacao: { ativo: boolean; pontosIndicador: number; pontosIndicado: number } | null;
+};
+
+/** Regras de resgate e Indique e Ganhe cadastrados no SAS. null = sem integração/erro. */
+export async function getProgramaFidelidadeSas(): Promise<ProgramaFidelidadeSas | null> {
+  const r = await buscar<ProgramaFidelidadeSas>("/beneficios");
+  return r && Array.isArray(r.beneficios) ? r : null;
+}
+
+/**
+ * Troca o número de pontos dos textos do Indique e Ganhe pelos do SAS.
+ * Aceita {pontos_indicador}/{pontos_indicado} no texto ou, em texto antigo
+ * com número digitado ("ganha 20 pontos"), troca o número: o texto "Já sou
+ * cliente" fala do indicador e as regras de "Recebi um código", do indicado.
+ */
+export function pontosNoTexto(texto: string, pontos: number, token: "pontos_indicador" | "pontos_indicado"): string {
+  const t = String(texto || "");
+  if (t.includes(`{${token}}`)) return t.split(`{${token}}`).join(String(pontos));
+  return t.replace(/\b\d+(\s*pontos?)\b/gi, (_m, sufixo: string) => `${pontos}${pontos === 1 ? sufixo.replace(/s$/i, "") : sufixo.replace(/o$/i, "os")}`);
 }
 
 // ── Horário de funcionamento ────────────────────────────────────────
