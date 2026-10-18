@@ -1,5 +1,10 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { consultarAnalytics, consultarSearchConsole, googleConfigurado } from "@/lib/google";
+import { canalDoAnalytics, canalDoSite, type Canal } from "@/lib/canais";
+
+/** Números de um canal (Google, Instagram...) numa fonte. */
+export type NumerosCanal = { pessoas: number; paginas: number; whatsapp: number; agendar: number; formularios: number };
+const zeroCanal = (): NumerosCanal => ({ pessoas: 0, paginas: 0, whatsapp: 0, agendar: 0, formularios: 0 });
 
 // Junta as três fontes do painel de Resultados:
 //   Google (Search Console): quantas vezes o site apareceu e foi clicado na busca
@@ -100,6 +105,8 @@ export type Resultados = {
     formularios: number;
     /** Pessoas do canal "Organic Search" */
     pessoasBuscaGoogle: number;
+    /** 18/10/2026: tudo por canal de origem, na contagem do Analytics (sessionSource) */
+    porCanal: Partial<Record<Canal, NumerosCanal>>;
     porDia: { data: string; pessoas: number }[];
     canais: { nome: string; pessoas: number }[];
     aparelhos: { nome: string; pessoas: number }[];
@@ -127,6 +134,8 @@ export type Resultados = {
     porDia: { data: string; contatos: number; pessoas: number; pessoasGoogle: number }[];
     paginas: { caminho: string; visitas: number; contatos: number }[];
     origens: { nome: string; visitas: number; contatos: number }[];
+    /** 18/10/2026: tudo por canal de origem, na contagem do site */
+    porCanal: Partial<Record<Canal, NumerosCanal>>;
     recentes: { quando: string; tipo: string; caminho: string; origem: string }[];
   };
   conexao: ReturnType<typeof googleConfigurado>;
@@ -186,6 +195,7 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
   const porDia = new Map(dias.map((d) => [d, { contatos: 0, pessoas: new Set<string>(), google: new Set<string>() }]));
   const paginas = new Map<string, { visitas: number; contatos: number }>();
   const origens = new Map<string, { visitas: number; contatos: number }>();
+  const canais = new Map<Canal, NumerosCanal & { vids: Set<string> }>();
   let visitas = 0, whatsapp = 0, agendar = 0, formularios = 0;
 
   for (const e of base) {
@@ -211,6 +221,15 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
     if (contato) p.contatos++;
     paginas.set(e.page_path, p);
 
+    const canal = canalDoSite(e.origem);
+    const c = canais.get(canal) ?? { ...zeroCanal(), vids: new Set<string>() };
+    if (vid) c.vids.add(vid);
+    if (e.event_type === "pageview") c.paginas++;
+    if (e.event_type === "click_whatsapp") c.whatsapp++;
+    if (e.event_type === "click_agendar") c.agendar++;
+    if (e.event_type === "form_submit") c.formularios++;
+    canais.set(canal, c);
+
     const nomeOrigem = e.origem || "Desconhecida";
     const o = origens.get(nomeOrigem) ?? { visitas: 0, contatos: 0 };
     if (e.event_type === "pageview") o.visitas++;
@@ -234,6 +253,7 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
     agendar,
     formularios,
     pessoasGoogle: googleSet.size,
+    porCanal: Object.fromEntries([...canais.entries()].map(([k, { vids, ...v }]) => [k, { ...v, pessoas: vids.size }])) as Partial<Record<Canal, NumerosCanal>>,
     porDia: [...porDia.entries()].map(([data, v]) => ({ data, contatos: v.contatos, pessoas: v.pessoas.size, pessoasGoogle: v.google.size })),
     paginas: [...paginas.entries()]
       .map(([caminho, v]) => ({ caminho, ...v }))
@@ -263,7 +283,7 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
     ok: false, aparicoes: 0, cliques: 0, posicao: 0, aparicoesAntes: 0, cliquesAntes: 0, completoAte: "", parcial: false, semComparacao: false, porDia: [], buscas: [], paginas: [],
   };
   const vazioGA: Resultados["analytics"] = {
-    ok: false, pessoas: 0, pessoasAntes: 0, novas: 0, paginasVistas: 0, cliquesWhats: 0, formularios: 0, pessoasBuscaGoogle: 0, porDia: [], canais: [], aparelhos: [], cidades: [],
+    ok: false, pessoas: 0, pessoasAntes: 0, novas: 0, paginasVistas: 0, cliquesWhats: 0, formularios: 0, pessoasBuscaGoogle: 0, porCanal: {}, porDia: [], canais: [], aparelhos: [], cidades: [],
   };
 
   const [google, analytics, site] = await Promise.all([
@@ -313,7 +333,7 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
     (async (): Promise<Resultados["analytics"]> => {
       if (!conexao.conta || !conexao.ga4) return { ...vazioGA, erro: "nao-configurado" };
       try {
-        const [total, antes, porDia, canais, aparelhos, cidades, eventos] = await Promise.all([
+        const [total, antes, porDia, canais, aparelhos, cidades, eventos, fontes, eventosFonte] = await Promise.all([
           consultarAnalytics({ inicio, fim, metricas: ["activeUsers", "newUsers", "screenPageViews"] }),
           consultarAnalytics({ inicio: iso(antesInicio), fim: iso(antesFim), metricas: ["activeUsers"] }),
           consultarAnalytics({ inicio, fim, dimensoes: ["date"], metricas: ["activeUsers"] }),
@@ -321,7 +341,22 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
           consultarAnalytics({ inicio, fim, dimensoes: ["deviceCategory"], metricas: ["activeUsers"] }),
           consultarAnalytics({ inicio, fim, dimensoes: ["city"], metricas: ["activeUsers"], limite: 10 }),
           consultarAnalytics({ inicio, fim, dimensoes: ["eventName"], metricas: ["eventCount"], filtroEvento: ["click_whatsapp", "click_agendar", "form_submit"] }).catch(() => []),
+          consultarAnalytics({ inicio, fim, dimensoes: ["sessionSource"], metricas: ["activeUsers", "screenPageViews"], limite: 100 }).catch(() => []),
+          consultarAnalytics({ inicio, fim, dimensoes: ["sessionSource", "eventName"], metricas: ["eventCount"], limite: 200, filtroEvento: ["click_whatsapp", "click_agendar", "form_submit"] }).catch(() => []),
         ]);
+        const porCanalGA: Partial<Record<Canal, NumerosCanal>> = {};
+        for (const r of fontes) {
+          const c = (porCanalGA[canalDoAnalytics(r.dims[0])] ??= zeroCanal());
+          c.pessoas += r.vals[0] ?? 0;
+          c.paginas += r.vals[1] ?? 0;
+        }
+        for (const r of eventosFonte) {
+          const c = (porCanalGA[canalDoAnalytics(r.dims[0])] ??= zeroCanal());
+          const n = r.vals[0] ?? 0;
+          if (r.dims[1] === "click_whatsapp") c.whatsapp += n;
+          if (r.dims[1] === "click_agendar") c.agendar += n;
+          if (r.dims[1] === "form_submit") c.formularios += n;
+        }
         const contaEvento = (...nomes: string[]) => eventos.filter((r) => nomes.includes(r.dims[0])).reduce((t, r) => t + (r.vals[0] ?? 0), 0);
         const mapaDia = new Map(porDia.map((r) => [`${r.dims[0].slice(0, 4)}-${r.dims[0].slice(4, 6)}-${r.dims[0].slice(6, 8)}`, r.vals[0]]));
         return {
@@ -331,6 +366,7 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
           paginasVistas: total[0]?.vals[2] ?? 0,
           cliquesWhats: contaEvento("click_whatsapp", "click_agendar"),
           formularios: contaEvento("form_submit"),
+          porCanal: porCanalGA,
           pessoasBuscaGoogle: canais.filter((r) => r.dims[0] === "Organic Search").reduce((t, r) => t + (r.vals[0] ?? 0), 0),
           pessoasAntes: antes[0]?.vals[0] ?? 0,
           porDia: dias.map((d) => ({ data: d, pessoas: mapaDia.get(d) ?? 0 })),
@@ -354,7 +390,7 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
       } catch (e) {
         return {
           ok: false, erro: (e as Error).message, legado: false, pessoas: 0, pessoasAntes: 0, visitasAntes: 0, cliquesWhatsAntes: 0, formulariosAntes: 0, visitas: 0, contatos: 0, contatosAntes: 0,
-          whatsapp: 0, agendar: 0, formularios: 0, pessoasGoogle: 0, porDia: [], paginas: [], origens: [], recentes: [],
+          whatsapp: 0, agendar: 0, formularios: 0, pessoasGoogle: 0, porCanal: {}, porDia: [], paginas: [], origens: [], recentes: [],
         };
       }
     })(),

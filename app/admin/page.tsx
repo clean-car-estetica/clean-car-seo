@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Search, MousePointerClick, Users, MessageCircle, Plug, Lightbulb, Minus } from "lucide-react";
 import { calcularPeriodo, carregarResultados, type Busca, type Resultados } from "@/lib/metricas";
 import GraficoDiario from "@/components/admin/GraficoDiario";
+import { CANAIS_ORDEM, type Canal } from "@/lib/canais";
+import type { NumerosCanal } from "@/lib/metricas";
 
 const n = (v: number) => Math.round(v).toLocaleString("pt-BR");
 const pct = (v: number) => `${(v * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
@@ -187,6 +189,95 @@ function DeOndeVem() {
         Exemplo: um cliente pesquisa no Google, entra no site e clica no WhatsApp. Na hora, a parte 1 (site) mostra a visita vinda do Google e o clique no WhatsApp. Em algumas horas o Analytics (parte 2) também conta. Dois ou três dias depois, o Search Console (parte 3) mostra o clique dele no resultado do Google. Na parte 4 você vê os três lado a lado.
       </p>
     </details>
+  );
+}
+
+const TITULO_CANAL: Record<Canal, string> = {
+  google: "Vieram do Google", bing: "Vieram do Bing", instagram: "Vieram do Instagram", facebook: "Vieram do Facebook",
+  whatsapp: "Vieram de link no WhatsApp", ia: "Vieram do ChatGPT e outras IAs", direto: "Direto (link salvo ou digitado)", outros: "Vieram de outros sites",
+};
+
+type LinhaOrigem = { nome: string; site?: number; analytics?: number; console?: string };
+
+function TabelaOrigem({ titulo, linhas, destaque, analyticsOk }: { titulo: string; linhas: LinhaOrigem[]; destaque?: boolean; analyticsOk: boolean }) {
+  const col = "py-1.5 px-2 text-right tabular-nums";
+  return (
+    <div className={`rounded-2xl border p-4 min-w-0 ${destaque ? "border-verniz/50 bg-card" : "border-card-line bg-card"}`}>
+      <h3 className="font-display font-bold text-lg text-steel mb-2">{titulo}</h3>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-[10px] uppercase tracking-wide">
+            <th className="pb-1 px-2 text-left font-bold text-steel-line">Métrica</th>
+            <th className="pb-1 px-2 text-right font-bold text-ok">Site</th>
+            <th className="pb-1 px-2 text-right font-bold text-cera">Analytics</th>
+            <th className="pb-1 px-2 text-right font-bold text-verniz-shine">Console</th>
+          </tr>
+        </thead>
+        <tbody>
+          {linhas.map((l) => (
+            <tr key={l.nome} className="border-t border-card-line">
+              <td className="py-1.5 px-2 text-steel">{l.nome}</td>
+              <td className={`${col} font-bold text-steel`}>{l.site === undefined ? "—" : n(l.site)}</td>
+              <td className={`${col} text-steel`}>{l.analytics === undefined ? "—" : analyticsOk ? n(l.analytics) : "não ligado"}</td>
+              <td className={`${col} text-steel`}>{l.console ?? "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/**
+ * 18/10/2026: tudo numa visão só, por origem. Um cartão por canal (Google,
+ * Instagram, direto...) com todas as métricas, e em cada uma o número de cada
+ * fonte lado a lado: Site, Analytics e Search Console.
+ */
+function PorOrigem({ r }: { r: Resultados }) {
+  const { site: s, analytics: a, google: g } = r;
+  const cliquesGoogle = g.porDia.reduce((t, d) => t + d.cliques, 0);
+  const aparicoes = g.porDia.reduce((t, d) => t + d.aparicoes, 0);
+  const parcial = g.ok && g.parcial ? "*" : "";
+  const soma = (m: Partial<Record<Canal, NumerosCanal>>) => Object.values(m).reduce<NumerosCanal>((t, c) => ({
+    pessoas: t.pessoas + (c?.pessoas ?? 0), paginas: t.paginas + (c?.paginas ?? 0), whatsapp: t.whatsapp + (c?.whatsapp ?? 0),
+    agendar: t.agendar + (c?.agendar ?? 0), formularios: t.formularios + (c?.formularios ?? 0),
+  }), { pessoas: 0, paginas: 0, whatsapp: 0, agendar: 0, formularios: 0 });
+
+  const temDado = (k: Canal) => {
+    const x = s.porCanal[k], y = a.porCanal[k];
+    return Boolean((x && (x.pessoas || x.paginas || x.whatsapp || x.agendar || x.formularios)) || (y && (y.pessoas || y.paginas || y.whatsapp || y.agendar)));
+  };
+  const canais = CANAIS_ORDEM.filter((k) => temDado(k) || (k === "google" && g.ok && aparicoes > 0))
+    .sort((x, y) => (s.porCanal[y]?.pessoas ?? 0) - (s.porCanal[x]?.pessoas ?? 0) || (a.porCanal[y]?.pessoas ?? 0) - (a.porCanal[x]?.pessoas ?? 0));
+
+  const linhasDe = (st: NumerosCanal | undefined, an: NumerosCanal | undefined, comConsole: boolean): LinhaOrigem[] => [
+    ...(comConsole && g.ok ? [
+      { nome: "Apareceu na pesquisa do Google", console: `${n(aparicoes)}${parcial}` },
+      { nome: "Clicou no resultado do Google", console: `${n(cliquesGoogle)}${parcial}` },
+    ] : []),
+    { nome: "Abriu o site (pessoas)", site: st?.pessoas ?? 0, analytics: an?.pessoas ?? 0 },
+    { nome: "Páginas abertas", site: st?.paginas ?? 0, analytics: an?.paginas ?? 0 },
+    { nome: "Clicou no WhatsApp", site: st?.whatsapp ?? 0, analytics: an?.whatsapp ?? 0 },
+    { nome: "Clicou em Agendar", site: st?.agendar ?? 0, analytics: an?.agendar ?? 0 },
+    { nome: "Enviou formulário", site: st?.formularios ?? 0, analytics: an?.formularios ?? 0 },
+  ];
+
+  return (
+    <div className="grid gap-4">
+      <TabelaOrigem titulo="Total (todas as origens)" destaque analyticsOk={a.ok} linhas={linhasDe(soma(s.porCanal), soma(a.porCanal), true)} />
+      {canais.length === 0 ? (
+        <p className="text-sm text-steel-line">Ainda sem visitas neste período.</p>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {canais.map((k) => (
+            <TabelaOrigem key={k} analyticsOk={a.ok} titulo={TITULO_CANAL[k]} linhas={linhasDe(s.porCanal[k], a.porCanal[k], k === "google")} />
+          ))}
+        </div>
+      )}
+      <p className="text-[11px] text-steel-line leading-relaxed">
+        <b className="text-ok">Site</b>: contado pelo próprio site, na hora, sem robôs e sem você. <b className="text-cera">Analytics</b>: Google Analytics, chega em algumas horas e costuma contar um pouco menos (bloqueadores e cookies recusados). <b className="text-verniz-shine">Console</b>: Google Search Console, só existe para o Google e chega em 2 a 3 dias.{parcial ? " * Os últimos 2 a 3 dias do período ainda não chegaram no Console." : ""} O site guarda a origem da primeira página da visita: quem entrou pelo Google e clicou no WhatsApp conta como &quot;Vieram do Google&quot;.
+      </p>
+    </div>
   );
 }
 
@@ -372,6 +463,15 @@ export default async function Resultados({
       </header>
 
       <DeOndeVem />
+
+      {/* ═════════ TUDO POR ORIGEM ═════════ */}
+      <Secao
+        cor="neutro"
+        titulo="Tudo por origem"
+        sub="Uma visão só: de onde cada pessoa veio e o que fez no site. Em cada número, o que o Site, o Analytics e o Search Console contaram."
+      >
+        <PorOrigem r={r} />
+      </Secao>
 
       {/* ═════════ 1. CONTADO PELO PRÓPRIO SITE ═════════ */}
       <Secao
