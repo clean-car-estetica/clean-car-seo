@@ -27,6 +27,9 @@ export function calcularPeriodo(chave: string, inicioParam?: string, fimParam?: 
   let inicio: Date;
   let fim = new Date(hoje);
   switch (chave) {
+    case "1d":
+      inicio = new Date(hoje);
+      break;
     case "7d":
       inicio = deslocar(hoje, -6);
       break;
@@ -39,10 +42,13 @@ export function calcularPeriodo(chave: string, inicioParam?: string, fimParam?: 
     case "personalizado":
       inicio = inicioParam ? new Date(inicioParam + "T00:00:00") : deslocar(hoje, -29);
       if (fimParam) fim = new Date(fimParam + "T00:00:00");
+      if (isNaN(inicio.getTime())) inicio = deslocar(hoje, -29);
+      if (isNaN(fim.getTime()) || fim > hoje) fim = new Date(hoje);
+      if (inicio > fim) [inicio, fim] = [fim, inicio];
       break;
     default:
-      chave = "28d";
-      inicio = deslocar(hoje, -27);
+      chave = "30d";
+      inicio = deslocar(hoje, -29);
   }
   const dias = Math.round((fim.getTime() - inicio.getTime()) / 86_400_000) + 1;
   return { inicio, fim, dias, chave };

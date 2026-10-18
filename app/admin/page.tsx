@@ -160,7 +160,7 @@ export default async function Resultados({
   searchParams: Promise<{ periodo?: string; inicio?: string; fim?: string }>;
 }) {
   const sp = await searchParams;
-  const periodo = calcularPeriodo(sp.periodo || "28d", sp.inicio, sp.fim);
+  const periodo = calcularPeriodo(sp.periodo || "30d", sp.inicio, sp.fim);
   const [r, campanhas] = await Promise.all([carregarResultados(periodo), getCampanhas()]);
   const { google: g, analytics: a, site: s } = r;
 
@@ -175,8 +175,9 @@ export default async function Resultados({
     .slice(0, 6);
 
   const periodos = [
+    { valor: "1d", label: "Hoje" },
     { valor: "7d", label: "7 dias" },
-    { valor: "28d", label: "28 dias" },
+    { valor: "30d", label: "30 dias" },
     { valor: "90d", label: "90 dias" },
     { valor: "mes", label: "Este mês" },
   ];
@@ -188,8 +189,13 @@ export default async function Resultados({
         <div>
           <h1 className="font-display font-bold text-3xl text-steel">Resultados</h1>
           <p className="text-steel-line text-sm mt-1">
-            {dataBR(r.periodo.inicio)} a {dataBR(r.periodo.fim)} · comparado aos {r.periodo.dias} dias anteriores
+            {r.periodo.dias === 1
+              ? `${dataBR(r.periodo.inicio)} · comparado ao dia anterior`
+              : `${dataBR(r.periodo.inicio)} a ${dataBR(r.periodo.fim)} · comparado aos ${r.periodo.dias} dias anteriores`}
           </p>
+          {periodo.chave === "1d" && (
+            <p className="text-steel-line text-xs mt-1">Os números do Google chegam com 2 a 3 dias de atraso; os contatos do site e as visitas aparecem na hora.</p>
+          )}
         </div>
         <nav className="flex flex-wrap items-center gap-2" aria-label="Período">
           {periodos.map((p) => (
@@ -207,7 +213,7 @@ export default async function Resultados({
             <input id="per-ini" type="date" name="inicio" defaultValue={sp.inicio} className="px-2 py-2 rounded-lg bg-card border border-card-line text-steel text-xs" />
             <label className="sr-only" htmlFor="per-fim">Fim</label>
             <input id="per-fim" type="date" name="fim" defaultValue={sp.fim} className="px-2 py-2 rounded-lg bg-card border border-card-line text-steel text-xs" />
-            <button type="submit" className="px-3 py-2 rounded-lg bg-card border border-card-line text-xs font-bold text-steel-line hover:text-verniz-shine">Ver</button>
+            <button type="submit" className={`px-3 py-2 rounded-lg text-xs font-bold ${periodo.chave === "personalizado" ? "bg-verniz text-carbon" : "bg-card border border-card-line text-steel-line hover:text-verniz-shine"}`}>Ver datas</button>
           </form>
         </nav>
       </header>
