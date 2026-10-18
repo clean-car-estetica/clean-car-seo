@@ -151,6 +151,9 @@ export default async function ServicoPage({
               <p className="mt-4 text-sm text-steel-line">
                 {servico.duracao ? `Tempo médio: ${servico.duracao}. ` : ""}
                 {servico.preco_desde ? `A partir de R$ ${servico.preco_desde}. ` : "Valor sob avaliação gratuita. "}
+                {servico.pontos_fidelidade > 0 && (
+                  <a href="/beneficios" className="font-bold text-cera hover:underline">Vale {servico.pontos_fidelidade} pontos de fidelidade. </a>
+                )}
                 {domicilio
                   ? "Feito na sua casa, em Mogi das Cruzes e região."
                   : "Feito no Jardim Universo, em Mogi das Cruzes, com produtos Vonixx."}

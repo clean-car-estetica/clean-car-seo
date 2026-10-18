@@ -9,12 +9,24 @@ import { consultarAnalytics, consultarSearchConsole, googleConfigurado } from "@
 
 export type Periodo = { inicio: Date; fim: Date; dias: number; chave: string };
 
+// 18/10/2026: as datas do painel são dias de São Paulo. O servidor da
+// Vercel roda em UTC, e antes "hoje" virava amanhã depois das 21h, e um
+// clique feito às 22h caía no dia seguinte. Um Date aqui é sempre a
+// meia-noite UTC do dia de São Paulo (o Brasil não tem horário de verão).
+const FUSO = "-03:00";
 const iso = (d: Date) => d.toISOString().slice(0, 10);
+/** "2026-10-18T01:30:00Z" (22h30 do dia 17 em SP) → "2026-10-17" */
+const diaSP = (instante: string) => new Date(Date.parse(instante) - 3 * 3_600_000).toISOString().slice(0, 10);
 function deslocar(d: Date, dias: number) {
   const x = new Date(d);
-  x.setDate(x.getDate() + dias);
+  x.setUTCDate(x.getUTCDate() + dias);
   return x;
 }
+function hojeSP(): Date {
+  return new Date(diaSP(new Date().toISOString()) + "T00:00:00Z");
+}
+/** Os números do Search Console chegam 2 a 3 dias depois: até aqui estão completos. */
+const ATRASO_GOOGLE_DIAS = 3;
 function listaDias(inicio: Date, fim: Date) {
   const out: string[] = [];
   for (let d = new Date(inicio); d <= fim; d = deslocar(d, 1)) out.push(iso(d));
@@ -22,8 +34,7 @@ function listaDias(inicio: Date, fim: Date) {
 }
 
 export function calcularPeriodo(chave: string, inicioParam?: string, fimParam?: string): Periodo {
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
+  const hoje = hojeSP();
   let inicio: Date;
   let fim = new Date(hoje);
   switch (chave) {
@@ -37,11 +48,11 @@ export function calcularPeriodo(chave: string, inicioParam?: string, fimParam?: 
       inicio = deslocar(hoje, -89);
       break;
     case "mes":
-      inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      inicio = new Date(Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth(), 1));
       break;
     case "personalizado":
-      inicio = inicioParam ? new Date(inicioParam + "T00:00:00") : deslocar(hoje, -29);
-      if (fimParam) fim = new Date(fimParam + "T00:00:00");
+      inicio = inicioParam ? new Date(inicioParam + "T00:00:00Z") : deslocar(hoje, -29);
+      if (fimParam) fim = new Date(fimParam + "T00:00:00Z");
       if (isNaN(inicio.getTime())) inicio = deslocar(hoje, -29);
       if (isNaN(fim.getTime()) || fim > hoje) fim = new Date(hoje);
       if (inicio > fim) [inicio, fim] = [fim, inicio];
@@ -66,6 +77,12 @@ export type Resultados = {
     posicao: number;
     aparicoesAntes: number;
     cliquesAntes: number;
+    /** Último dia com números completos do Google (os totais vão até aqui). */
+    completoAte: string;
+    /** O período pedido termina depois de completoAte. */
+    parcial: boolean;
+    /** Período todo dentro dos dias que o Google ainda está contando: sem comparação. */
+    semComparacao: boolean;
     porDia: { data: string; aparicoes: number; cliques: number }[];
     buscas: Busca[];
     paginas: { pagina: string; cliques: number; aparicoes: number }[];
@@ -89,6 +106,8 @@ export type Resultados = {
     visitas: number;
     contatos: number;
     contatosAntes: number;
+    /** Pessoas no período anterior, mesma contagem (18/10/2026: antes não existia e o card dizia sempre "novo"). */
+    pessoasAntes: number;
     whatsapp: number;
     agendar: number;
     formularios: number;
@@ -123,15 +142,13 @@ type Evento = {
 };
 
 async function lerEventos(inicio: Date, fim: Date): Promise<Evento[]> {
-  const fimDia = new Date(fim);
-  fimDia.setHours(23, 59, 59, 999);
   const todos: Evento[] = [];
   for (let de = 0; de < 30_000; de += 1000) {
     const { data, error } = await supabaseAdmin
       .from("events")
       .select("event_type, page_path, origem, created_at, meta")
-      .gte("created_at", inicio.toISOString())
-      .lte("created_at", fimDia.toISOString())
+      .gte("created_at", `${iso(inicio)}T00:00:00${FUSO}`)
+      .lte("created_at", `${iso(fim)}T23:59:59.999${FUSO}`)
       .order("created_at", { ascending: false })
       .range(de, de + 999);
     if (error) throw error;
@@ -143,9 +160,12 @@ async function lerEventos(inicio: Date, fim: Date): Promise<Evento[]> {
 
 const ehContato = (t: string) => t === "click_whatsapp" || t === "click_agendar" || t === "form_submit";
 
-function resumirSite(eventos: Evento[], dias: string[]) {
+// modo: o período anterior usa a MESMA forma de contar do atual — antes,
+// com o período atual na contagem limpa (v2) e o anterior só com dados
+// antigos (que contavam robôs e o dono), a comparação era injusta.
+function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo") {
   const novos = eventos.filter((e) => e.meta?.v === 2);
-  const legado = novos.length === 0 && eventos.length > 0;
+  const legado = modo ? modo === "legado" : novos.length === 0 && eventos.length > 0;
   const base = legado ? eventos : novos;
 
   const pessoasSet = new Set<string>();
@@ -155,7 +175,7 @@ function resumirSite(eventos: Evento[], dias: string[]) {
   let visitas = 0, whatsapp = 0, agendar = 0, formularios = 0;
 
   for (const e of base) {
-    const dia = e.created_at.slice(0, 10);
+    const dia = diaSP(e.created_at);
     const vid = e.meta?.vid;
     const contato = ehContato(e.event_type);
     if (vid) pessoasSet.add(vid);
@@ -222,7 +242,7 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
   const dias = listaDias(p.inicio, p.fim);
 
   const vazioGoogle: Resultados["google"] = {
-    ok: false, aparicoes: 0, cliques: 0, posicao: 0, aparicoesAntes: 0, cliquesAntes: 0, porDia: [], buscas: [], paginas: [],
+    ok: false, aparicoes: 0, cliques: 0, posicao: 0, aparicoesAntes: 0, cliquesAntes: 0, completoAte: "", parcial: false, semComparacao: false, porDia: [], buscas: [], paginas: [],
   };
   const vazioGA: Resultados["analytics"] = {
     ok: false, pessoas: 0, pessoasAntes: 0, novas: 0, porDia: [], canais: [], aparelhos: [], cidades: [],
@@ -233,9 +253,20 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
     (async (): Promise<Resultados["google"]> => {
       if (!conexao.conta) return { ...vazioGoogle, erro: "nao-configurado" };
       try {
+        // 18/10/2026: o Google entrega os números com 2 a 3 dias de atraso.
+        // Antes o painel comparava um período com os últimos dias ainda
+        // vazios contra um período completo (dava "0 cliques, -100%"). Agora
+        // os totais e a comparação vão só até o último dia completo, e os dois
+        // períodos têm o mesmo tamanho.
+        const ultimoCompleto = deslocar(hojeSP(), -ATRASO_GOOGLE_DIAS);
+        const fimG = p.fim < ultimoCompleto ? p.fim : ultimoCompleto;
+        const semComparacao = fimG < p.inicio;
+        const diasG = semComparacao ? 0 : Math.round((fimG.getTime() - p.inicio.getTime()) / 86_400_000) + 1;
+        const antesFimG = deslocar(p.inicio, -1);
+        const antesInicioG = deslocar(antesFimG, -(Math.max(diasG, 1) - 1));
         const [total, antes, porDia, buscas, paginas] = await Promise.all([
-          consultarSearchConsole({ inicio, fim }),
-          consultarSearchConsole({ inicio: iso(antesInicio), fim: iso(antesFim) }),
+          consultarSearchConsole({ inicio, fim: semComparacao ? fim : iso(fimG) }),
+          semComparacao ? Promise.resolve([]) : consultarSearchConsole({ inicio: iso(antesInicioG), fim: iso(antesFimG) }),
           consultarSearchConsole({ inicio, fim, dimensoes: ["date"] }),
           consultarSearchConsole({ inicio, fim, dimensoes: ["query"], limite: 250 }),
           consultarSearchConsole({ inicio, fim, dimensoes: ["page"], limite: 50 }),
@@ -249,6 +280,9 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
           posicao: total[0]?.position ?? 0,
           aparicoesAntes: antes[0]?.impressions ?? 0,
           cliquesAntes: antes[0]?.clicks ?? 0,
+          completoAte: iso(ultimoCompleto),
+          parcial: p.fim > ultimoCompleto,
+          semComparacao,
           porDia: dias.map((d) => ({ data: d, aparicoes: mapaDia.get(d)?.impressions ?? 0, cliques: mapaDia.get(d)?.clicks ?? 0 })),
           buscas: buscas.map((r) => ({ termo: r.keys[0], cliques: r.clicks, aparicoes: r.impressions, posicao: r.position })),
           paginas: paginas.map((r) => ({ pagina: r.keys[0].replace(host, "") || "/", cliques: r.clicks, aparicoes: r.impressions })),
@@ -291,11 +325,11 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
       try {
         const [atual, anterior] = await Promise.all([lerEventos(p.inicio, p.fim), lerEventos(antesInicio, antesFim)]);
         const r = resumirSite(atual, dias);
-        const a = resumirSite(anterior, listaDias(antesInicio, antesFim));
-        return { ok: true, ...r, contatosAntes: a.contatos };
+        const a = resumirSite(anterior, listaDias(antesInicio, antesFim), r.legado ? "legado" : "novo");
+        return { ok: true, ...r, contatosAntes: a.contatos, pessoasAntes: a.pessoas };
       } catch (e) {
         return {
-          ok: false, erro: (e as Error).message, legado: false, pessoas: 0, visitas: 0, contatos: 0, contatosAntes: 0,
+          ok: false, erro: (e as Error).message, legado: false, pessoas: 0, pessoasAntes: 0, visitas: 0, contatos: 0, contatosAntes: 0,
           whatsapp: 0, agendar: 0, formularios: 0, porDia: [], paginas: [], origens: [], recentes: [],
         };
       }

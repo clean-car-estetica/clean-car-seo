@@ -10,8 +10,10 @@ import GraficoDiario from "@/components/admin/GraficoDiario";
 const n = (v: number) => Math.round(v).toLocaleString("pt-BR");
 const pct = (v: number) => `${(v * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
 const dataBR = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
+const deslocarIso = (d: string, dias: number) => new Date(Date.parse(d + "T00:00:00Z") + dias * 86_400_000).toISOString().slice(0, 10);
 
-function Variacao({ atual, antes }: { atual: number; antes: number }) {
+function Variacao({ atual, antes, semComparacao }: { atual: number; antes: number; semComparacao?: boolean }) {
+  if (semComparacao) return <span className="text-xs text-steel-line">parcial: o Google ainda está contando estes dias</span>;
   if (!antes && !atual) return <span className="text-xs text-steel-line">sem dados antes</span>;
   if (!antes) return <span className="text-xs text-verniz-shine font-bold">novo</span>;
   const d = (atual - antes) / antes;
@@ -27,9 +29,9 @@ function Variacao({ atual, antes }: { atual: number; antes: number }) {
 }
 
 function Etapa({
-  icone: Icone, titulo, valor, explicacao, atual, antes, taxa, indisponivel,
+  icone: Icone, titulo, valor, explicacao, atual, antes, taxa, indisponivel, nota, semComparacao,
 }: {
-  icone: typeof Search; titulo: string; valor: number; explicacao: string; atual: number; antes: number; taxa?: string; indisponivel?: string;
+  icone: typeof Search; titulo: string; valor: number; explicacao: string; atual: number; antes: number; taxa?: string; indisponivel?: string; nota?: string; semComparacao?: boolean;
 }) {
   return (
     <div className="relative bg-card border border-card-line rounded-2xl p-5 flex flex-col gap-2 min-w-0">
@@ -42,10 +44,11 @@ function Etapa({
       ) : (
         <>
           <div className="font-display font-extrabold text-4xl text-steel tabular-nums leading-none">{n(valor)}</div>
-          <Variacao atual={atual} antes={antes} />
+          <Variacao atual={atual} antes={antes} semComparacao={semComparacao} />
         </>
       )}
       <p className="text-xs text-steel-line leading-relaxed">{explicacao}</p>
+      {nota && !indisponivel && <p className="text-[11px] text-cera leading-relaxed">{nota}</p>}
       {taxa && !indisponivel && (
         <span className="self-start mt-auto rounded-full bg-verniz/10 text-verniz-shine text-[11px] font-bold px-2.5 py-1">{taxa}</span>
       )}
@@ -163,10 +166,14 @@ export default async function Resultados({
   const periodo = calcularPeriodo(sp.periodo || "30d", sp.inicio, sp.fim);
   const [r, campanhas] = await Promise.all([carregarResultados(periodo), getCampanhas()]);
   const { google: g, analytics: a, site: s } = r;
+  const notaGoogle = !g.ok || !g.parcial ? undefined
+    : g.semComparacao
+      ? `Ainda incompleto: o Google só fecha estes dias até ${dataBR(deslocarIso(r.periodo.fim, 3))}.`
+      : `Contado até ${dataBR(g.completoAte)} (o Google fecha os últimos dias com 2 a 3 dias de atraso), comparado com o mesmo número de dias antes.`;
 
   // Pessoas: o Analytics é a melhor fonte; sem ele, as contadas pelo próprio site.
   const pessoas = a.ok ? a.pessoas : s.pessoas;
-  const pessoasAntes = a.ok ? a.pessoasAntes : 0;
+  const pessoasAntes = a.ok ? a.pessoasAntes : s.pessoasAntes;
   const pessoasPorDia = a.ok ? a.porDia.map((d) => ({ data: d.data, valor: d.pessoas })) : s.porDia.map((d) => ({ data: d.data, valor: d.pessoas }));
 
   const oportunidades = g.buscas
@@ -231,6 +238,8 @@ export default async function Resultados({
             atual={g.aparicoes}
             antes={g.aparicoesAntes}
             explicacao="Vezes que o site surgiu na tela de alguém que pesquisou no Google."
+            nota={notaGoogle}
+            semComparacao={g.semComparacao}
             indisponivel={g.ok ? undefined : "Ligue o Search Console para ver."}
             taxa={g.ok && g.posicao ? `posição média ${g.posicao.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}` : undefined}
           />
@@ -240,7 +249,9 @@ export default async function Resultados({
             valor={g.cliques}
             atual={g.cliques}
             antes={g.cliquesAntes}
-            explicacao="Pessoas que viram o site no Google e clicaram para entrar."
+            explicacao="Só quem clicou no resultado da pesquisa do Google para entrar no site (não conta Instagram, link direto nem cliques dentro do site). O Google entrega esse número 2 a 3 dias depois. Quem clicou no WhatsApp aparece na hora em “Abriu o WhatsApp”."
+            nota={notaGoogle}
+            semComparacao={g.semComparacao}
             indisponivel={g.ok ? undefined : "Ligue o Search Console para ver."}
             taxa={g.ok && g.aparicoes ? `${pct(g.cliques / g.aparicoes)} de quem viu clicou` : undefined}
           />

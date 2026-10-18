@@ -96,6 +96,7 @@ export default async function PrecosPage() {
                           ) : (
                             <span className="font-display font-bold text-verniz-shine">Sob avaliação gratuita</span>
                           )}
+                          {s.pontos_fidelidade > 0 && <span className="block text-xs font-bold text-cera">+{s.pontos_fidelidade} pontos de fidelidade</span>}
                         </td>
                       </tr>
                     ))}

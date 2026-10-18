@@ -45,6 +45,7 @@ export default function ServicosLista({ servicos, titulo, subtitulo }: { servico
                     <span className="text-xs text-steel-line">Consulte</span>
                   )}
                   {s.duracao && <span className="block text-xs text-steel-line">{s.duracao}</span>}
+                  {s.pontos_fidelidade > 0 && <span className="block text-xs font-bold text-cera">+{s.pontos_fidelidade} pontos</span>}
                 </span>
               </Link>
               <AgendarButton

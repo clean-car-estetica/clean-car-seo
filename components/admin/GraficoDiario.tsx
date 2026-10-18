@@ -18,6 +18,10 @@ export default function GraficoDiario({
   cor?: string;
   altura?: number;
 }) {
+  // 18/10/2026: com 1 ou 2 dias (ex.: "Hoje") a linha virava um ponto solto
+  // e a barra ocupava a largura toda. Com poucos dias, sempre barras, com
+  // largura máxima, centralizadas e com o número em cima.
+  if (pontos.length <= 2) tipo = "barras";
   const caixa = useRef<HTMLDivElement>(null);
   const [foco, setFoco] = useState<number | null>(null);
   const L = 640, A = altura, mE = 34, mD = 8, mT = 10, mB = 24;
@@ -26,8 +30,10 @@ export default function GraficoDiario({
   const passo = max <= 4 ? 1 : Math.ceil(max / 3 / (max > 50 ? 10 : 1)) * (max > 50 ? 10 : 1);
   const topo = Math.max(passo * 3, max);
   const x = (i: number) => mE + (n <= 1 ? 0 : (i * (L - mE - mD)) / (n - 1));
-  const larguraBarra = Math.max(2, (L - mE - mD) / Math.max(n, 1) - 3);
-  const xb = (i: number) => mE + i * ((L - mE - mD) / Math.max(n, 1)) + 1.5;
+  const fatia = (L - mE - mD) / Math.max(n, 1);
+  const larguraBarra = Math.min(56, Math.max(2, fatia - 3));
+  const xb = (i: number) => mE + i * fatia + (fatia - larguraBarra) / 2;
+  const mostrarValores = tipo === "barras" && n <= 14;
   const y = (v: number) => mT + (A - mT - mB) * (1 - v / topo);
   const fmtData = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
   const marcas = [0, passo, passo * 2, passo * 3].filter((v) => v <= topo);
@@ -96,8 +102,15 @@ export default function GraficoDiario({
             ) : null
           )
         )}
+        {mostrarValores && pontos.map((p, i) =>
+          p.valor > 0 ? (
+            <text key={`v${p.data}`} x={xb(i) + larguraBarra / 2} y={Math.max(mT + 10, y(p.valor) - 5)} fontSize="11" fontWeight="700" textAnchor="middle" fill="var(--steel, #e5e9ef)">
+              {p.valor.toLocaleString("pt-BR")}
+            </text>
+          ) : null
+        )}
         {rotulosX.map((i) => (
-          <text key={i} x={tipo === "barras" ? xb(i) + larguraBarra / 2 : x(i)} y={A - 6} fontSize="11" textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} fill="var(--steel-line, #8b96a5)">
+          <text key={i} x={tipo === "barras" ? xb(i) + larguraBarra / 2 : x(i)} y={A - 6} fontSize="11" textAnchor={tipo === "barras" ? "middle" : i === 0 ? "start" : i === n - 1 ? "end" : "middle"} fill="var(--steel-line, #8b96a5)">
             {fmtData(pontos[i].data)}
           </text>
         ))}
