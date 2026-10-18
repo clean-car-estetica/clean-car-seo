@@ -91,6 +91,7 @@ export default async function PrecosPage() {
                             <>
                               <span className="block text-xs text-steel-line">a partir de</span>
                               <span className="font-display font-extrabold text-2xl text-verniz-shine tabular-nums">R$ {s.preco_desde}</span>
+                              {s.avaliacao_previa && <span className="block text-xs text-steel-line">com avaliação prévia</span>}
                             </>
                           ) : (
                             <span className="font-display font-bold text-verniz-shine">Sob avaliação gratuita</span>

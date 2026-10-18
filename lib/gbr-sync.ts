@@ -29,6 +29,8 @@ export type ServicoSas = {
   nome: string;
   descricao?: string | null;
   preco: number | null;
+  /** Valor "a partir de": o preço final só depois de avaliar o carro */
+  avaliacaoPrevia?: boolean;
   duracao: string | null;
   destaque: boolean;
   ativo: boolean;
@@ -167,6 +169,7 @@ type ServicoSite = {
   descricao: string;
   duracao: string | null;
   preco_desde: number | null;
+  avaliacao_previa?: boolean;
   imagem_url: string;
   tag: string | null;
   pontos_fidelidade: number;
@@ -225,6 +228,7 @@ export async function aplicarServicosSas<T extends ServicoSite>(lista: T[], foto
       ...base,
       nome: limparNome(v.nome) || base.nome,
       preco_desde: v.preco == null ? null : Math.round(Number(v.preco) * 100) / 100,
+      avaliacao_previa: v.avaliacaoPrevia === true,
       duracao: duracaoSite(v.duracao) ?? base.duracao,
       descricao: base.descricao || v.descricao || "",
       resumo: base.resumo || resumoDe(v.descricao),

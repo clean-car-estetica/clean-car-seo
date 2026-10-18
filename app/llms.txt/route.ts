@@ -45,7 +45,7 @@ export async function GET() {
   L.push("## Serviços e preços");
   L.push("Lavagens, higienizações e cristalização de vidros: valores para porte médio (hatch e sedan); SUV, picape e veículos grandes têm acréscimo de 25% a 30% após avaliação. Os demais serviços têm valor fixo.");
   for (const s of servicos) {
-    const preco = s.preco_desde ? `a partir de R$ ${s.preco_desde}` : "valor sob avaliação gratuita pelas fotos";
+    const preco = s.preco_desde ? `a partir de R$ ${s.preco_desde}${s.avaliacao_previa ? " (valor final após avaliação prévia)" : ""}` : "valor sob avaliação gratuita pelas fotos";
     const local = SERVICOS_DOMICILIO.includes(s.slug) ? " Feito na casa do cliente." : "";
     L.push(`- [${s.nome}](${SITE_URL}/servicos/${s.slug}): ${preco}${s.duracao ? `, cerca de ${s.duracao}` : ""}. ${limpa(s.resumo)}${local}`);
   }

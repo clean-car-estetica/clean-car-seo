@@ -96,6 +96,7 @@ export default async function ServicoCidadePage({
           descricao={servico.descricao}
           duracao={servico.duracao}
           preco={servico.preco_desde}
+          avaliacaoPrevia={servico.avaliacao_previa === true}
           brinde={SERVICOS_COM_BRINDE.includes(servico.slug)}
           midia={imagemFundo}
           textoAgendar={`Agendar ${servico.nome}`}

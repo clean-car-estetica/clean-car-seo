@@ -15,6 +15,7 @@ export default function ServicoTopo({
   descricao,
   duracao,
   preco,
+  avaliacaoPrevia = false,
   midia,
   textoAgendar = "Agendar este serviço",
   domicilio = false,
@@ -26,6 +27,8 @@ export default function ServicoTopo({
   descricao: string;
   duracao?: string | null;
   preco?: number | null;
+  /** Valor final só depois da avaliação do carro (marcado no SAS) */
+  avaliacaoPrevia?: boolean;
   midia?: string;
   textoAgendar?: string;
   /** Serviço feito na casa do cliente, com valor só depois de avaliar */
@@ -47,6 +50,7 @@ export default function ServicoTopo({
               <div>
                 <dt className="text-sm text-steel-line">A partir de</dt>
                 <dd className="font-display font-extrabold text-4xl text-verniz-shine">R$ {preco}</dd>
+                {avaliacaoPrevia && <dd className="text-xs text-steel-line mt-1">Valor final após avaliação prévia do veículo</dd>}
               </div>
             ) : (
               <div>

@@ -98,6 +98,7 @@ export default async function ServicoPage({
           descricao={servico.descricao}
           duracao={servico.duracao}
           preco={servico.preco_desde}
+          avaliacaoPrevia={servico.avaliacao_previa === true}
           brinde={SERVICOS_COM_BRINDE.includes(servico.slug)}
           midia={servico.imagem_url}
           domicilio={domicilio}

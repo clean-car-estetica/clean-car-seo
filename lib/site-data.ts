@@ -32,6 +32,8 @@ export type ServicoDB = {
   descricao: string;
   duracao: string | null;
   preco_desde: number | null;
+  /** Vem do SAS: valor "a partir de", final após avaliação prévia */
+  avaliacao_previa?: boolean;
   imagem_url: string;
   tag: string | null;
   pontos_fidelidade: number;
