@@ -24,9 +24,10 @@ import Bloco from "@/components/Bloco";
 import { paginaDaCidade } from "@/lib/paginas-locais";
 import { getServicosPublicos, getTransformacoesPublicas, getCidadesPublicas, getDepoimentosPublicos, getProcessoPassos, getProdutosLista, getFaqsPublicos } from "@/lib/site-data";
 import { getTextosGerais, getContatoContent, getVideoCliente } from "@/lib/site-content";
-import { getCampanha } from "@/lib/campanhas-servidor";
+import { getCampanha, getCampanhaProxima } from "@/lib/campanhas-servidor";
 import { getPacotes } from "@/lib/pacotes-servidor";
 import CampanhaFaixa from "@/components/CampanhaFaixa";
+import CampanhaEmBreve from "@/components/CampanhaEmBreve";
 import VideoCliente from "@/components/VideoCliente";
 
 export const revalidate = 60;
@@ -36,7 +37,7 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, contato, videoCliente, campanha] = await Promise.all([
+  const [hero, servicos, transformacoes, cidades, depoimentos, planos, passos, produtos, textos, faqs, contato, videoCliente, campanha, campanhaProxima] = await Promise.all([
     getHeroContent(),
     getServicosPublicos(),
     getTransformacoesPublicas(),
@@ -50,6 +51,7 @@ export default async function Home() {
     getContatoContent(),
     getVideoCliente(),
     getCampanha(),
+    getCampanhaProxima(),
   ]);
   const lavagens = ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"];
   const outros = servicos.filter((x) => !lavagens.includes(x.slug));
@@ -104,6 +106,7 @@ export default async function Home() {
         </section>
 
         <CampanhaFaixa campanha={campanha} contato={contato} />
+        <CampanhaEmBreve campanha={campanhaProxima} contato={contato} />
 
         <Bloco id="servicos"><FaixaServicos nomes={servicos.map((x) => x.nome)} /></Bloco>
         <Diferenciais className="pt-14" />

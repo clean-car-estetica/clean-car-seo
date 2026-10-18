@@ -30,6 +30,20 @@ export function mensagemCampanha(c: CampanhaItem) {
   return msg;
 }
 
+const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+
+/** "Em novembro" quando começa no dia 1 do mês; senão "A partir de 15/11". */
+export function quandoComeca(inicia_em: string) {
+  const [, m, d] = inicia_em.split("-");
+  return d === "01" ? `Em ${MESES[Number(m) - 1]}` : `A partir de ${dataCurta(inicia_em)}`;
+}
+
+/** Mensagem do "Vem aí": a pessoa já garante o horário para quando a campanha começar. */
+export function mensagemCampanhaProxima(c: CampanhaItem) {
+  const quando = c.inicia_em ? quandoComeca(c.inicia_em).toLowerCase() : "em breve";
+  return `Olá! Vi no site que vem aí a *${c.titulo || "nova campanha"}* (${quando}). Quero saber mais e já garantir meu horário.`;
+}
+
 /** Botão da campanha: link do console ou, se vazio, WhatsApp com a mensagem da campanha */
 export function linkCampanha(c: CampanhaItem, contato: Contato) {
   return c.link_botao || whatsappLink(contato, mensagemCampanha(c));

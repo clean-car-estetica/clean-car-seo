@@ -136,6 +136,19 @@ export function situacaoCampanha(c: CampanhaItem, hoje = hojeSP()): SituacaoCamp
   return "no_ar";
 }
 
+/**
+ * 18/10/2026: a próxima campanha agendada (a que começa primeiro), para o
+ * site anunciar "Vem aí" — o Glauber programa a campanha do mês seguinte.
+ * Só as que começam em até 60 dias, para não anunciar coisa distante.
+ */
+export function campanhaProxima(lista: CampanhaItem[], hoje = hojeSP()): CampanhaItem | null {
+  const limite = new Date(Date.parse(hoje + "T00:00:00Z") + 60 * 86_400_000).toISOString().slice(0, 10);
+  const proximas = lista
+    .filter((c) => situacaoCampanha(c, hoje) === "agendada" && c.inicia_em! <= limite)
+    .sort((a, b) => (a.inicia_em ?? "").localeCompare(b.inicia_em ?? ""));
+  return proximas[0] ?? null;
+}
+
 /** A campanha valendo hoje. Se houver mais de uma, a que começou por último. */
 export function campanhaDeHoje(lista: CampanhaItem[]): Campanha {
   const hoje = hojeSP();

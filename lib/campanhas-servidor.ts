@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { supabasePublico } from "@/lib/supabase";
-import { CAMPANHA_VAZIA, campanhaDeHoje, type Campanha, type CampanhaItem } from "@/lib/site-content";
+import { CAMPANHA_VAZIA, campanhaDeHoje, campanhaProxima, type Campanha, type CampanhaItem } from "@/lib/site-content";
 
 // SÓ SERVIDOR (usa a chave da integração GBR). Não importar em "use client".
 //
@@ -81,4 +81,9 @@ export async function getCampanhas(): Promise<CampanhaItem[]> {
 
 export async function getCampanha(): Promise<Campanha> {
   return campanhaDeHoje(await getCampanhas());
+}
+
+/** Próxima campanha agendada no SAS (para o "Vem aí" do site), ou null. */
+export async function getCampanhaProxima(): Promise<CampanhaItem | null> {
+  return campanhaProxima(await getCampanhas());
 }
