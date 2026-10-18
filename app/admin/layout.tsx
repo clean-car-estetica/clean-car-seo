@@ -5,7 +5,7 @@ import { marcarNavegadorInterno } from "@/lib/track";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { LayoutDashboard, Search, LogOut, Smile, Inbox, Link2, Plug, UserSearch, Menu, X, MousePointerClick, BookOpen, Newspaper, MessageCircleQuestionMark, Megaphone, Quote } from "lucide-react";
+import { LayoutDashboard, Search, LogOut, Smile, Inbox, Link2, Plug, UserSearch, Menu, X, MousePointerClick, BookOpen, Newspaper, MessageCircleQuestionMark, Megaphone, Quote, Tags } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -71,6 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     {
       titulo: "Ferramentas",
       links: [
+        { href: "/admin/metadados", label: "Título e descrição no Google", icon: Tags },
         { href: "/admin/palavras-chave", label: "Palavras-chave", icon: Search },
         { href: "/admin/links", label: "Links de rastreamento", icon: Link2 },
         { href: "/admin/consulta-gbr", label: "Consultar cliente (GBR)", icon: UserSearch },
