@@ -204,7 +204,7 @@ const FONTE: Record<Fonte, { nome: string; cor: string; borda: string }> = {
   console: { nome: "Console", cor: "text-verniz-shine", borda: "border-verniz/40" },
   meta: { nome: "Meta", cor: "text-[#e1306c]", borda: "border-[#e1306c]/40" },
 };
-type Valor = { fonte: Fonte; valor: number; dias: number; parcial?: boolean };
+type Valor = { fonte: Fonte; valor: number; dias: number; parcial?: boolean; /** mesmo período anterior; undefined = sem comparação */ antes?: number };
 type LinhaOrigem = { nome: string; valores: Valor[] };
 
 const media = (v: number, dias: number) => {
@@ -214,13 +214,24 @@ const media = (v: number, dias: number) => {
 };
 
 /** Um número de uma fonte: "Site 6 · 0,9/dia" */
+/** "+18%" / "−20%" / "novo" comparado ao período anterior */
+function variacao(atual: number, antes: number | undefined): { texto: string; cor: string } | null {
+  if (antes === undefined || (!atual && !antes)) return null;
+  if (!antes) return { texto: "novo", cor: "text-verniz-shine" };
+  const d = Math.round(((atual - antes) / antes) * 100);
+  if (d === 0) return { texto: "=", cor: "text-steel-line" };
+  return { texto: `${d > 0 ? "+" : "−"}${Math.abs(d)}%`, cor: d > 0 ? "text-ok" : "text-warn" };
+}
+
 function Selo({ v }: { v: Valor }) {
   const f = FONTE[v.fonte];
   const m = media(v.valor, v.dias);
+  const va = variacao(v.valor, v.antes);
   return (
     <span className={`inline-flex items-baseline gap-1.5 rounded-lg border ${f.borda} px-2 py-1`}>
       <span className={`text-[10px] font-bold uppercase tracking-wide ${f.cor}`}>{f.nome}</span>
       <b className="font-display text-lg leading-none text-steel tabular-nums">{n(v.valor)}{v.parcial ? "*" : ""}</b>
+      {va && <span className={`text-[11px] font-bold tabular-nums ${va.cor}`}>{va.texto}</span>}
       {m && <span className="text-[11px] text-steel-line tabular-nums">{m}</span>}
     </span>
   );
@@ -252,38 +263,42 @@ function CartaoOrigem({ titulo, linhas, destaque, rodape }: { titulo: string; li
 function PorOrigem({ r }: { r: Resultados }) {
   const { site: s, analytics: a, google: g } = r;
   const ig = r.meta.instagram;
+  const igAntes = r.meta.instagramAntes?.ok ? r.meta.instagramAntes : null;
   const dias = r.periodo.dias;
-  // O Console só tem os dias até o último completo: a média usa esses dias.
+  // O Console só tem os dias até o último completo: totais, média e comparação usam esses dias
+  // (g.aparicoes/g.cliques já vêm assim, e o "antes" com o mesmo número de dias).
   const diasConsole = g.ok && g.parcial && !g.semComparacao
     ? Math.round((Date.parse(g.completoAte) - Date.parse(r.periodo.inicio)) / 86_400_000) + 1
     : dias;
-  const consoleTotal = (campo: "aparicoes" | "cliques") =>
-    g.porDia.filter((d) => !g.parcial || g.semComparacao || d.data <= g.completoAte).reduce((t, d) => t + d[campo], 0);
+  const vazio = { pessoas: 0, paginas: 0, whatsapp: 0, agendar: 0, formularios: 0, pessoasContato: 0 };
   const soma = (m: Partial<Record<Canal, NumerosCanal>>) => Object.values(m).reduce<NumerosCanal>((t, c) => ({
     pessoas: t.pessoas + (c?.pessoas ?? 0), paginas: t.paginas + (c?.paginas ?? 0), whatsapp: t.whatsapp + (c?.whatsapp ?? 0),
-    agendar: t.agendar + (c?.agendar ?? 0), formularios: t.formularios + (c?.formularios ?? 0),
-  }), { pessoas: 0, paginas: 0, whatsapp: 0, agendar: 0, formularios: 0 });
+    agendar: t.agendar + (c?.agendar ?? 0), formularios: t.formularios + (c?.formularios ?? 0), pessoasContato: t.pessoasContato + (c?.pessoasContato ?? 0),
+  }), vazio);
 
-  const sv = (fonte: Fonte, valor: number | undefined, d = dias, parcial = false): Valor[] => valor === undefined ? [] : [{ fonte, valor, dias: d, parcial }];
-  const daSite = (st: NumerosCanal | undefined, an: NumerosCanal | undefined, campo: keyof NumerosCanal) => [
-    ...sv("site", st?.[campo] ?? 0),
-    ...(a.ok ? sv("analytics", an?.[campo] ?? 0) : []),
+  const sv = (fonte: Fonte, valor: number | undefined, antes: number | undefined, d = dias, parcial = false): Valor[] =>
+    valor === undefined ? [] : [{ fonte, valor, dias: d, parcial, antes }];
+  type Par = { st?: NumerosCanal; stA?: NumerosCanal; an?: NumerosCanal; anA?: NumerosCanal };
+  const daSite = (p: Par, campo: keyof NumerosCanal) => [
+    ...sv("site", p.st?.[campo] ?? 0, p.stA?.[campo] ?? 0),
+    ...(a.ok ? sv("analytics", p.an?.[campo] ?? 0, p.anA?.[campo] ?? 0) : []),
   ];
   const linhasConsole = (): LinhaOrigem[] => g.ok ? [
-    { nome: "Apareceu na pesquisa do Google", valores: sv("console", consoleTotal("aparicoes"), diasConsole, g.parcial) },
-    { nome: "Clicou no resultado do Google", valores: sv("console", consoleTotal("cliques"), diasConsole, g.parcial) },
+    { nome: "Apareceu na pesquisa do Google", valores: sv("console", g.aparicoes, g.semComparacao ? undefined : g.aparicoesAntes, diasConsole, g.parcial) },
+    { nome: "Clicou no resultado do Google", valores: sv("console", g.cliques, g.semComparacao ? undefined : g.cliquesAntes, diasConsole, g.parcial) },
   ] : [];
   const linhasMeta = (): LinhaOrigem[] => ig?.ok ? [
-    { nome: "Viu o Instagram (contas alcançadas)", valores: sv("meta", ig.alcance, 1) },
-    { nome: "Visitou o perfil do Instagram", valores: sv("meta", ig.visitasPerfil) },
-    { nome: "Clicou no link do site no perfil", valores: sv("meta", ig.cliquesLinkSite) },
+    { nome: "Viu o Instagram (contas alcançadas)", valores: sv("meta", ig.alcance, igAntes?.alcance, 1) },
+    { nome: "Visitou o perfil do Instagram", valores: sv("meta", ig.visitasPerfil, igAntes?.visitasPerfil) },
+    { nome: "Clicou no link do site no perfil", valores: sv("meta", ig.cliquesLinkSite, igAntes?.cliquesLinkSite) },
   ] : [];
-  const linhasSite = (st: NumerosCanal | undefined, an: NumerosCanal | undefined): LinhaOrigem[] => [
-    { nome: "Abriu o site (pessoas)", valores: daSite(st, an, "pessoas") },
-    { nome: "Páginas abertas", valores: daSite(st, an, "paginas") },
-    { nome: "Clicou no WhatsApp", valores: daSite(st, an, "whatsapp") },
-    { nome: "Clicou em Agendar", valores: daSite(st, an, "agendar") },
-    { nome: "Enviou formulário", valores: daSite(st, an, "formularios") },
+  const linhasSite = (p: Par): LinhaOrigem[] => [
+    { nome: "Abriu o site (pessoas)", valores: daSite(p, "pessoas") },
+    { nome: "Páginas abertas", valores: daSite(p, "paginas") },
+    { nome: "Pessoas que clicaram no WhatsApp ou Agendar", valores: daSite(p, "pessoasContato") },
+    { nome: "Cliques no WhatsApp", valores: daSite(p, "whatsapp") },
+    { nome: "Cliques em Agendar", valores: daSite(p, "agendar") },
+    { nome: "Formulários enviados", valores: daSite(p, "formularios") },
   ];
 
   const temDado = (k: Canal) => {
@@ -297,9 +312,9 @@ function PorOrigem({ r }: { r: Resultados }) {
   const tot = soma(s.porCanal);
   const pct1 = (x: number, y: number) => (y ? `${((x / y) * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%` : "—");
   const taxas: [string, string][] = [
-    ["Das pessoas que abriram o site, clicaram no WhatsApp ou Agendar", pct1(tot.whatsapp + tot.agendar, tot.pessoas)],
+    ["Das pessoas que abriram o site, clicaram no WhatsApp ou Agendar", pct1(tot.pessoasContato, tot.pessoas)],
     ["Páginas abertas por pessoa", tot.pessoas ? (tot.paginas / tot.pessoas).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) : "—"],
-    ...(g.ok ? [["Das vezes que apareceu no Google, clicaram", pct1(consoleTotal("cliques"), consoleTotal("aparicoes"))] as [string, string]] : []),
+    ...(g.ok ? [["Das vezes que apareceu no Google, clicaram", pct1(g.cliques, g.aparicoes)] as [string, string]] : []),
     ...(ig?.ok ? [["Das visitas ao perfil do Instagram, clicaram no link do site", pct1(ig.cliquesLinkSite ?? 0, ig.visitasPerfil ?? 0)] as [string, string]] : []),
   ];
 
@@ -324,7 +339,7 @@ function PorOrigem({ r }: { r: Resultados }) {
       <CartaoOrigem
         titulo="Total (todas as origens)"
         destaque
-        linhas={[...linhasConsole(), ...linhasMeta(), ...linhasSite(tot, soma(a.porCanal))]}
+        linhas={[...linhasConsole(), ...linhasMeta(), ...linhasSite({ st: tot, stA: soma(s.porCanalAntes), an: soma(a.porCanal), anA: soma(a.porCanalAntes) })]}
         rodape={
           <div className="mt-3 rounded-xl bg-carbon/60 p-3 grid gap-1.5">
             <p className="text-[10px] font-bold uppercase tracking-wide text-steel-line">Taxas (contagem do site)</p>
@@ -339,12 +354,12 @@ function PorOrigem({ r }: { r: Resultados }) {
           <CartaoOrigem
             key={k}
             titulo={TITULO_CANAL[k]}
-            linhas={[...(k === "google" ? linhasConsole() : []), ...(k === "instagram" ? linhasMeta() : []), ...linhasSite(s.porCanal[k], a.porCanal[k])]}
+            linhas={[...(k === "google" ? linhasConsole() : []), ...(k === "instagram" ? linhasMeta() : []), ...linhasSite({ st: s.porCanal[k], stA: s.porCanalAntes[k], an: a.porCanal[k], anA: a.porCanalAntes[k] })]}
           />
         ))}
       </div>
       <p className="text-[11px] text-steel-line leading-relaxed">
-        Média = total dividido pelos dias do período{g.ok && g.parcial ? "; no Console, só pelos dias que o Google já fechou (* = os últimos 2 a 3 dias ainda não chegaram)" : ""}. Cada pessoa fica na origem por onde entrou: quem achou no Google e clicou no WhatsApp conta em &quot;Vieram do Google&quot;.
+        A porcentagem compara com o período anterior do mesmo tamanho (em &quot;Hoje&quot;, com ontem; em &quot;7 dias&quot;, com os 7 dias antes). Média = total dividido pelos dias do período{g.ok && g.parcial ? "; no Console, só pelos dias que o Google já fechou (* = os últimos 2 a 3 dias ainda não chegaram)" : ""}. Cada pessoa fica na origem por onde entrou: quem achou no Google e clicou no WhatsApp conta em &quot;Vieram do Google&quot;.
       </p>
     </div>
   );
