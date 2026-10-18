@@ -160,7 +160,7 @@ function DeOndeVem() {
     ["Clicou no resultado do Google", "Search Console", "2 a 3 dias depois"],
   ];
   return (
-    <details className="bg-card border border-card-line rounded-2xl p-5 group" open>
+    <details className="bg-card border border-card-line rounded-2xl p-5 group">
       <summary className="cursor-pointer font-display font-bold text-steel list-none flex items-center justify-between">
         De onde vem cada número
         <span className="text-xs text-steel-line font-sans group-open:hidden">mostrar</span>
@@ -197,85 +197,154 @@ const TITULO_CANAL: Record<Canal, string> = {
   whatsapp: "Vieram de link no WhatsApp", ia: "Vieram do ChatGPT e outras IAs", direto: "Direto (link salvo ou digitado)", outros: "Vieram de outros sites",
 };
 
-type LinhaOrigem = { nome: string; site?: number; analytics?: number; console?: string };
+type Fonte = "site" | "analytics" | "console" | "meta";
+const FONTE: Record<Fonte, { nome: string; cor: string; borda: string }> = {
+  site: { nome: "Site", cor: "text-ok", borda: "border-ok/40" },
+  analytics: { nome: "Analytics", cor: "text-cera", borda: "border-cera/40" },
+  console: { nome: "Console", cor: "text-verniz-shine", borda: "border-verniz/40" },
+  meta: { nome: "Meta", cor: "text-[#e1306c]", borda: "border-[#e1306c]/40" },
+};
+type Valor = { fonte: Fonte; valor: number; dias: number; parcial?: boolean };
+type LinhaOrigem = { nome: string; valores: Valor[] };
 
-function TabelaOrigem({ titulo, linhas, destaque, analyticsOk }: { titulo: string; linhas: LinhaOrigem[]; destaque?: boolean; analyticsOk: boolean }) {
-  const col = "py-1.5 px-2 text-right tabular-nums";
+const media = (v: number, dias: number) => {
+  if (dias <= 1 || !v) return "";
+  const m = v / dias;
+  return `${m.toLocaleString("pt-BR", { maximumFractionDigits: m < 10 ? 1 : 0 })}/dia`;
+};
+
+/** Um número de uma fonte: "Site 6 · 0,9/dia" */
+function Selo({ v }: { v: Valor }) {
+  const f = FONTE[v.fonte];
+  const m = media(v.valor, v.dias);
+  return (
+    <span className={`inline-flex items-baseline gap-1.5 rounded-lg border ${f.borda} px-2 py-1`}>
+      <span className={`text-[10px] font-bold uppercase tracking-wide ${f.cor}`}>{f.nome}</span>
+      <b className="font-display text-lg leading-none text-steel tabular-nums">{n(v.valor)}{v.parcial ? "*" : ""}</b>
+      {m && <span className="text-[11px] text-steel-line tabular-nums">{m}</span>}
+    </span>
+  );
+}
+
+function CartaoOrigem({ titulo, linhas, destaque, rodape }: { titulo: string; linhas: LinhaOrigem[]; destaque?: boolean; rodape?: React.ReactNode }) {
+  const visiveis = linhas.filter((l) => l.valores.length);
   return (
     <div className={`rounded-2xl border p-4 min-w-0 ${destaque ? "border-verniz/50 bg-card" : "border-card-line bg-card"}`}>
-      <h3 className="font-display font-bold text-lg text-steel mb-2">{titulo}</h3>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-[10px] uppercase tracking-wide">
-            <th className="pb-1 px-2 text-left font-bold text-steel-line">Métrica</th>
-            <th className="pb-1 px-2 text-right font-bold text-ok">Site</th>
-            <th className="pb-1 px-2 text-right font-bold text-cera">Analytics</th>
-            <th className="pb-1 px-2 text-right font-bold text-verniz-shine">Console</th>
-          </tr>
-        </thead>
-        <tbody>
-          {linhas.map((l) => (
-            <tr key={l.nome} className="border-t border-card-line">
-              <td className="py-1.5 px-2 text-steel">{l.nome}</td>
-              <td className={`${col} font-bold text-steel`}>{l.site === undefined ? "—" : n(l.site)}</td>
-              <td className={`${col} text-steel`}>{l.analytics === undefined ? "—" : analyticsOk ? n(l.analytics) : "não ligado"}</td>
-              <td className={`${col} text-steel`}>{l.console ?? "—"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h3 className="font-display font-bold text-lg text-steel mb-1">{titulo}</h3>
+      <ul className="divide-y divide-card-line">
+        {visiveis.map((l) => (
+          <li key={l.nome} className="py-2.5 grid gap-1.5">
+            <span className="text-sm text-steel">{l.nome}</span>
+            <span className="flex flex-wrap gap-1.5">{l.valores.map((v) => <Selo key={v.fonte} v={v} />)}</span>
+          </li>
+        ))}
+      </ul>
+      {rodape}
     </div>
   );
 }
 
 /**
- * 18/10/2026: tudo numa visão só, por origem. Um cartão por canal (Google,
- * Instagram, direto...) com todas as métricas, e em cada uma o número de cada
- * fonte lado a lado: Site, Analytics e Search Console.
+ * 18/10/2026: tudo numa visão só, por origem. Um cartão por canal com todas
+ * as métricas; em cada métrica só aparecem as fontes que medem aquilo, com o
+ * total e a média por dia.
  */
 function PorOrigem({ r }: { r: Resultados }) {
   const { site: s, analytics: a, google: g } = r;
-  const cliquesGoogle = g.porDia.reduce((t, d) => t + d.cliques, 0);
-  const aparicoes = g.porDia.reduce((t, d) => t + d.aparicoes, 0);
-  const parcial = g.ok && g.parcial ? "*" : "";
+  const ig = r.meta.instagram;
+  const dias = r.periodo.dias;
+  // O Console só tem os dias até o último completo: a média usa esses dias.
+  const diasConsole = g.ok && g.parcial && !g.semComparacao
+    ? Math.round((Date.parse(g.completoAte) - Date.parse(r.periodo.inicio)) / 86_400_000) + 1
+    : dias;
+  const consoleTotal = (campo: "aparicoes" | "cliques") =>
+    g.porDia.filter((d) => !g.parcial || g.semComparacao || d.data <= g.completoAte).reduce((t, d) => t + d[campo], 0);
   const soma = (m: Partial<Record<Canal, NumerosCanal>>) => Object.values(m).reduce<NumerosCanal>((t, c) => ({
     pessoas: t.pessoas + (c?.pessoas ?? 0), paginas: t.paginas + (c?.paginas ?? 0), whatsapp: t.whatsapp + (c?.whatsapp ?? 0),
     agendar: t.agendar + (c?.agendar ?? 0), formularios: t.formularios + (c?.formularios ?? 0),
   }), { pessoas: 0, paginas: 0, whatsapp: 0, agendar: 0, formularios: 0 });
 
+  const sv = (fonte: Fonte, valor: number | undefined, d = dias, parcial = false): Valor[] => valor === undefined ? [] : [{ fonte, valor, dias: d, parcial }];
+  const daSite = (st: NumerosCanal | undefined, an: NumerosCanal | undefined, campo: keyof NumerosCanal) => [
+    ...sv("site", st?.[campo] ?? 0),
+    ...(a.ok ? sv("analytics", an?.[campo] ?? 0) : []),
+  ];
+  const linhasConsole = (): LinhaOrigem[] => g.ok ? [
+    { nome: "Apareceu na pesquisa do Google", valores: sv("console", consoleTotal("aparicoes"), diasConsole, g.parcial) },
+    { nome: "Clicou no resultado do Google", valores: sv("console", consoleTotal("cliques"), diasConsole, g.parcial) },
+  ] : [];
+  const linhasMeta = (): LinhaOrigem[] => ig?.ok ? [
+    { nome: "Viu o Instagram (contas alcançadas)", valores: sv("meta", ig.alcance, 1) },
+    { nome: "Visitou o perfil do Instagram", valores: sv("meta", ig.visitasPerfil) },
+    { nome: "Clicou no link do site no perfil", valores: sv("meta", ig.cliquesLinkSite) },
+  ] : [];
+  const linhasSite = (st: NumerosCanal | undefined, an: NumerosCanal | undefined): LinhaOrigem[] => [
+    { nome: "Abriu o site (pessoas)", valores: daSite(st, an, "pessoas") },
+    { nome: "Páginas abertas", valores: daSite(st, an, "paginas") },
+    { nome: "Clicou no WhatsApp", valores: daSite(st, an, "whatsapp") },
+    { nome: "Clicou em Agendar", valores: daSite(st, an, "agendar") },
+    { nome: "Enviou formulário", valores: daSite(st, an, "formularios") },
+  ];
+
   const temDado = (k: Canal) => {
     const x = s.porCanal[k], y = a.porCanal[k];
-    return Boolean((x && (x.pessoas || x.paginas || x.whatsapp || x.agendar || x.formularios)) || (y && (y.pessoas || y.paginas || y.whatsapp || y.agendar)));
+    return Boolean((x && (x.pessoas || x.paginas)) || (y && (y.pessoas || y.paginas)));
   };
-  const canais = CANAIS_ORDEM.filter((k) => temDado(k) || (k === "google" && g.ok && aparicoes > 0))
+  const canais = CANAIS_ORDEM.filter((k) => temDado(k) || (k === "google" && g.ok) || (k === "instagram" && ig?.ok))
     .sort((x, y) => (s.porCanal[y]?.pessoas ?? 0) - (s.porCanal[x]?.pessoas ?? 0) || (a.porCanal[y]?.pessoas ?? 0) - (a.porCanal[x]?.pessoas ?? 0));
 
-  const linhasDe = (st: NumerosCanal | undefined, an: NumerosCanal | undefined, comConsole: boolean): LinhaOrigem[] => [
-    ...(comConsole && g.ok ? [
-      { nome: "Apareceu na pesquisa do Google", console: `${n(aparicoes)}${parcial}` },
-      { nome: "Clicou no resultado do Google", console: `${n(cliquesGoogle)}${parcial}` },
-    ] : []),
-    { nome: "Abriu o site (pessoas)", site: st?.pessoas ?? 0, analytics: an?.pessoas ?? 0 },
-    { nome: "Páginas abertas", site: st?.paginas ?? 0, analytics: an?.paginas ?? 0 },
-    { nome: "Clicou no WhatsApp", site: st?.whatsapp ?? 0, analytics: an?.whatsapp ?? 0 },
-    { nome: "Clicou em Agendar", site: st?.agendar ?? 0, analytics: an?.agendar ?? 0 },
-    { nome: "Enviou formulário", site: st?.formularios ?? 0, analytics: an?.formularios ?? 0 },
+  // Taxas do total: o que mais interessa no dia a dia
+  const tot = soma(s.porCanal);
+  const pct1 = (x: number, y: number) => (y ? `${((x / y) * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%` : "—");
+  const taxas: [string, string][] = [
+    ["Das pessoas que abriram o site, clicaram no WhatsApp ou Agendar", pct1(tot.whatsapp + tot.agendar, tot.pessoas)],
+    ["Páginas abertas por pessoa", tot.pessoas ? (tot.paginas / tot.pessoas).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) : "—"],
+    ...(g.ok ? [["Das vezes que apareceu no Google, clicaram", pct1(consoleTotal("cliques"), consoleTotal("aparicoes"))] as [string, string]] : []),
+    ...(ig?.ok ? [["Das visitas ao perfil do Instagram, clicaram no link do site", pct1(ig.cliquesLinkSite ?? 0, ig.visitasPerfil ?? 0)] as [string, string]] : []),
   ];
+
+  const faltando = [
+    !a.ok && "Google Analytics",
+    !ig?.ok && (ig?.erro ? `Instagram (${ig.erro})` : "Instagram"),
+  ].filter(Boolean) as string[];
 
   return (
     <div className="grid gap-4">
-      <TabelaOrigem titulo="Total (todas as origens)" destaque analyticsOk={a.ok} linhas={linhasDe(soma(s.porCanal), soma(a.porCanal), true)} />
-      {canais.length === 0 ? (
-        <p className="text-sm text-steel-line">Ainda sem visitas neste período.</p>
-      ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {canais.map((k) => (
-            <TabelaOrigem key={k} analyticsOk={a.ok} titulo={TITULO_CANAL[k]} linhas={linhasDe(s.porCanal[k], a.porCanal[k], k === "google")} />
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-2 text-[11px] text-steel-line">
+        {(Object.keys(FONTE) as Fonte[]).map((f) => (
+          <span key={f} className={`rounded-full border ${FONTE[f].borda} px-2.5 py-0.5`}>
+            <b className={FONTE[f].cor}>{FONTE[f].nome}</b>{" "}
+            {f === "site" ? "conta na hora" : f === "analytics" ? "algumas horas depois" : f === "console" ? "2 a 3 dias depois" : "Instagram, pelo SAS"}
+          </span>
+        ))}
+      </div>
+      {faltando.length > 0 && (
+        <p className="text-xs text-cera">Ainda sem números de: {faltando.join(" · ")}. Assim que ligar, eles entram aqui sozinhos.</p>
       )}
+      <CartaoOrigem
+        titulo="Total (todas as origens)"
+        destaque
+        linhas={[...linhasConsole(), ...linhasMeta(), ...linhasSite(tot, soma(a.porCanal))]}
+        rodape={
+          <div className="mt-3 rounded-xl bg-carbon/60 p-3 grid gap-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-steel-line">Taxas (contagem do site)</p>
+            {taxas.map(([nome, v]) => (
+              <p key={nome} className="flex justify-between gap-3 text-sm"><span className="text-steel-line">{nome}</span><b className="text-steel tabular-nums shrink-0">{v}</b></p>
+            ))}
+          </div>
+        }
+      />
+      <div className="grid gap-4 lg:grid-cols-2">
+        {canais.map((k) => (
+          <CartaoOrigem
+            key={k}
+            titulo={TITULO_CANAL[k]}
+            linhas={[...(k === "google" ? linhasConsole() : []), ...(k === "instagram" ? linhasMeta() : []), ...linhasSite(s.porCanal[k], a.porCanal[k])]}
+          />
+        ))}
+      </div>
       <p className="text-[11px] text-steel-line leading-relaxed">
-        <b className="text-ok">Site</b>: contado pelo próprio site, na hora, sem robôs e sem você. <b className="text-cera">Analytics</b>: Google Analytics, chega em algumas horas e costuma contar um pouco menos (bloqueadores e cookies recusados). <b className="text-verniz-shine">Console</b>: Google Search Console, só existe para o Google e chega em 2 a 3 dias.{parcial ? " * Os últimos 2 a 3 dias do período ainda não chegaram no Console." : ""} O site guarda a origem da primeira página da visita: quem entrou pelo Google e clicou no WhatsApp conta como &quot;Vieram do Google&quot;.
+        Média = total dividido pelos dias do período{g.ok && g.parcial ? "; no Console, só pelos dias que o Google já fechou (* = os últimos 2 a 3 dias ainda não chegaram)" : ""}. Cada pessoa fica na origem por onde entrou: quem achou no Google e clicou no WhatsApp conta em &quot;Vieram do Google&quot;.
       </p>
     </div>
   );

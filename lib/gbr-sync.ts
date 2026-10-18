@@ -89,6 +89,13 @@ export async function getServicosSas(): Promise<ServicoSas[] | null> {
   return r.servicos.map((s) => ({ ...s, ativo: s.ativo !== false, destaque: s.destaque === true }));
 }
 
+/** 18/10/2026: estatísticas do Instagram (Meta) vindas do SAS para o painel. */
+export type InstagramSas = { ok: boolean; erro?: string; usuario?: string | null; visitasPerfil?: number; cliquesLinkSite?: number; alcance?: number; contasEngajadas?: number };
+export async function getRedesSas(inicio: string, fim: string): Promise<InstagramSas | null> {
+  const r = await buscar<{ instagram?: InstagramSas }>(`/redes?inicio=${inicio}&fim=${fim}`);
+  return r?.instagram ?? null;
+}
+
 export async function getFuncionamentoSas(): Promise<FuncionamentoSas | null> {
   const r = await buscar<FuncionamentoSas>("/funcionamento");
   return r && Array.isArray(r.semana) ? r : null;

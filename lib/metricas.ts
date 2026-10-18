@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { consultarAnalytics, consultarSearchConsole, googleConfigurado } from "@/lib/google";
 import { canalDoAnalytics, canalDoSite, type Canal } from "@/lib/canais";
+import { getRedesSas, type InstagramSas } from "@/lib/gbr-sync";
 
 /** Números de um canal (Google, Instagram...) numa fonte. */
 export type NumerosCanal = { pessoas: number; paginas: number; whatsapp: number; agendar: number; formularios: number };
@@ -138,6 +139,8 @@ export type Resultados = {
     porCanal: Partial<Record<Canal, NumerosCanal>>;
     recentes: { quando: string; tipo: string; caminho: string; origem: string }[];
   };
+  /** 18/10/2026: Instagram (Meta), pelo SAS. null = integração do SAS desligada. */
+  meta: { instagram: InstagramSas | null };
   conexao: ReturnType<typeof googleConfigurado>;
 };
 
@@ -286,7 +289,7 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
     ok: false, pessoas: 0, pessoasAntes: 0, novas: 0, paginasVistas: 0, cliquesWhats: 0, formularios: 0, pessoasBuscaGoogle: 0, porCanal: {}, porDia: [], canais: [], aparelhos: [], cidades: [],
   };
 
-  const [google, analytics, site] = await Promise.all([
+  const [google, analytics, site, instagram] = await Promise.all([
     // ---- Search Console
     (async (): Promise<Resultados["google"]> => {
       if (!conexao.conta) return { ...vazioGoogle, erro: "nao-configurado" };
@@ -394,7 +397,9 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
         };
       }
     })(),
+    // ---- Instagram (Meta), pelo SAS
+    getRedesSas(inicio, fim).catch(() => null),
   ]);
 
-  return { periodo: { inicio, fim, dias: p.dias }, google, analytics, site, conexao };
+  return { periodo: { inicio, fim, dias: p.dias }, google, analytics, site, meta: { instagram }, conexao };
 }
