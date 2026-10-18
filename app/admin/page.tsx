@@ -29,9 +29,9 @@ function Variacao({ atual, antes, semComparacao }: { atual: number; antes: numbe
 }
 
 function Etapa({
-  icone: Icone, titulo, valor, explicacao, atual, antes, taxa, indisponivel, nota, semComparacao,
+  icone: Icone, titulo, valor, explicacao, atual, antes, taxa, indisponivel, nota, semComparacao, semVariacao,
 }: {
-  icone: typeof Search; titulo: string; valor: number; explicacao: string; atual: number; antes: number; taxa?: string; indisponivel?: string; nota?: string; semComparacao?: boolean;
+  icone: typeof Search; titulo: string; valor: number; explicacao: string; atual: number; antes: number; taxa?: string; indisponivel?: string; nota?: string; semComparacao?: boolean; semVariacao?: boolean;
 }) {
   return (
     <div className="relative bg-card border border-card-line rounded-2xl p-5 flex flex-col gap-2 min-w-0">
@@ -44,7 +44,7 @@ function Etapa({
       ) : (
         <>
           <div className="font-display font-extrabold text-4xl text-steel tabular-nums leading-none">{n(valor)}</div>
-          <Variacao atual={atual} antes={antes} semComparacao={semComparacao} />
+          {!semVariacao && <Variacao atual={atual} antes={antes} semComparacao={semComparacao} />}
         </>
       )}
       <p className="text-xs text-steel-line leading-relaxed">{explicacao}</p>
@@ -128,6 +128,157 @@ function TabelaBuscas({ buscas }: { buscas: Busca[] }) {
   );
 }
 
+const CORES_SECAO = {
+  ok: { caixa: "border-ok/30 bg-ok/[0.04]", titulo: "text-ok" },
+  verniz: { caixa: "border-verniz/30 bg-verniz/[0.04]", titulo: "text-verniz-shine" },
+  cera: { caixa: "border-cera/30 bg-cera/[0.04]", titulo: "text-cera" },
+  neutro: { caixa: "border-card-line bg-card/40", titulo: "text-steel" },
+};
+
+function Secao({ titulo, sub, cor, children }: { titulo: string; sub: string; cor: keyof typeof CORES_SECAO; children: React.ReactNode }) {
+  return (
+    <section className={`grid gap-5 rounded-3xl border p-4 md:p-6 ${CORES_SECAO[cor].caixa}`}>
+      <div>
+        <h2 className={`font-display font-extrabold text-2xl ${CORES_SECAO[cor].titulo}`}>{titulo}</h2>
+        <p className="text-sm text-steel-line mt-1 max-w-3xl leading-relaxed">{sub}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+/** Resumo no topo: de onde vem cada número do painel. */
+function DeOndeVem() {
+  const linhas: [string, string, string][] = [
+    ["Pessoas no site, páginas abertas", "Site", "na hora"],
+    ["Cliques no WhatsApp e Agendar, formulários", "Site", "na hora"],
+    ["De onde veio, páginas que geram contato, últimos cliques", "Site", "na hora"],
+    ["Pessoas, páginas, cliques no WhatsApp, canais, cidades, aparelhos", "Analytics", "algumas horas depois"],
+    ["Apareceu no Google, posição, o que pesquisaram", "Search Console", "2 a 3 dias depois"],
+    ["Clicou no resultado do Google", "Search Console", "2 a 3 dias depois"],
+  ];
+  return (
+    <details className="bg-card border border-card-line rounded-2xl p-5 group" open>
+      <summary className="cursor-pointer font-display font-bold text-steel list-none flex items-center justify-between">
+        De onde vem cada número
+        <span className="text-xs text-steel-line font-sans group-open:hidden">mostrar</span>
+      </summary>
+      <div className="overflow-x-auto mt-3 -mx-1">
+        <table className="w-full text-sm min-w-[360px]">
+          <thead>
+            <tr className="text-left text-steel-line text-[11px] uppercase tracking-wide">
+              <th className="pb-2 px-1 font-bold">Número</th>
+              <th className="pb-2 px-1 font-bold">Quem conta</th>
+              <th className="pb-2 px-1 font-bold">Quando aparece</th>
+            </tr>
+          </thead>
+          <tbody>
+            {linhas.map(([numero, fonte, quando]) => (
+              <tr key={numero} className="border-t border-card-line align-top">
+                <td className="py-2 px-1 text-steel">{numero}</td>
+                <td className={`py-2 px-1 font-bold ${fonte === "Site" ? "text-ok" : fonte === "Analytics" ? "text-cera" : "text-verniz-shine"}`}>{fonte}</td>
+                <td className="py-2 px-1 text-steel-line">{quando}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-steel-line mt-3">
+        Exemplo: um cliente pesquisa no Google, entra no site e clica no WhatsApp. Na hora, a parte 1 (site) mostra a visita vinda do Google e o clique no WhatsApp. Em algumas horas o Analytics (parte 2) também conta. Dois ou três dias depois, o Search Console (parte 3) mostra o clique dele no resultado do Google. Na parte 4 você vê os três lado a lado.
+      </p>
+    </details>
+  );
+}
+
+/** Quadro lado a lado: o mesmo assunto em cada fonte, mais a tabela dia a dia. */
+function Comparacao({ r }: { r: Resultados }) {
+  const { site: s, analytics: a, google: g } = r;
+  const cliquesGoogle = g.porDia.reduce((t, d) => t + d.cliques, 0);
+  const aparicoes = g.porDia.reduce((t, d) => t + d.aparicoes, 0);
+  const semA = a.ok ? null : "não ligado";
+  const semG = g.ok ? null : "não ligado";
+  const parcialG = g.ok && g.parcial ? "*" : "";
+  const linhas: { assunto: string; site: string; analytics: string; console: string; ajuda: string }[] = [
+    { assunto: "Pessoas no site", site: n(s.pessoas), analytics: semA ?? n(a.pessoas), console: "—",
+      ajuda: "Site e Analytics devem ficar próximos. Analytics menor: bloqueadores/cookies recusados." },
+    { assunto: "Páginas abertas", site: n(s.visitas), analytics: semA ?? n(a.paginasVistas), console: "—", ajuda: "" },
+    { assunto: "Vieram pelo Google", site: n(s.pessoasGoogle), analytics: semA ?? n(a.pessoasBuscaGoogle), console: semG ?? `${n(cliquesGoogle)}${parcialG}`,
+      ajuda: "Site e Analytics contam pessoas; o Console conta cliques no resultado (os últimos dias chegam depois)." },
+    { assunto: "Clicou no WhatsApp/Agendar", site: n(s.whatsapp + s.agendar), analytics: semA ?? n(a.cliquesWhats), console: "—",
+      ajuda: "O Console não vê cliques dentro do site." },
+    { assunto: "Formulários enviados", site: n(s.formularios), analytics: semA ?? n(a.formularios), console: "—", ajuda: "" },
+    { assunto: "Apareceu no Google", site: "—", analytics: "—", console: semG ?? `${n(aparicoes)}${parcialG}`, ajuda: "Só o Console sabe disso." },
+  ];
+  const mapaA = new Map(a.porDia.map((d) => [d.data, d.pessoas]));
+  const mapaG = new Map(g.porDia.map((d) => [d.data, d.cliques]));
+  const dias = [...s.porDia].reverse();
+  const col = "py-2 px-2 text-right tabular-nums";
+  return (
+    <div className="grid gap-6">
+      <Cartao titulo="Mesmo assunto, três fontes" sub="Período escolhido no topo">
+        <div className="overflow-x-auto -mx-1">
+          <table className="w-full text-sm min-w-[420px]">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wide">
+                <th className="pb-2 px-2 font-bold text-steel-line">Assunto</th>
+                <th className="pb-2 px-2 font-bold text-right text-ok">Site</th>
+                <th className="pb-2 px-2 font-bold text-right text-cera">Analytics</th>
+                <th className="pb-2 px-2 font-bold text-right text-verniz-shine">Console</th>
+              </tr>
+            </thead>
+            <tbody>
+              {linhas.map((l) => (
+                <tr key={l.assunto} className="border-t border-card-line align-top">
+                  <td className="py-2 px-2 text-steel">
+                    {l.assunto}
+                    {l.ajuda && <span className="block text-[11px] text-steel-line leading-snug mt-0.5">{l.ajuda}</span>}
+                  </td>
+                  <td className={`${col} font-bold text-steel`}>{l.site}</td>
+                  <td className={`${col} text-steel`}>{l.analytics}</td>
+                  <td className={`${col} text-steel`}>{l.console}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {parcialG && <p className="text-[11px] text-steel-line mt-3">* Console ainda incompleto nos últimos 2 a 3 dias do período.</p>}
+      </Cartao>
+
+      <Cartao titulo="Dia a dia" sub="Pessoas segundo o site e o Analytics, quem veio do Google segundo o site, cliques no resultado do Google (Console) e cliques no WhatsApp (site)">
+        <div className="overflow-x-auto -mx-1">
+          <table className="w-full text-sm min-w-[520px]">
+            <thead>
+              <tr className="text-[11px] uppercase tracking-wide">
+                <th className="pb-2 px-2 font-bold text-left text-steel-line">Dia</th>
+                <th className="pb-2 px-2 font-bold text-right text-ok">Pessoas · site</th>
+                <th className="pb-2 px-2 font-bold text-right text-cera">Pessoas · Analytics</th>
+                <th className="pb-2 px-2 font-bold text-right text-ok">Do Google · site</th>
+                <th className="pb-2 px-2 font-bold text-right text-verniz-shine">Cliques · Console</th>
+                <th className="pb-2 px-2 font-bold text-right text-ok">WhatsApp · site</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dias.map((d) => {
+                const recente = g.ok && d.data > g.completoAte;
+                return (
+                  <tr key={d.data} className="border-t border-card-line">
+                    <td className="py-2 px-2 text-steel tabular-nums">{dataBR(d.data)}</td>
+                    <td className={`${col} font-bold text-steel`}>{n(d.pessoas)}</td>
+                    <td className={`${col} text-steel`}>{a.ok ? n(mapaA.get(d.data) ?? 0) : "—"}</td>
+                    <td className={`${col} text-steel`}>{n(d.pessoasGoogle)}</td>
+                    <td className={`${col} ${recente ? "text-steel-line" : "text-steel"}`}>{g.ok ? (recente ? `${n(mapaG.get(d.data) ?? 0)}*` : n(mapaG.get(d.data) ?? 0)) : "—"}</td>
+                    <td className={`${col} text-steel`}>{n(d.contatos)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </Cartao>
+    </div>
+  );
+}
+
 function AvisoConexao({ r }: { r: Resultados }) {
   const passos = [
     { ok: r.conexao.conta, texto: "Chave do Google na Vercel (GOOGLE_CLIENT_EMAIL e GOOGLE_PRIVATE_KEY)" },
@@ -170,11 +321,6 @@ export default async function Resultados({
     : g.semComparacao
       ? `Ainda incompleto: o Google só fecha estes dias até ${dataBR(deslocarIso(r.periodo.fim, 3))}.`
       : `Contado até ${dataBR(g.completoAte)} (o Google fecha os últimos dias com 2 a 3 dias de atraso), comparado com o mesmo número de dias antes.`;
-
-  // Pessoas: o Analytics é a melhor fonte; sem ele, as contadas pelo próprio site.
-  const pessoas = a.ok ? a.pessoas : s.pessoas;
-  const pessoasAntes = a.ok ? a.pessoasAntes : s.pessoasAntes;
-  const pessoasPorDia = a.ok ? a.porDia.map((d) => ({ data: d.data, valor: d.pessoas })) : s.porDia.map((d) => ({ data: d.data, valor: d.pessoas }));
 
   const oportunidades = g.buscas
     .filter((b) => b.posicao > 4 && b.posicao <= 25 && b.aparicoes >= 3)
@@ -225,19 +371,170 @@ export default async function Resultados({
         </nav>
       </header>
 
-      <AvisoConexao r={r} />
+      <DeOndeVem />
 
-      {/* O caminho do cliente */}
-      <section aria-labelledby="funil">
-        <h2 id="funil" className="text-[11px] font-bold uppercase tracking-wider text-steel-line mb-3">O caminho do cliente até você</h2>
+      {/* ═════════ 1. CONTADO PELO PRÓPRIO SITE ═════════ */}
+      <Secao
+        cor="ok"
+        titulo="1 · Contado pelo próprio site"
+        sub="Aparece na hora. O site registra cada visita e cada clique, já sem robôs e sem as suas visitas (este navegador está marcado como seu). É o que mostra quem realmente chegou até você."
+      >
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <Etapa
+            icone={Users}
+            titulo="Pessoas no site"
+            valor={s.pessoas}
+            atual={s.pessoas}
+            antes={s.pessoasAntes}
+            explicacao="Pessoas diferentes que abriram o site, vindas de qualquer lugar (Google, Instagram, link direto). A mesma pessoa voltando conta uma vez."
+          />
+          <Etapa
+            icone={MousePointerClick}
+            titulo="Páginas abertas"
+            valor={s.visitas}
+            atual={s.visitas}
+            antes={s.visitasAntes}
+            explicacao="Total de páginas vistas. Uma pessoa que abre 3 páginas conta 3 aqui."
+            taxa={s.pessoas ? `${(s.visitas / s.pessoas).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} páginas por pessoa` : undefined}
+          />
+          <Etapa
+            icone={MessageCircle}
+            titulo="Clicou no WhatsApp"
+            valor={s.whatsapp + s.agendar}
+            atual={s.whatsapp + s.agendar}
+            antes={s.cliquesWhatsAntes}
+            explicacao={`Cliques que abrem o WhatsApp com a mensagem pronta: botão WhatsApp (${n(s.whatsapp)}) e botão Agendar (${n(s.agendar)}). É o clique, não a mensagem: quem clicou e não enviou também conta. As que chegam começam com "Vim pelo site da Clean Car".`}
+            taxa={s.pessoas ? `${pct((s.whatsapp + s.agendar) / s.pessoas)} das pessoas clicaram` : undefined}
+          />
+          <Etapa
+            icone={MessageCircle}
+            titulo="Formulários enviados"
+            valor={s.formularios}
+            atual={s.formularios}
+            antes={s.formulariosAntes}
+            explicacao="Formulários preenchidos e enviados no site (ex.: cupom de primeira visita)."
+          />
+        </div>
+        {s.legado && (
+          <p className="text-xs text-steel-line">
+            Neste período ainda há só dados antigos, que contavam também robôs e as suas visitas. A contagem limpa começou em 08/10/2026.
+          </p>
+        )}
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Cartao titulo="Pessoas no site por dia" sub="Contagem do próprio site">
+            <GraficoDiario pontos={s.porDia.map((d) => ({ data: d.data, valor: d.pessoas }))} unidade="pessoas" />
+          </Cartao>
+          <Cartao titulo="Cliques para o WhatsApp por dia" sub="Botões WhatsApp e Agendar, mais formulários">
+            <GraficoDiario pontos={s.porDia.map((d) => ({ data: d.data, valor: d.contatos }))} unidade="contatos" tipo="barras" cor="var(--cera)" />
+          </Cartao>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Cartao titulo="De onde as pessoas vieram" sub="O site anota de onde cada visita chegou (Google, Instagram, link direto…) e quantas clicaram no WhatsApp">
+            <ListaBarras unidade="visitas" itens={s.origens.map((o) => ({ nome: o.nome, valor: o.visitas, extra: `${n(o.contatos)} contatos` }))} />
+          </Cartao>
+          <Cartao titulo="Páginas que mais geram contato" sub="Visitas e cliques em WhatsApp/Agendar em cada página">
+            {s.paginas.length === 0 ? (
+              <p className="text-sm text-steel-line">Sem dados neste período.</p>
+            ) : (
+              <div className="overflow-x-auto -mx-1">
+                <table className="w-full text-sm min-w-[320px]">
+                  <thead>
+                    <tr className="text-left text-steel-line text-[11px] uppercase tracking-wide">
+                      <th className="pb-2 px-1 font-bold">Página</th>
+                      <th className="pb-2 px-1 font-bold text-right">Visitas</th>
+                      <th className="pb-2 px-1 font-bold text-right">Contatos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {s.paginas.map((p) => (
+                      <tr key={p.caminho} className="border-t border-card-line">
+                        <td className="py-2 px-1 text-steel break-all">{p.caminho === "/" ? "Página inicial" : p.caminho}</td>
+                        <td className="py-2 px-1 text-right tabular-nums text-steel-line">{n(p.visitas)}</td>
+                        <td className="py-2 px-1 text-right tabular-nums font-bold text-steel">{n(p.contatos)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Cartao>
+        </div>
+
+        <Cartao titulo="Últimos cliques para o WhatsApp" sub="Data e hora de cada clique, de onde a pessoa veio e em que página estava: compare com as conversas que começam com “Vim pelo site da Clean Car”">
+          {s.recentes.length === 0 ? (
+            <p className="text-sm text-steel-line">Nenhum contato neste período.</p>
+          ) : (
+            <ul className="divide-y divide-card-line">
+              {s.recentes.map((e, i) => (
+                <li key={i} className="py-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-sm">
+                  <span className="tabular-nums text-steel-line text-xs w-24 shrink-0">
+                    {new Date(e.quando).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" })}
+                  </span>
+                  <span className="font-bold text-steel w-20 shrink-0">{e.tipo}</span>
+                  <span className="text-steel-line min-w-0 break-all flex-1">{e.caminho === "/" ? "Página inicial" : e.caminho}</span>
+                  <span className="text-xs text-steel-line">veio de: {e.origem}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Cartao>
+      </Secao>
+
+      {/* ═════════ 2. GOOGLE ANALYTICS ═════════ */}
+      <Secao
+        cor="cera"
+        titulo="2 · Google Analytics"
+        sub="Ferramenta do Google que também conta visitas e cliques do site, com o código do Analytics instalado nas páginas. Chega em algumas horas. Costuma dar um pouco diferente da parte 1: conta de outro jeito, e bloqueadores de anúncio e quem recusa cookies escondem algumas pessoas."
+      >
+        {!a.ok ? (
+          <AvisoConexao r={r} />
+        ) : (
+          <>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <Etapa icone={Users} titulo="Pessoas no site" valor={a.pessoas} atual={a.pessoas} antes={a.pessoasAntes}
+                explicacao={`Pessoas ativas no site segundo o Analytics. ${n(a.novas)} delas entraram pela primeira vez.`} />
+              <Etapa icone={MousePointerClick} titulo="Páginas abertas" valor={a.paginasVistas} atual={a.paginasVistas} antes={0} semVariacao
+                explicacao="Páginas vistas segundo o Analytics." />
+              <Etapa icone={MessageCircle} titulo="Clicou no WhatsApp" valor={a.cliquesWhats} atual={a.cliquesWhats} antes={0} semVariacao
+                explicacao="Cliques nos botões WhatsApp e Agendar que o site também avisa ao Analytics." />
+              <Etapa icone={Search} titulo="Vieram da busca do Google" valor={a.pessoasBuscaGoogle} atual={a.pessoasBuscaGoogle} antes={0} semVariacao
+                explicacao="Pessoas que chegaram pela pesquisa orgânica do Google (canal Organic Search)." />
+            </div>
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Cartao titulo="Pessoas por dia (Analytics)" sub="Contagem do Google Analytics">
+                <GraficoDiario pontos={a.porDia.map((d) => ({ data: d.data, valor: d.pessoas }))} unidade="pessoas" cor="var(--cera)" />
+              </Cartao>
+              <Cartao titulo="De onde vieram (Analytics)" sub="Canais classificados pelo Google">
+                <ListaBarras unidade="pessoas" itens={a.canais.map((c) => ({ nome: c.nome, valor: c.pessoas }))} />
+              </Cartao>
+              <Cartao titulo="Cidades dos visitantes" sub="Cidade aproximada">
+                <ListaBarras unidade="pessoas" itens={a.cidades.map((c) => ({ nome: c.nome, valor: c.pessoas }))} />
+              </Cartao>
+              <Cartao titulo="Aparelho usado" sub="Celular ou computador">
+                <ListaBarras unidade="pessoas" itens={a.aparelhos.map((c) => ({ nome: c.nome, valor: c.pessoas }))} />
+              </Cartao>
+            </div>
+          </>
+        )}
+      </Secao>
+
+      {/* ═════════ 3. SEARCH CONSOLE ═════════ */}
+      <Secao
+        cor="verniz"
+        titulo="3 · Google Search Console"
+        sub="Números que o próprio Google manda sobre as pesquisas: quantas vezes o site apareceu e quantas pessoas clicaram no resultado. Chegam com 2 a 3 dias de atraso, então os dias mais recentes ficam vazios ou incompletos. Serve para ver se o site está sendo encontrado."
+      >
+        {!g.ok && <AvisoConexao r={r} />}
+        <div className="grid gap-3 sm:grid-cols-2">
           <Etapa
             icone={Search}
             titulo="Apareceu no Google"
             valor={g.aparicoes}
             atual={g.aparicoes}
             antes={g.aparicoesAntes}
-            explicacao="Vezes que o site surgiu na tela de alguém que pesquisou no Google."
+            explicacao="Vezes que o site surgiu na tela de alguém que pesquisou no Google (mesmo sem clicar)."
             nota={notaGoogle}
             semComparacao={g.semComparacao}
             indisponivel={g.ok ? undefined : "Ligue o Search Console para ver."}
@@ -245,155 +542,70 @@ export default async function Resultados({
           />
           <Etapa
             icone={MousePointerClick}
-            titulo="Clicou no site"
+            titulo="Clicou no resultado do Google"
             valor={g.cliques}
             atual={g.cliques}
             antes={g.cliquesAntes}
-            explicacao="Só quem clicou no resultado da pesquisa do Google para entrar no site (não conta Instagram, link direto nem cliques dentro do site). O Google entrega esse número 2 a 3 dias depois. Quem clicou no WhatsApp aparece na hora em “Abriu o WhatsApp”."
+            explicacao="Só quem clicou no link do site na página de resultados do Google. Não conta Instagram, link direto nem cliques dentro do site. Quem chegou hoje pelo Google aparece aqui em 2 a 3 dias; na parte 1 (site) já aparece na hora."
             nota={notaGoogle}
             semComparacao={g.semComparacao}
             indisponivel={g.ok ? undefined : "Ligue o Search Console para ver."}
             taxa={g.ok && g.aparicoes ? `${pct(g.cliques / g.aparicoes)} de quem viu clicou` : undefined}
           />
-          <Etapa
-            icone={Users}
-            titulo="Visitou o site"
-            valor={pessoas}
-            atual={pessoas}
-            antes={pessoasAntes}
-            explicacao={a.ok ? "Pessoas diferentes que abriram o site, vindas de qualquer lugar (Google, Instagram, link direto)." : "Pessoas diferentes contadas pelo próprio site, já sem robôs e sem você."}
-          />
-          <Etapa
-            icone={MessageCircle}
-            titulo="Abriu o WhatsApp"
-            valor={s.contatos}
-            atual={s.contatos}
-            antes={s.contatosAntes}
-            explicacao={`Cliques que abrem o WhatsApp com a mensagem pronta: botão WhatsApp (${n(s.whatsapp)}) e Agendar (${n(s.agendar)}), mais formulários (${n(s.formularios)}). É o clique, não a mensagem: nem todo mundo envia. As que chegam começam com "Vim pelo site da Clean Car".`}
-            taxa={pessoas ? `${pct(s.contatos / pessoas)} das visitas clicaram` : undefined}
-          />
         </div>
-        {s.legado && (
-          <p className="text-xs text-steel-line mt-3">
-            Neste período ainda há só dados antigos, que contavam também robôs e as suas visitas. A contagem limpa começou em 08/10/2026.
-          </p>
+
+        {g.ok && (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Cartao titulo="Aparições no Google por dia" sub="Os últimos 2 a 3 dias ainda podem estar zerados">
+              <GraficoDiario pontos={g.porDia.map((d) => ({ data: d.data, valor: d.aparicoes }))} unidade="aparições" />
+            </Cartao>
+            <Cartao titulo="Cliques no resultado do Google por dia" sub="Quantas dessas aparições viraram visita">
+              <GraficoDiario pontos={g.porDia.map((d) => ({ data: d.data, valor: d.cliques }))} unidade="cliques" tipo="barras" />
+            </Cartao>
+          </div>
         )}
-      </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Cartao titulo="Pessoas no site por dia" sub={a.ok ? "Fonte: Google Analytics" : "Fonte: contagem do próprio site"}>
-          <GraficoDiario pontos={pessoasPorDia} unidade="pessoas" />
-        </Cartao>
-        <Cartao titulo="Cliques para o WhatsApp por dia" sub="Abriu o WhatsApp pelo site (não quer dizer que enviou a mensagem)">
-          <GraficoDiario pontos={s.porDia.map((d) => ({ data: d.data, valor: d.contatos }))} unidade="contatos" tipo="barras" cor="var(--cera)" />
-        </Cartao>
-      </div>
-
-      {g.ok && (
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Cartao titulo="Aparições no Google por dia" sub="O Google leva 2 a 3 dias para mostrar os números mais recentes">
-            <GraficoDiario pontos={g.porDia.map((d) => ({ data: d.data, valor: d.aparicoes }))} unidade="aparições" />
-          </Cartao>
-          <Cartao titulo="Cliques vindos do Google por dia" sub="Quantas dessas aparições viraram visita">
-            <GraficoDiario pontos={g.porDia.map((d) => ({ data: d.data, valor: d.cliques }))} unidade="cliques" tipo="barras" />
-          </Cartao>
-        </div>
-      )}
-
-      {g.ok && (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <Cartao titulo="O que pesquisaram para achar você" sub="As buscas em que o site apareceu, das que mais trouxeram cliques">
-            <TabelaBuscas buscas={g.buscas.slice(0, 15)} />
-          </Cartao>
-          <Cartao titulo="Quase na primeira página" sub="Buscas que já mostram o site, mas ainda abaixo dos primeiros. São as mais fáceis de subir.">
-            {oportunidades.length === 0 ? (
-              <p className="text-sm text-steel-line">Nenhuma oportunidade clara neste período.</p>
-            ) : (
-              <ul className="grid gap-3">
-                {oportunidades.map((o) => (
-                  <li key={o.termo} className="flex gap-3">
-                    <Lightbulb size={16} className="text-cera shrink-0 mt-0.5" aria-hidden />
-                    <div className="min-w-0">
-                      <p className="text-sm text-steel font-bold">{o.termo}</p>
-                      <p className="text-xs text-steel-line">
-                        Apareceu {n(o.aparicoes)} vezes, na posição {o.posicao.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}. Um artigo ou página falando disso ajuda a subir.
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Cartao>
-        </div>
-      )}
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Cartao titulo="Páginas que mais geram contato" sub="Visitas e cliques em WhatsApp/Agendar em cada página do site">
-          {s.paginas.length === 0 ? (
-            <p className="text-sm text-steel-line">Sem dados neste período.</p>
-          ) : (
-            <div className="overflow-x-auto -mx-1">
-              <table className="w-full text-sm min-w-[360px]">
-                <thead>
-                  <tr className="text-left text-steel-line text-[11px] uppercase tracking-wide">
-                    <th className="pb-2 px-1 font-bold">Página</th>
-                    <th className="pb-2 px-1 font-bold text-right">Visitas</th>
-                    <th className="pb-2 px-1 font-bold text-right">Contatos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {s.paginas.map((p) => (
-                    <tr key={p.caminho} className="border-t border-card-line">
-                      <td className="py-2 px-1 text-steel break-all">{p.caminho === "/" ? "Página inicial" : p.caminho}</td>
-                      <td className="py-2 px-1 text-right tabular-nums text-steel-line">{n(p.visitas)}</td>
-                      <td className="py-2 px-1 text-right tabular-nums font-bold text-steel">{n(p.contatos)}</td>
-                    </tr>
+        {g.ok && (
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+            <Cartao titulo="O que pesquisaram para achar você" sub="As buscas em que o site apareceu, das que mais trouxeram cliques">
+              <TabelaBuscas buscas={g.buscas.slice(0, 15)} />
+            </Cartao>
+            <Cartao titulo="Quase na primeira página" sub="Buscas que já mostram o site, mas ainda abaixo dos primeiros. São as mais fáceis de subir.">
+              {oportunidades.length === 0 ? (
+                <p className="text-sm text-steel-line">Nenhuma oportunidade clara neste período.</p>
+              ) : (
+                <ul className="grid gap-3">
+                  {oportunidades.map((o) => (
+                    <li key={o.termo} className="flex gap-3">
+                      <Lightbulb size={16} className="text-cera shrink-0 mt-0.5" aria-hidden />
+                      <div className="min-w-0">
+                        <p className="text-sm text-steel font-bold">{o.termo}</p>
+                        <p className="text-xs text-steel-line">
+                          Apareceu {n(o.aparicoes)} vezes, na posição {o.posicao.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}. Um artigo ou página falando disso ajuda a subir.
+                        </p>
+                      </div>
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Cartao>
-        <Cartao titulo="De onde vêm as pessoas" sub={a.ok ? "Fonte: Google Analytics" : "Fonte: contagem do próprio site (visitas)"}>
-          <ListaBarras
-            unidade={a.ok ? "pessoas" : "visitas"}
-            itens={a.ok ? a.canais.map((c) => ({ nome: c.nome, valor: c.pessoas })) : s.origens.map((o) => ({ nome: o.nome, valor: o.visitas, extra: `${n(o.contatos)} contatos` }))}
-          />
-        </Cartao>
-      </div>
-
-      {a.ok && (
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Cartao titulo="Cidades dos visitantes" sub="Cidade aproximada de quem visitou">
-            <ListaBarras unidade="pessoas" itens={a.cidades.map((c) => ({ nome: c.nome, valor: c.pessoas }))} />
-          </Cartao>
-          <Cartao titulo="Aparelho usado" sub="Celular ou computador">
-            <ListaBarras unidade="pessoas" itens={a.aparelhos.map((c) => ({ nome: c.nome, valor: c.pessoas }))} />
-          </Cartao>
-        </div>
-      )}
-
-      <Cartao titulo="Últimos cliques para o WhatsApp" sub="Data e hora de cada clique: compare com as conversas que começam com “Vim pelo site da Clean Car”">
-        {s.recentes.length === 0 ? (
-          <p className="text-sm text-steel-line">Nenhum contato neste período.</p>
-        ) : (
-          <ul className="divide-y divide-card-line">
-            {s.recentes.map((e, i) => (
-              <li key={i} className="py-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-sm">
-                <span className="tabular-nums text-steel-line text-xs w-24 shrink-0">
-                  {new Date(e.quando).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" })}
-                </span>
-                <span className="font-bold text-steel w-20 shrink-0">{e.tipo}</span>
-                <span className="text-steel-line min-w-0 break-all flex-1">{e.caminho === "/" ? "Página inicial" : e.caminho}</span>
-                <span className="text-xs text-steel-line">{e.origem}</span>
-              </li>
-            ))}
-          </ul>
+                </ul>
+              )}
+            </Cartao>
+          </div>
         )}
-      </Cartao>
+
+      </Secao>
+
+
+      {/* ═════════ 4. COMPARAR ═════════ */}
+      <Secao
+        cor="neutro"
+        titulo="4 · Comparar as três fontes"
+        sub="O mesmo assunto contado por cada ferramenta, lado a lado. Diferenças pequenas são normais (cada uma conta de um jeito); diferença grande indica algo para investigar."
+      >
+        <Comparacao r={r} />
+      </Secao>
 
       <p className="text-xs text-steel-line">
-        Este navegador está marcado como seu e não entra nas contagens. Os números do Google são atualizados a cada 30 minutos.
+        Os números do Google são atualizados a cada 30 minutos; os do próprio site, a cada vez que você abre esta página.
       </p>
     </div>
   );
