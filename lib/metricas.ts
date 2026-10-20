@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { consultarAnalytics, consultarSearchConsole, googleConfigurado, type LinhaGA } from "@/lib/google";
 import { canalDoAnalytics, canalDoSite, type Canal } from "@/lib/canais";
@@ -206,7 +207,16 @@ type Evento = {
   meta: { v?: number; vid?: string; sid?: string; novo?: boolean; tela?: string } | null;
 };
 
-async function lerEventos(inicio: Date, fim: Date): Promise<Evento[]> {
+// 20/10/2026: os eventos ficam 1 minuto em cache (trocar de aba ou de período
+// e voltar não lê o banco de novo). "Na hora" passa a ser "no último minuto".
+const lerEventos = (inicio: Date, fim: Date) => lerEventosCache(iso(inicio), iso(fim));
+const lerEventosCache = unstable_cache(
+  async (inicio: string, fim: string) => lerEventosBanco(new Date(inicio + "T00:00:00Z"), new Date(fim + "T00:00:00Z")),
+  ["eventos-site"],
+  { revalidate: 60, tags: ["eventos"] }
+);
+
+async function lerEventosBanco(inicio: Date, fim: Date): Promise<Evento[]> {
   const todos: Evento[] = [];
   for (let de = 0; de < 30_000; de += 1000) {
     const { data, error } = await supabaseAdmin

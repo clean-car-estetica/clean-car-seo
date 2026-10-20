@@ -1,4 +1,5 @@
 import { createSign } from "node:crypto";
+import { unstable_cache } from "next/cache";
 import { GA_MEDICAO } from "@/lib/gtag";
 
 // Leitura do Search Console e do Google Analytics 4 com uma conta de serviço.
@@ -81,15 +82,21 @@ async function obterToken(): Promise<string> {
   return tokenCache.token;
 }
 
-// Cache em memória (por instância do servidor) para não consultar o Google a
-// cada abertura do painel. Os dados do Google mudam poucas vezes por dia.
-const memo = new Map<string, { valor: unknown; expira: number }>();
+// 20/10/2026: cache do Next (unstable_cache), que vale para todos os servidores
+// da Vercel. Antes era só em memória: cada abertura do painel podia cair num
+// servidor novo e refazer as ~25 consultas ao Google, e o admin demorava.
+// Falhas ficam guardadas por 3 minutos (em memória), para não repetir na hora
+// uma consulta que acabou de dar erro (ex.: a propriedade antiga sem acesso).
+const falhas = new Map<string, { erro: Error; expira: number }>();
 async function comCache<T>(chave: string, minutos: number, fn: () => Promise<T>): Promise<T> {
-  const m = memo.get(chave);
-  if (m && m.expira > Date.now()) return m.valor as T;
-  const valor = await fn();
-  memo.set(chave, { valor, expira: Date.now() + minutos * 60_000 });
-  return valor;
+  const f = falhas.get(chave);
+  if (f && f.expira > Date.now()) throw f.erro;
+  try {
+    return await unstable_cache(fn, ["google", chave], { revalidate: minutos * 60, tags: ["google"] })();
+  } catch (e) {
+    falhas.set(chave, { erro: e as Error, expira: Date.now() + 3 * 60_000 });
+    throw e;
+  }
 }
 
 async function chamarGoogle(url: string, corpo?: unknown) {
@@ -182,6 +189,11 @@ export async function propriedadeGA(): Promise<string> {
   const v = ga4Variavel();
   if (/^\d+$/.test(v)) return v;
   if (propriedadeCache) return propriedadeCache;
+  propriedadeCache = await comCache("ga-propriedade", 24 * 60, () => descobrirPropriedade(v));
+  return propriedadeCache;
+}
+
+async function descobrirPropriedade(v: string): Promise<string> {
   const aviso = v ? ` (GA4_PROPERTY_ID está "${v}", que não é o número da propriedade; pode apagar essa variável)` : "";
   let resumo: ResumoContas;
   try {
@@ -203,7 +215,6 @@ export async function propriedadeGA(): Promise<string> {
       }
     }
   }
-  propriedadeCache = escolhida;
   return escolhida;
 }
 

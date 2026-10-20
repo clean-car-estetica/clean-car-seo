@@ -3,6 +3,7 @@ import { getCampanhas } from "@/lib/campanhas-servidor";
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { ArrowDownRight, ArrowUpRight, Lightbulb, Minus, Plug, CircleCheck, CircleAlert, CircleDashed } from "lucide-react";
 import { calcularPeriodo, carregarResultados, type Busca, type Resultados, type NumerosCanal } from "@/lib/metricas";
 import GraficoSerie from "@/components/admin/GraficoSerie";
@@ -342,12 +343,52 @@ function AvisoConexao({ r }: { r: Resultados }) {
 
 // ───────────────────────────────────────────────────────── página
 
-export default async function Resultados({
-  searchParams,
-}: {
-  searchParams: Promise<{ periodo?: string; inicio?: string; fim?: string; aba?: string; quem?: string }>;
-}) {
+type Busca_ = { periodo?: string; inicio?: string; fim?: string; aba?: string; quem?: string };
+
+// 20/10/2026: a página abre na hora com o esqueleto (título, períodos e abas) e
+// os números entram quando chegam. A key faz o esqueleto aparecer também ao
+// trocar de período ou de aba, em vez de a tela ficar parada sem resposta.
+export default async function Resultados({ searchParams }: { searchParams: Promise<Busca_> }) {
   const sp = await searchParams;
+  return (
+    <Suspense key={JSON.stringify(sp)} fallback={<Esqueleto sp={sp} />}>
+      <Conteudo sp={sp} />
+    </Suspense>
+  );
+}
+
+function Esqueleto({ sp }: { sp: Busca_ }) {
+  const chave = sp.periodo || "30d";
+  const aba = sp.aba || "geral";
+  const bloco = "rounded-2xl border border-card-line bg-card animate-pulse";
+  return (
+    <div className="grid gap-5 max-w-6xl" aria-busy="true">
+      <div>
+        <h1 className="font-display font-bold text-3xl text-steel">Resultados</h1>
+        <p className="text-steel-line text-sm mt-1">Carregando os números…</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {PERIODOS.map((p) => (
+          <span key={p.valor} className={`px-4 py-2 rounded-full text-sm font-bold ${chave === p.valor ? "bg-verniz text-carbon" : "bg-card border border-card-line text-steel-line"}`}>{p.label}</span>
+        ))}
+      </div>
+      <div className="flex gap-1 overflow-x-auto border-b border-card-line">
+        {ABAS.map((t) => (
+          <span key={t.valor} className={`px-4 py-2.5 text-sm font-bold whitespace-nowrap border-b-2 -mb-px ${aba === t.valor ? "border-verniz text-verniz-shine" : "border-transparent text-steel-line"}`}>{t.label}</span>
+        ))}
+      </div>
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => <div key={i} className={`${bloco} h-36`} />)}
+      </div>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div className={`${bloco} h-72`} />
+        <div className={`${bloco} h-72`} />
+      </div>
+    </div>
+  );
+}
+
+async function Conteudo({ sp }: { sp: Busca_ }) {
   const periodo = calcularPeriodo(sp.periodo || "30d", sp.inicio, sp.fim);
   const aba: Aba = (ABAS.find((a) => a.valor === sp.aba)?.valor ?? "geral") as Aba;
   const [r, campanhas] = await Promise.all([carregarResultados(periodo), getCampanhas()]);
@@ -625,7 +666,7 @@ export default async function Resultados({
       {aba === "comparar" && <Comparacao r={r} />}
 
       <p className="text-xs text-steel-line">
-        Os números do Google são atualizados a cada 30 minutos; os do próprio site, a cada vez que você abre esta página.
+        Os números do Google são atualizados a cada 30 minutos; os do próprio site, a cada minuto.
       </p>
     </div>
   );
