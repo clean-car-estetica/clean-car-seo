@@ -1,5 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { consultarAnalytics, consultarSearchConsole, googleConfigurado } from "@/lib/google";
+import { consultarAnalytics, consultarSearchConsole, googleConfigurado, type LinhaGA } from "@/lib/google";
 import { canalDoAnalytics, canalDoSite, type Canal } from "@/lib/canais";
 import { getRedesSas, type InstagramSas } from "@/lib/gbr-sync";
 
@@ -27,6 +28,8 @@ const FUSO = "-03:00";
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 /** "2026-10-18T01:30:00Z" (22h30 do dia 17 em SP) → "2026-10-17" */
 const diaSP = (instante: string) => new Date(Date.parse(instante) - 3 * 3_600_000).toISOString().slice(0, 10);
+/** Hora (0 a 23) de São Paulo */
+const horaSP = (instante: string) => new Date(Date.parse(instante) - 3 * 3_600_000).getUTCHours();
 function deslocar(d: Date, dias: number) {
   const x = new Date(d);
   x.setUTCDate(x.getUTCDate() + dias);
@@ -75,6 +78,16 @@ export function calcularPeriodo(chave: string, inicioParam?: string, fimParam?: 
   return { inicio, fim, dias, chave };
 }
 
+/** contatos = cliques em WhatsApp/Agendar + formulários; chamaram = pessoas diferentes que clicaram em WhatsApp/Agendar */
+export type DiaSite = { data: string; contatos: number; pessoas: number; pessoasGoogle: number; paginas: number; chamaram: number };
+export type HoraSite = { pessoas: number; paginas: number; contatos: number; chamaram: number };
+
+/** 20/10/2026: cada visitante do período (id anônimo do navegador), para ver quem entrou e quem clicou */
+export type Visitante = {
+  id: string; primeiro: string; ultimo: string; origem: string; tela: string; novo: boolean;
+  visitas: number; paginas: number; caminhos: string[]; whatsapp: number; agendar: number; formularios: number;
+};
+
 export type Busca = { termo: string; cliques: number; aparicoes: number; posicao: number };
 
 export type Resultados = {
@@ -93,7 +106,9 @@ export type Resultados = {
     parcial: boolean;
     /** Período todo dentro dos dias que o Google ainda está contando: sem comparação. */
     semComparacao: boolean;
-    porDia: { data: string; aparicoes: number; cliques: number }[];
+    porDia: { data: string; aparicoes: number; cliques: number; posicao: number }[];
+    /** 20/10/2026: período anterior dia a dia (mesmo número de dias), para o gráfico comparar */
+    porDiaAntes: { data: string; aparicoes: number; cliques: number }[];
     buscas: Busca[];
     paginas: { pagina: string; cliques: number; aparicoes: number }[];
   };
@@ -103,6 +118,8 @@ export type Resultados = {
     pessoas: number;
     pessoasAntes: number;
     novas: number;
+    novasAntes: number;
+    paginasVistasAntes: number;
     /** Páginas vistas (screenPageViews) */
     paginasVistas: number;
     /** Eventos click_whatsapp + click_agendar enviados pelo site ao GA4 */
@@ -114,6 +131,10 @@ export type Resultados = {
     porCanal: Partial<Record<Canal, NumerosCanal>>;
     porCanalAntes: Partial<Record<Canal, NumerosCanal>>;
     porDia: { data: string; pessoas: number }[];
+    porDiaAntes: { data: string; pessoas: number }[];
+    /** Pessoas por hora do dia (0 a 23), no período e no anterior */
+    porHora: number[];
+    porHoraAntes: number[];
     canais: { nome: string; pessoas: number }[];
     aparelhos: { nome: string; pessoas: number }[];
     cidades: { nome: string; pessoas: number }[];
@@ -139,7 +160,11 @@ export type Resultados = {
     formularios: number;
     /** Pessoas cuja visita veio do Google (referrer google) */
     pessoasGoogle: number;
-    porDia: { data: string; contatos: number; pessoas: number; pessoasGoogle: number }[];
+    porDia: DiaSite[];
+    /** 20/10/2026: período anterior dia a dia e os dois períodos por hora (0 a 23, hora de SP) */
+    porDiaAntes: DiaSite[];
+    porHora: HoraSite[];
+    porHoraAntes: HoraSite[];
     paginas: { caminho: string; visitas: number; contatos: number }[];
     origens: { nome: string; visitas: number; contatos: number }[];
     /** 18/10/2026: tudo por canal de origem, na contagem do site */
@@ -147,6 +172,13 @@ export type Resultados = {
     /** Mesmo período anterior, mesma contagem */
     porCanalAntes: Partial<Record<Canal, NumerosCanal>>;
     recentes: { quando: string; tipo: string; caminho: string; origem: string }[];
+    /** os 200 visitantes mais recentes do período, e o total */
+    visitantes: Visitante[];
+    totalVisitantes: number;
+    /** pessoas por aparelho (celular/computador), pela contagem do site */
+    aparelhos: { nome: string; pessoas: number }[];
+    /** quantas pessoas viram 1, 2, 3 a 5 e 6 ou mais páginas */
+    profundidade: number[];
   };
   /** 18/10/2026: Instagram (Meta), pelo SAS. null = integração do SAS desligada. */
   meta: { instagram: InstagramSas | null; instagramAntes: InstagramSas | null };
@@ -172,10 +204,19 @@ type Evento = {
   page_path: string;
   origem: string | null;
   created_at: string;
-  meta: { v?: number; vid?: string; sid?: string; novo?: boolean } | null;
+  meta: { v?: number; vid?: string; sid?: string; novo?: boolean; tela?: string } | null;
 };
 
-async function lerEventos(inicio: Date, fim: Date): Promise<Evento[]> {
+// 20/10/2026: os eventos ficam 1 minuto em cache (trocar de aba ou de período
+// e voltar não lê o banco de novo). "Na hora" passa a ser "no último minuto".
+const lerEventos = (inicio: Date, fim: Date) => lerEventosCache(iso(inicio), iso(fim));
+const lerEventosCache = unstable_cache(
+  async (inicio: string, fim: string) => lerEventosBanco(new Date(inicio + "T00:00:00Z"), new Date(fim + "T00:00:00Z")),
+  ["eventos-site"],
+  { revalidate: 60, tags: ["eventos"] }
+);
+
+async function lerEventosBanco(inicio: Date, fim: Date): Promise<Evento[]> {
   const todos: Evento[] = [];
   for (let de = 0; de < 30_000; de += 1000) {
     const { data, error } = await supabaseAdmin
@@ -204,12 +245,14 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
 
   const pessoasSet = new Set<string>();
   const googleSet = new Set<string>();
-  const porDia = new Map(dias.map((d) => [d, { contatos: 0, pessoas: new Set<string>(), google: new Set<string>() }]));
+  const porDia = new Map(dias.map((d) => [d, { contatos: 0, paginas: 0, pessoas: new Set<string>(), google: new Set<string>(), chamaram: new Set<string>() }]));
+  const porHora = Array.from({ length: 24 }, () => ({ contatos: 0, paginas: 0, pessoas: new Set<string>(), chamaram: new Set<string>() }));
   const paginas = new Map<string, { visitas: number; contatos: number }>();
   const origens = new Map<string, { visitas: number; contatos: number }>();
   const canais = new Map<Canal, NumerosCanal & { vids: Set<string>; vidsContato: Set<string> }>();
   const sessoes = new Map<string, { paginas: number; contato: boolean }>();
   const novasSet = new Set<string>();
+  const visitantes = new Map<string, Visitante & { sids: Set<string>; caminhosSet: Set<string> }>();
   let visitas = 0, whatsapp = 0, agendar = 0, formularios = 0;
 
   for (const e of base) {
@@ -223,16 +266,41 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
       sessoes.set(sid, ss);
     }
     if (vid && e.meta?.novo) novasSet.add(vid);
+    if (vid) {
+      // eventos vêm do mais novo para o mais antigo: o primeiro visto é o último acesso
+      const v = visitantes.get(vid) ?? {
+        id: vid, primeiro: e.created_at, ultimo: e.created_at, origem: e.origem || "Direto", tela: e.meta?.tela || "—", novo: false,
+        visitas: 0, paginas: 0, caminhos: [], whatsapp: 0, agendar: 0, formularios: 0, sids: new Set<string>(), caminhosSet: new Set<string>(),
+      };
+      v.primeiro = e.created_at;
+      if (e.origem && e.origem !== "Navegação interna") v.origem = e.origem;
+      if (e.meta?.novo) v.novo = true;
+      if (e.meta?.tela && v.tela === "—") v.tela = e.meta.tela;
+      if (sid) v.sids.add(sid);
+      if (e.event_type === "pageview") { v.paginas++; v.caminhosSet.add(e.page_path); }
+      if (e.event_type === "click_whatsapp") v.whatsapp++;
+      if (e.event_type === "click_agendar") v.agendar++;
+      if (e.event_type === "form_submit") v.formularios++;
+      visitantes.set(vid, v);
+    }
     const contato = ehContato(e.event_type);
     const doGoogle = (e.origem || "").startsWith("Google");
     if (vid) pessoasSet.add(vid);
     if (vid && doGoogle) googleSet.add(vid);
+    const chamou = e.event_type === "click_whatsapp" || e.event_type === "click_agendar";
     const pd = porDia.get(dia);
     if (pd) {
       if (contato) pd.contatos++;
+      if (e.event_type === "pageview") pd.paginas++;
       if (vid) pd.pessoas.add(vid);
       if (vid && doGoogle) pd.google.add(vid);
+      if (vid && chamou) pd.chamaram.add(vid);
     }
+    const ph = porHora[horaSP(e.created_at)];
+    if (contato) ph.contatos++;
+    if (e.event_type === "pageview") ph.paginas++;
+    if (vid) ph.pessoas.add(vid);
+    if (vid && chamou) ph.chamaram.add(vid);
     if (e.event_type === "pageview") visitas++;
     if (e.event_type === "click_whatsapp") whatsapp++;
     if (e.event_type === "click_agendar") agendar++;
@@ -267,8 +335,16 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
     pageview: "Visita",
   };
 
+  const listaVisitantes = [...visitantes.values()].map(({ sids, caminhosSet, ...v }) => ({ ...v, visitas: Math.max(1, sids.size), caminhos: [...caminhosSet].reverse().slice(0, 8) }));
+  const porTela = new Map<string, number>();
+  for (const v of listaVisitantes) porTela.set(v.tela, (porTela.get(v.tela) ?? 0) + 1);
+
   return {
     legado,
+    visitantes: listaVisitantes.slice(0, 200),
+    totalVisitantes: listaVisitantes.length,
+    profundidade: [1, 2, 5, Infinity].map((ate, i, l) => listaVisitantes.filter((v) => Math.max(1, v.paginas) <= ate && Math.max(1, v.paginas) > (i ? l[i - 1] : 0)).length),
+    aparelhos: [...porTela.entries()].map(([t, pessoas]) => ({ nome: t === "celular" ? "Celular" : t === "computador" ? "Computador" : "Não informado", pessoas })).sort((a, b) => b.pessoas - a.pessoas),
     visitas_: {
       sessoes: sessoes.size,
       // "rejeição": visita que abriu uma página só e não clicou em nada
@@ -283,7 +359,8 @@ function resumirSite(eventos: Evento[], dias: string[], modo?: "legado" | "novo"
     formularios,
     pessoasGoogle: googleSet.size,
     porCanal: Object.fromEntries([...canais.entries()].map(([k, { vids, vidsContato, ...v }]) => [k, { ...v, pessoas: vids.size, pessoasContato: vidsContato.size }])) as Partial<Record<Canal, NumerosCanal>>,
-    porDia: [...porDia.entries()].map(([data, v]) => ({ data, contatos: v.contatos, pessoas: v.pessoas.size, pessoasGoogle: v.google.size })),
+    porDia: [...porDia.entries()].map(([data, v]) => ({ data, contatos: v.contatos, paginas: v.paginas, pessoas: v.pessoas.size, pessoasGoogle: v.google.size, chamaram: v.chamaram.size })),
+    porHora: porHora.map((h) => ({ contatos: h.contatos, paginas: h.paginas, pessoas: h.pessoas.size, chamaram: h.chamaram.size })),
     paginas: [...paginas.entries()]
       .map(([caminho, v]) => ({ caminho, ...v }))
       .sort((a, b) => b.contatos - a.contatos || b.visitas - a.visitas)
@@ -307,12 +384,14 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
   const antesFim = deslocar(p.inicio, -1);
   const antesInicio = deslocar(antesFim, -(p.dias - 1));
   const dias = listaDias(p.inicio, p.fim);
+  const diasAntes = listaDias(antesInicio, antesFim);
 
   const vazioGoogle: Resultados["google"] = {
-    ok: false, aparicoes: 0, cliques: 0, posicao: 0, aparicoesAntes: 0, cliquesAntes: 0, completoAte: "", parcial: false, semComparacao: false, porDia: [], buscas: [], paginas: [],
+    ok: false, aparicoes: 0, cliques: 0, posicao: 0, aparicoesAntes: 0, cliquesAntes: 0, completoAte: "", parcial: false, semComparacao: false, porDia: [], porDiaAntes: [], buscas: [], paginas: [],
   };
   const vazioGA: Resultados["analytics"] = {
-    ok: false, pessoas: 0, pessoasAntes: 0, novas: 0, paginasVistas: 0, cliquesWhats: 0, formularios: 0, pessoasBuscaGoogle: 0, porCanal: {}, porCanalAntes: {}, porDia: [], canais: [], aparelhos: [], cidades: [],
+    ok: false, pessoas: 0, pessoasAntes: 0, novas: 0, novasAntes: 0, paginasVistas: 0, paginasVistasAntes: 0, cliquesWhats: 0, formularios: 0, pessoasBuscaGoogle: 0, porCanal: {}, porCanalAntes: {},
+    porDia: [], porDiaAntes: [], porHora: [], porHoraAntes: [], canais: [], aparelhos: [], cidades: [],
   };
 
   const [google, analytics, site, instagram, instagramAntes] = await Promise.all([
@@ -331,14 +410,16 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
         const diasG = semComparacao ? 0 : Math.round((fimG.getTime() - p.inicio.getTime()) / 86_400_000) + 1;
         const antesFimG = deslocar(p.inicio, -1);
         const antesInicioG = deslocar(antesFimG, -(Math.max(diasG, 1) - 1));
-        const [total, antes, porDia, buscas, paginas] = await Promise.all([
+        const [total, antes, porDia, buscas, paginas, porDiaAntes] = await Promise.all([
           consultarSearchConsole({ inicio, fim: semComparacao ? fim : iso(fimG) }),
           semComparacao ? Promise.resolve([]) : consultarSearchConsole({ inicio: iso(antesInicioG), fim: iso(antesFimG) }),
           consultarSearchConsole({ inicio, fim, dimensoes: ["date"] }),
           consultarSearchConsole({ inicio, fim, dimensoes: ["query"], limite: 250 }),
           consultarSearchConsole({ inicio, fim, dimensoes: ["page"], limite: 50 }),
+          consultarSearchConsole({ inicio: iso(antesInicio), fim: iso(antesFim), dimensoes: ["date"] }).catch(() => []),
         ]);
         const mapaDia = new Map(porDia.map((r) => [r.keys[0], r]));
+        const mapaAntes = new Map(porDiaAntes.map((r) => [r.keys[0], r]));
         const host = /^https?:\/\/[^/]+/;
         return {
           ok: true,
@@ -350,7 +431,8 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
           completoAte: iso(ultimoCompleto),
           parcial: p.fim > ultimoCompleto,
           semComparacao,
-          porDia: dias.map((d) => ({ data: d, aparicoes: mapaDia.get(d)?.impressions ?? 0, cliques: mapaDia.get(d)?.clicks ?? 0 })),
+          porDia: dias.map((d) => ({ data: d, aparicoes: mapaDia.get(d)?.impressions ?? 0, cliques: mapaDia.get(d)?.clicks ?? 0, posicao: mapaDia.get(d)?.position ?? 0 })),
+          porDiaAntes: diasAntes.map((d) => ({ data: d, aparicoes: mapaAntes.get(d)?.impressions ?? 0, cliques: mapaAntes.get(d)?.clicks ?? 0 })),
           buscas: buscas.map((r) => ({ termo: r.keys[0], cliques: r.clicks, aparicoes: r.impressions, posicao: r.position })),
           paginas: paginas.map((r) => ({ pagina: r.keys[0].replace(host, "") || "/", cliques: r.clicks, aparicoes: r.impressions })),
         };
@@ -362,19 +444,30 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
     (async (): Promise<Resultados["analytics"]> => {
       if (!conexao.conta || !conexao.ga4) return { ...vazioGA, erro: "nao-configurado" };
       try {
-        const [total, antes, porDia, canais, aparelhos, cidades, eventos, fontes, eventosFonte, fontesAntes, eventosFonteAntes] = await Promise.all([
+        // 20/10/2026: só o total é obrigatório. Antes, qualquer consulta que
+        // falhasse derrubava o Analytics inteiro e o painel dizia "não ligado".
+        const opcional = (q: Promise<LinhaGA[]>) => q.catch(() => [] as LinhaGA[]);
+        const [total, antes, porDia, canais, aparelhos, cidades, eventos, fontes, eventosFonte, fontesAntes, eventosFonteAntes, porDiaAntes, porHora, porHoraAntes] = await Promise.all([
           consultarAnalytics({ inicio, fim, metricas: ["activeUsers", "newUsers", "screenPageViews"] }),
-          consultarAnalytics({ inicio: iso(antesInicio), fim: iso(antesFim), metricas: ["activeUsers"] }),
-          consultarAnalytics({ inicio, fim, dimensoes: ["date"], metricas: ["activeUsers"] }),
-          consultarAnalytics({ inicio, fim, dimensoes: ["sessionDefaultChannelGroup"], metricas: ["activeUsers"] }),
-          consultarAnalytics({ inicio, fim, dimensoes: ["deviceCategory"], metricas: ["activeUsers"] }),
-          consultarAnalytics({ inicio, fim, dimensoes: ["city"], metricas: ["activeUsers"], limite: 10 }),
+          opcional(consultarAnalytics({ inicio: iso(antesInicio), fim: iso(antesFim), metricas: ["activeUsers", "newUsers", "screenPageViews"] })),
+          opcional(consultarAnalytics({ inicio, fim, dimensoes: ["date"], metricas: ["activeUsers"] })),
+          opcional(consultarAnalytics({ inicio, fim, dimensoes: ["sessionDefaultChannelGroup"], metricas: ["activeUsers"] })),
+          opcional(consultarAnalytics({ inicio, fim, dimensoes: ["deviceCategory"], metricas: ["activeUsers"] })),
+          opcional(consultarAnalytics({ inicio, fim, dimensoes: ["city"], metricas: ["activeUsers"], limite: 10 })),
           consultarAnalytics({ inicio, fim, dimensoes: ["eventName"], metricas: ["eventCount"], filtroEvento: ["click_whatsapp", "click_agendar", "form_submit"] }).catch(() => []),
           consultarAnalytics({ inicio, fim, dimensoes: ["sessionSource"], metricas: ["activeUsers", "screenPageViews"], limite: 100 }).catch(() => []),
           consultarAnalytics({ inicio, fim, dimensoes: ["sessionSource", "eventName"], metricas: ["eventCount", "activeUsers"], limite: 200, filtroEvento: ["click_whatsapp", "click_agendar", "form_submit"] }).catch(() => []),
           consultarAnalytics({ inicio: iso(antesInicio), fim: iso(antesFim), dimensoes: ["sessionSource"], metricas: ["activeUsers", "screenPageViews"], limite: 100 }).catch(() => []),
           consultarAnalytics({ inicio: iso(antesInicio), fim: iso(antesFim), dimensoes: ["sessionSource", "eventName"], metricas: ["eventCount", "activeUsers"], limite: 200, filtroEvento: ["click_whatsapp", "click_agendar", "form_submit"] }).catch(() => []),
+          opcional(consultarAnalytics({ inicio: iso(antesInicio), fim: iso(antesFim), dimensoes: ["date"], metricas: ["activeUsers"] })),
+          opcional(consultarAnalytics({ inicio, fim, dimensoes: ["hour"], metricas: ["activeUsers"] })),
+          opcional(consultarAnalytics({ inicio: iso(antesInicio), fim: iso(antesFim), dimensoes: ["hour"], metricas: ["activeUsers"] })),
         ]);
+        const horas = (ls: LinhaGA[]) => {
+          const out = Array<number>(24).fill(0);
+          for (const r of ls) out[Number(r.dims[0]) % 24] += r.vals[0] ?? 0;
+          return out;
+        };
         const montarCanais = (fs: typeof fontes, evs: typeof eventosFonte) => {
           const out: Partial<Record<Canal, NumerosCanal>> = {};
           for (const r of fs) {
@@ -396,12 +489,16 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
         const porCanalGA = montarCanais(fontes, eventosFonte);
         const porCanalGAAntes = montarCanais(fontesAntes, eventosFonteAntes);
         const contaEvento = (...nomes: string[]) => eventos.filter((r) => nomes.includes(r.dims[0])).reduce((t, r) => t + (r.vals[0] ?? 0), 0);
-        const mapaDia = new Map(porDia.map((r) => [`${r.dims[0].slice(0, 4)}-${r.dims[0].slice(4, 6)}-${r.dims[0].slice(6, 8)}`, r.vals[0]]));
+        const porData = (ls: LinhaGA[]) => new Map(ls.map((r) => [`${r.dims[0].slice(0, 4)}-${r.dims[0].slice(4, 6)}-${r.dims[0].slice(6, 8)}`, r.vals[0]]));
+        const mapaDia = porData(porDia);
+        const mapaAntes = porData(porDiaAntes);
         return {
           ok: true,
           pessoas: total[0]?.vals[0] ?? 0,
           novas: total[0]?.vals[1] ?? 0,
           paginasVistas: total[0]?.vals[2] ?? 0,
+          novasAntes: antes[0]?.vals[1] ?? 0,
+          paginasVistasAntes: antes[0]?.vals[2] ?? 0,
           cliquesWhats: contaEvento("click_whatsapp", "click_agendar"),
           formularios: contaEvento("form_submit"),
           porCanal: porCanalGA,
@@ -409,6 +506,9 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
           pessoasBuscaGoogle: canais.filter((r) => r.dims[0] === "Organic Search").reduce((t, r) => t + (r.vals[0] ?? 0), 0),
           pessoasAntes: antes[0]?.vals[0] ?? 0,
           porDia: dias.map((d) => ({ data: d, pessoas: mapaDia.get(d) ?? 0 })),
+          porDiaAntes: diasAntes.map((d) => ({ data: d, pessoas: mapaAntes.get(d) ?? 0 })),
+          porHora: horas(porHora),
+          porHoraAntes: horas(porHoraAntes),
           canais: canais.map((r) => ({ nome: CANAIS[r.dims[0]] ?? r.dims[0], pessoas: r.vals[0] })).sort((a, b) => b.pessoas - a.pessoas),
           aparelhos: aparelhos.map((r) => ({ nome: APARELHOS[r.dims[0]] ?? r.dims[0], pessoas: r.vals[0] })).sort((a, b) => b.pessoas - a.pessoas),
           cidades: cidades
@@ -424,12 +524,12 @@ export async function carregarResultados(p: Periodo): Promise<Resultados> {
       try {
         const [atual, anterior] = await Promise.all([lerEventos(p.inicio, p.fim), lerEventos(antesInicio, antesFim)]);
         const r = resumirSite(atual, dias);
-        const a = resumirSite(anterior, listaDias(antesInicio, antesFim), r.legado ? "legado" : "novo");
-        return { ok: true, ...r, porCanalAntes: a.porCanal, contatosAntes: a.contatos, pessoasAntes: a.pessoas, visitasAntes: a.visitas, cliquesWhatsAntes: a.whatsapp + a.agendar, formulariosAntes: a.formularios };
+        const a = resumirSite(anterior, diasAntes, r.legado ? "legado" : "novo");
+        return { ok: true, ...r, porDiaAntes: a.porDia, porHoraAntes: a.porHora, porCanalAntes: a.porCanal, contatosAntes: a.contatos, pessoasAntes: a.pessoas, visitasAntes: a.visitas, cliquesWhatsAntes: a.whatsapp + a.agendar, formulariosAntes: a.formularios };
       } catch (e) {
         return {
           ok: false, erro: (e as Error).message, legado: false, visitas_: { sessoes: 0, sessoesUmaPagina: 0, pessoasNovas: 0 }, pessoas: 0, pessoasAntes: 0, visitasAntes: 0, cliquesWhatsAntes: 0, formulariosAntes: 0, visitas: 0, contatos: 0, contatosAntes: 0,
-          whatsapp: 0, agendar: 0, formularios: 0, pessoasGoogle: 0, porCanal: {}, porCanalAntes: {}, porDia: [], paginas: [], origens: [], recentes: [],
+          whatsapp: 0, agendar: 0, formularios: 0, pessoasGoogle: 0, porCanal: {}, porCanalAntes: {}, porDia: [], porDiaAntes: [], porHora: [], porHoraAntes: [], paginas: [], origens: [], recentes: [], visitantes: [], totalVisitantes: 0, aparelhos: [], profundidade: [0, 0, 0, 0],
         };
       }
     })(),

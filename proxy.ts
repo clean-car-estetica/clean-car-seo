@@ -64,9 +64,12 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // 20/10/2026: getClaims confere o login pela assinatura do token, sem ir ao
+  // servidor do Supabase a cada clique (getUser fazia uma ida e volta por
+  // página aberta e por pré-carregamento de link, e o admin ficava lento).
+  // Quando o token vence, ele renova a sessão como antes.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ? data.claims : null;
 
   const isLoginPage = pathname === "/admin/login";
 

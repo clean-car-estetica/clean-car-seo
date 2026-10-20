@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { usePathname } from "next/navigation";
+import { GA_MEDICAO } from "@/lib/gtag";
 
 export default function GoogleAnalytics() {
   const pathname = usePathname();
@@ -12,13 +13,13 @@ export default function GoogleAnalytics() {
 
   return (
     <>
-      <Script src="https://www.googletagmanager.com/gtag/js?id=G-54H7DP2E49" strategy="afterInteractive" />
+      <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEDICAO}`} strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-54H7DP2E49');
+          gtag('config', '${GA_MEDICAO}');
         `}
       </Script>
     </>
