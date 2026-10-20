@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { consultarAnalytics, consultarSearchConsole, googleConfigurado } from "@/lib/google";
+import { consultarAnalytics, consultarSearchConsole, googleConfigurado, propriedadeGA } from "@/lib/google";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const c = googleConfigurado();
   const hoje = new Date().toISOString().slice(0, 10);
   const inicio = new Date(Date.now() - 27 * 86_400_000).toISOString().slice(0, 10);
-  const r: Record<string, unknown> = { conta: c.conta, email: c.email, ga4: c.ga4, site: c.site };
+  const r: Record<string, unknown> = { conta: c.conta, email: c.email, ga4: c.ga4, ga4Origem: c.ga4Origem, site: c.site };
   try {
     const l = await consultarSearchConsole({ inicio, fim: hoje });
     r.searchConsole = { ok: true, cliques: l[0]?.clicks ?? 0, aparicoes: l[0]?.impressions ?? 0, posicao: l[0]?.position ?? 0 };
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
   if (c.ga4) {
     try {
       const l = await consultarAnalytics({ inicio, fim: hoje, metricas: ["activeUsers"] });
-      r.analytics = { ok: true, pessoas: l[0]?.vals[0] ?? 0 };
+      r.analytics = { ok: true, propriedade: await propriedadeGA(), pessoas: l[0]?.vals[0] ?? 0 };
     } catch (e) {
       r.analytics = { ok: false, erro: (e as Error).message };
     }

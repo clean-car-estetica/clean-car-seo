@@ -1,11 +1,14 @@
 import { createSign } from "node:crypto";
+import { GA_MEDICAO } from "@/lib/gtag";
 
 // Leitura do Search Console e do Google Analytics 4 com uma conta de serviço.
 // Sem bibliotecas: assina o JWT com o crypto do Node e chama as APIs REST.
 //
 // Variáveis na Vercel:
 //   GOOGLE_SERVICE_ACCOUNT_JSON  conteúdo inteiro do .json da conta de serviço
-//   GA4_PROPERTY_ID              número da propriedade do Analytics (não o G-…)
+//   GA4_PROPERTY_ID              opcional; número da propriedade do Analytics (não o G-…).
+//                                Sem ele (ou com o G-… por engano), a propriedade é
+//                                descoberta sozinha pela conta de serviço.
 //   GSC_SITE                     opcional; padrão sc-domain:cleancarestetica.com.br
 
 const ESCOPOS = [
@@ -32,14 +35,21 @@ function lerCredencial(): Credencial | null {
   }
 }
 
+/** GA4_PROPERTY_ID como está na Vercel, sem "properties/" e sem espaços. */
+const ga4Variavel = () => (process.env.GA4_PROPERTY_ID || "").trim().replace(/^properties\//, "");
+
 export function googleConfigurado() {
   const c = lerCredencial();
+  const v = ga4Variavel();
   return {
     conta: Boolean(c),
     email: c?.client_email ?? null,
-    ga4: Boolean(process.env.GA4_PROPERTY_ID),
+    // 20/10/2026: a propriedade não depende mais da variável (é descoberta pela conta)
+    ga4: Boolean(c),
+    /** como a propriedade do Analytics é achada */
+    ga4Origem: /^\d+$/.test(v) ? "variavel" : v ? "variavel-invalida" : "automatica",
     site: process.env.GSC_SITE || "sc-domain:cleancarestetica.com.br",
-  };
+  } as const;
 }
 
 const b64url = (b: Buffer | string) =>
@@ -82,22 +92,27 @@ async function comCache<T>(chave: string, minutos: number, fn: () => Promise<T>)
   return valor;
 }
 
-async function postGoogle(url: string, corpo: unknown) {
+async function chamarGoogle(url: string, corpo?: unknown) {
   const token = await obterToken();
   const r = await fetch(url, {
-    method: "POST",
+    method: corpo === undefined ? "GET" : "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(corpo),
+    body: corpo === undefined ? undefined : JSON.stringify(corpo),
     cache: "no-store",
   });
-  const j = await r.json();
+  const j = await r.json().catch(() => ({}));
   if (!r.ok) {
     const msg = j?.error?.message || `erro ${r.status}`;
-    if (r.status === 403) throw new Error(`Sem permissão: adicione ${googleConfigurado().email} como usuário. (${msg})`);
+    // API desligada no projeto do Google Cloud: a mensagem traz o link para ativar
+    if (/has not been used|is disabled|SERVICE_DISABLED/i.test(msg + JSON.stringify(j?.error?.details ?? ""))) {
+      throw new Error(`A API não está ativada no Google Cloud (projeto da conta de serviço). Ative e espere alguns minutos. (${msg})`);
+    }
+    if (r.status === 403) throw new Error(`Sem permissão: adicione ${googleConfigurado().email} como usuário (Leitor). (${msg})`);
     throw new Error(msg);
   }
   return j;
 }
+const postGoogle = (url: string, corpo: unknown) => chamarGoogle(url, corpo);
 
 // ---------------------------------------------------------------- Search Console
 export type LinhaGSC = { keys: string[]; clicks: number; impressions: number; ctr: number; position: number };
@@ -154,6 +169,44 @@ export async function consultarSearchConsole(params: {
 }
 
 // ---------------------------------------------------------------- Analytics 4
+// 20/10/2026: o Analytics aparecia "não ligado" quando GA4_PROPERTY_ID faltava
+// ou vinha com o código G-… (ID de medição). Agora, sem um número válido, a
+// propriedade é descoberta pela própria conta de serviço (API Admin): a que
+// tem o fluxo da web com o G-… do site, ou a única que a conta enxerga.
+let propriedadeCache: string | null = null;
+
+type ResumoContas = { accountSummaries?: { propertySummaries?: { property: string; displayName?: string }[] }[] };
+type Fluxos = { dataStreams?: { webStreamData?: { measurementId?: string } }[] };
+
+export async function propriedadeGA(): Promise<string> {
+  const v = ga4Variavel();
+  if (/^\d+$/.test(v)) return v;
+  if (propriedadeCache) return propriedadeCache;
+  const aviso = v ? ` (GA4_PROPERTY_ID está "${v}", que não é o número da propriedade; pode apagar essa variável)` : "";
+  let resumo: ResumoContas;
+  try {
+    resumo = await chamarGoogle("https://analyticsadmin.googleapis.com/v1beta/accountSummaries?pageSize=200");
+  } catch (e) {
+    throw new Error(`Não deu para achar a propriedade do Analytics sozinho: ${(e as Error).message}. Outra saída: coloque na Vercel GA4_PROPERTY_ID com o número da propriedade (Analytics → Administrador → Detalhes da propriedade).${aviso}`);
+  }
+  const ids = (resumo.accountSummaries ?? []).flatMap((a) => (a.propertySummaries ?? []).map((p) => p.property.replace(/^properties\//, "")));
+  if (ids.length === 0) {
+    throw new Error(`A conta ${googleConfigurado().email} ainda não tem acesso a nenhuma propriedade do Analytics. No Analytics: Administrador → Gerenciamento de acesso à propriedade → + → adicione esse e-mail como Leitor.${aviso}`);
+  }
+  let escolhida = ids[0];
+  if (ids.length > 1) {
+    for (const id of ids) {
+      const f: Fluxos = await chamarGoogle(`https://analyticsadmin.googleapis.com/v1beta/properties/${id}/dataStreams`).catch(() => ({}));
+      if ((f.dataStreams ?? []).some((d) => d.webStreamData?.measurementId === GA_MEDICAO)) {
+        escolhida = id;
+        break;
+      }
+    }
+  }
+  propriedadeCache = escolhida;
+  return escolhida;
+}
+
 export type LinhaGA = { dims: string[]; vals: number[] };
 
 export async function consultarAnalytics(params: {
@@ -164,8 +217,7 @@ export async function consultarAnalytics(params: {
   limite?: number;
   filtroEvento?: string[];
 }): Promise<LinhaGA[]> {
-  const id = process.env.GA4_PROPERTY_ID;
-  if (!id) throw new Error("ID da propriedade do Analytics não configurado.");
+  const id = await propriedadeGA();
   const corpo: Record<string, unknown> = {
     dateRanges: [{ startDate: params.inicio, endDate: params.fim }],
     dimensions: (params.dimensoes ?? []).map((name) => ({ name })),
