@@ -2,8 +2,7 @@ export const dynamic = "force-dynamic";
 
 import AvisoCampanha from "@/components/admin/AvisoCampanha";
 import { getCampanhasComOrigem } from "@/lib/campanhas-servidor";
-import { situacaoCampanha, campanhaProxima, getConfigCampanhas, type SituacaoCampanha } from "@/lib/site-content";
-import { definirVemAi } from "./actions";
+import { situacaoCampanha, campanhaProxima, type SituacaoCampanha } from "@/lib/site-content";
 import { mensagemCampanha, dataCurta, reais } from "@/lib/campanha";
 
 const SITUACAO: Record<SituacaoCampanha, { nome: string; cor: string }> = {
@@ -17,9 +16,8 @@ const SITUACAO: Record<SituacaoCampanha, { nome: string; cor: string }> = {
 // Campanhas). Aqui só se confere o que o site está mostrando e a mensagem
 // que vai para o WhatsApp.
 export default async function CampanhaAdminPage() {
-  const [{ lista, origem }, config] = await Promise.all([getCampanhasComOrigem(), getConfigCampanhas()]);
+  const { lista, origem, mostrarVemAi } = await getCampanhasComOrigem();
   const proxima = campanhaProxima(lista);
-  const base = "px-4 py-2 text-sm font-bold transition-colors";
 
   return (
     <div>
@@ -55,29 +53,15 @@ export default async function CampanhaAdminPage() {
 
       <AvisoCampanha lista={lista} />
 
-      {/* 22/10/2026: "Vem aí" opcional — desligado, campanha agendada só aparece na data */}
+      {/* 22/10/2026: a chave do "Vem aí" fica no SAS, junto do cadastro das campanhas */}
       <div className="mb-6 max-w-4xl bg-card border border-card-line rounded-xl p-4">
-        <h2 className="font-display font-bold text-lg text-steel">Mostrar a próxima campanha (“Vem aí”)</h2>
-        <p className="text-sm text-steel-line mt-1">
-          <strong className="text-steel">Ligado:</strong> a página inicial anuncia a próxima campanha agendada (até 60 dias antes),
-          e o cliente já pode garantir o horário. <strong className="text-steel">Desligado:</strong> o site mostra só a campanha
-          que está valendo hoje — as agendadas aparecem sozinhas no dia em que começam.
+        <h2 className="font-display font-bold text-lg text-steel">Próxima campanha (“Vem aí”)</h2>
+        <p className={`text-sm mt-1 font-bold ${mostrarVemAi ? "text-ok" : "text-steel-line"}`}>
+          {mostrarVemAi
+            ? proxima ? `Ligado no SAS — a página inicial anuncia “${proxima.titulo}” (começa ${dataCurta(proxima.inicia_em)}).` : "Ligado no SAS, mas não há campanha agendada para os próximos 60 dias."
+            : "Desligado no SAS — o site mostra só a campanha de hoje; as agendadas aparecem no dia em que começam."}
         </p>
-        <form action={definirVemAi} className="mt-3 inline-flex rounded-full border border-card-line overflow-hidden" role="group" aria-label="Vem aí">
-          <button type="submit" name="vemAi" value="desligado" disabled={!config.mostrarVemAi}
-            className={`${base} ${!config.mostrarVemAi ? "bg-steel-line/20 text-steel cursor-default" : "text-steel-line hover:bg-carbon"}`}>
-            Desligado
-          </button>
-          <button type="submit" name="vemAi" value="ligado" disabled={config.mostrarVemAi}
-            className={`${base} ${config.mostrarVemAi ? "bg-ok/20 text-ok cursor-default" : "text-steel-line hover:bg-ok/10 hover:text-ok"}`}>
-            Ligado
-          </button>
-        </form>
-        <p className={`mt-2 text-xs font-bold ${config.mostrarVemAi ? "text-ok" : "text-steel-line"}`}>
-          {config.mostrarVemAi
-            ? proxima ? `No ar: “Vem aí — ${proxima.titulo}” (começa ${dataCurta(proxima.inicia_em)}).` : "Ligado, mas não há campanha agendada para os próximos 60 dias."
-            : "O site mostra só a campanha de hoje."}
-        </p>
+        <p className="text-xs text-steel-line mt-1">Para mudar: SAS → Serviços e estoque → Campanhas → “Mostrar a próxima campanha antes de começar”.</p>
       </div>
 
       <div className="grid gap-3 max-w-4xl">
