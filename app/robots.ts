@@ -19,6 +19,9 @@ export default function robots(): MetadataRoute.Robots {
           "CCBot",           // Common Crawl (base de dados para várias IAs)
         ],
         allow: "/",
+        // 22/10/2026: um grupo próprio substitui o "*" para esses robôs, então
+        // o bloqueio do painel precisa ser repetido aqui.
+        disallow: ["/admin/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
