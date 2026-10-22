@@ -364,6 +364,18 @@ export async function getHeroContent(): Promise<HeroContent> {
 // site e só aparece quando o console marca "Publicado" (autorização da cliente).
 export type VideoCliente = { publicado: boolean };
 
+// 22/10/2026 (Glauber): o "Vem aí" (próxima campanha agendada) virou opção.
+// Desligado = o site mostra só a campanha valendo na data. Padrão: desligado.
+export type ConfigCampanhas = { mostrarVemAi: boolean };
+export async function getConfigCampanhas(): Promise<ConfigCampanhas> {
+  try {
+    const { data } = await supabasePublico.from("site_content").select("data").eq("section", "campanhas_config").maybeSingle();
+    return { mostrarVemAi: (data?.data as Partial<ConfigCampanhas> | undefined)?.mostrarVemAi === true };
+  } catch {
+    return { mostrarVemAi: false };
+  }
+}
+
 export async function getVideoCliente(): Promise<VideoCliente> {
   try {
     const { data } = await supabasePublico.from("site_content").select("data").eq("section", "video_cliente").maybeSingle();

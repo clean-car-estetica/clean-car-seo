@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { supabasePublico } from "@/lib/supabase";
-import { CAMPANHA_VAZIA, campanhaDeHoje, campanhaProxima, type Campanha, type CampanhaItem } from "@/lib/site-content";
+import { CAMPANHA_VAZIA, campanhaDeHoje, campanhaProxima, getConfigCampanhas, type Campanha, type CampanhaItem } from "@/lib/site-content";
 
 // SÓ SERVIDOR (usa a chave da integração GBR). Não importar em "use client".
 //
@@ -83,7 +83,13 @@ export async function getCampanha(): Promise<Campanha> {
   return campanhaDeHoje(await getCampanhas());
 }
 
-/** Próxima campanha agendada no SAS (para o "Vem aí" do site), ou null. */
+/**
+ * Próxima campanha agendada no SAS (para o "Vem aí" do site), ou null.
+ * 22/10/2026: só quando o "Vem aí" está ligado no admin (Campanhas);
+ * desligado, campanha agendada só aparece na data de começar.
+ */
 export async function getCampanhaProxima(): Promise<CampanhaItem | null> {
+  const { mostrarVemAi } = await getConfigCampanhas();
+  if (!mostrarVemAi) return null;
   return campanhaProxima(await getCampanhas());
 }
