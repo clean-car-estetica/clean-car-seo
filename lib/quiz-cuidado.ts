@@ -8,8 +8,9 @@
  *    completa (fica só a maior das lavagens escolhidas);
  *  - Higienização Interna VIP cobre todos os bancos, o teto e o carpete
  *    (não cobra banco a banco junto com ela);
- *  - "Serviço complementar: feito junto com uma lavagem" (ozônio,
- *    cristalização, motor) — sem lavagem na lista, o teste inclui uma;
+ *  - Higienização, ozônio, cristalização, motor etc. são serviços à parte:
+ *    o teste NÃO acrescenta lavagem sozinho (22/10/2026, Glauber — a lavagem
+ *    é combinada na hora com o cliente, sem aviso formal no site);
  *  - Enceramento técnico precisa de Prata ou Ouro antes.
  *
  * Só funções puras: dá para testar (tests/quiz-cuidado.test.mts) e roda no
@@ -90,11 +91,6 @@ export type ItemIndicado = { slug: string; qtd: number; motivo: string };
 export type Indicacao = { itens: ItemIndicado[]; tambem: string[]; alternativa: { titulo: string; itens: ItemIndicado[] } | null };
 
 const LAVAGENS = ["lavagem-bronze", "lavagem-prata", "lavagem-ouro"];
-const PEDE_LAVAGEM: Record<string, string> = {
-  "tratamento-anti-odor": "O tratamento com ozônio é feito junto com uma lavagem",
-  "cristalizacao-de-vidros": "A cristalização é feita junto com uma lavagem",
-  "lavagem-motor": "A limpeza do motor é feita junto com uma lavagem",
-};
 
 export function recomendar(veiculo: Veiculo, problemas: ProblemaId[], extras: Extras = {}): Indicacao {
   const itens = new Map<string, ItemIndicado>();
@@ -195,17 +191,6 @@ export function recomendar(veiculo: Veiculo, problemas: ProblemaId[], extras: Ex
   if (itens.has("enceramento-tecnico") && !itens.has("lavagem-prata") && !itens.has("lavagem-ouro")) {
     itens.delete("lavagem-bronze");
     add("lavagem-prata", "O enceramento precisa de uma Lavagem Prata antes, para limpar bem a pintura.");
-  }
-
-  // Complementares que são feitos junto com uma lavagem
-  const temLavagem = () => LAVAGENS.some((l) => itens.has(l));
-  const complementares = Object.keys(PEDE_LAVAGEM).filter((s) => itens.has(s));
-  const soInterior = itens.has("higienizacao"); // carro fica o dia todo para o interior
-  if (complementares.length && !temLavagem()) {
-    const precisaInterior = itens.has("tratamento-anti-odor") && !soInterior;
-    const precisaFora = itens.has("cristalizacao-de-vidros") || itens.has("lavagem-motor");
-    if (precisaInterior) add("lavagem-prata", `${PEDE_LAVAGEM["tratamento-anti-odor"]}: a Prata limpa por dentro e por fora.`);
-    else if (precisaFora) add("lavagem-bronze", `${PEDE_LAVAGEM[complementares.find((c) => c !== "tratamento-anti-odor")!]}: a Bronze é a mais rápida.`);
   }
 
   // Sugestões opcionais que já estão na lista principal não se repetem

@@ -9,7 +9,7 @@ const slugs = (p: ProblemaId[], e: Extras = {}, v: "medio" | "grande" | "moto" =
 t("sujo por fora → Bronze", slugs(["sujo_fora"]) === "lavagem-bronze");
 t("sujo por fora e por dentro (recente) → Prata", slugs(["sujo_tudo"], { ultima: "recente" }) === "lavagem-prata");
 t("sujo por fora e por dentro (faz tempo) → Ouro", slugs(["sujo_tudo"], { ultima: "muito" }) === "lavagem-ouro");
-t("cheiro leve → ozônio + Prata (ozônio é feito junto com lavagem)", slugs(["cheiro"], { cheiro: "leve" }) === "lavagem-prata + tratamento-anti-odor");
+t("cheiro leve → só o ozônio (lavagem é à parte)", slugs(["cheiro"], { cheiro: "leve" }) === "tratamento-anti-odor");
 t("cheiro forte → Higienização VIP + ozônio", slugs(["cheiro"], { cheiro: "forte" }) === "higienizacao + tratamento-anti-odor");
 t("plástico de fora → revitalização externa", slugs(["plastico_fora"]) === "revitalizacao-plastico-externo");
 t("plástico de dentro → revitalização interna", slugs(["plastico_dentro"]) === "revitalizacao-plastico");
@@ -23,8 +23,8 @@ t("frente e trás → VIP com alternativa só bancos", todos.itens[0].slug === "
 
 // Combinações
 t("sujo por fora + vidro → Bronze + cristalização (sem lavagem extra)", slugs(["sujo_fora", "vidro"]) === "lavagem-bronze + cristalizacao-de-vidros");
-t("só vidro → inclui a Bronze (complementar)", slugs(["vidro"]) === "lavagem-bronze + cristalizacao-de-vidros");
-t("só motor → inclui a Bronze", slugs(["motor"]) === "lavagem-bronze + lavagem-motor");
+t("só vidro → só a cristalização (lavagem é à parte)", slugs(["vidro"]) === "cristalizacao-de-vidros");
+t("só motor → só a limpeza do motor", slugs(["motor"]) === "lavagem-motor");
 t("sujo por fora + pintura sem brilho → vira Prata (enceramento pede Prata ou Ouro)", slugs(["sujo_fora", "brilho"]) === "lavagem-prata + enceramento-tecnico");
 t("sujo tudo (recente) + vender → fica só a Ouro", slugs(["sujo_tudo", "vender"], { ultima: "recente" }) === "lavagem-ouro");
 t("encardido + banco → só a VIP (cobre os bancos)", slugs(["encardido", "banco"], { bancos: "dois" }) === "higienizacao");
