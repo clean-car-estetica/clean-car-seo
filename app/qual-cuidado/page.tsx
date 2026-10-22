@@ -20,7 +20,7 @@ const SITUACOES: { titulo: string; texto: string; servicos: string[] }[] = [
   },
   {
     titulo: "Bancos manchados, cheiro ruim ou muita gente usando o carro",
-    texto: "Café, refrigerante, suor, pelo de pet ou criança no banco de trás deixam manchas e cheiro que a lavagem comum não tira. Aqui o caminho é a higienização interna, que limpa bancos, teto, carpetes e ar-condicionado.",
+    texto: "Café, refrigerante, suor, pelo de pet ou criança no banco de trás deixam manchas e cheiro que a lavagem comum não tira. Aqui o caminho é a higienização interna, que limpa a fundo bancos, teto e carpete; para o cheiro que vem do ar-condicionado, o tratamento com ozônio higieniza os dutos.",
     servicos: ["higienizacao", "higienizacao-banco-dianteiro", "higienizacao-banco-traseiro", "tratamento-anti-odor"],
   },
   {
@@ -40,7 +40,7 @@ const SITUACOES: { titulo: string; texto: string; servicos: string[] }[] = [
   },
   {
     titulo: "Rodas escuras de pó de freio e motor sujo",
-    texto: "Pó de freio gruda nas rodas e não sai com lavagem comum. Já o motor sujo dificulta achar vazamentos e esquenta mais. São limpezas específicas, feitas com o cuidado certo para cada parte.",
+    texto: "Pó de freio gruda nas rodas e não sai com lavagem comum. Já com o motor limpo fica mais fácil perceber um vazamento novo. São limpezas específicas, feitas com o cuidado certo para cada parte (o motor é limpo a seco, sem água sob pressão).",
     servicos: ["lavagem-pesada-de-rodas", "lavagem-motor"],
   },
   {
@@ -58,7 +58,7 @@ const SITUACOES: { titulo: string; texto: string; servicos: string[] }[] = [
 export const metadata: Metadata = {
   title: { absolute: "Qual cuidado o seu carro precisa? Teste rápido | Clean Car Mogi das Cruzes" },
   description:
-    "Responda 5 perguntas rápidas e descubra qual lavagem ou tratamento o seu carro precisa, com preço de referência. Clean Car Estética Automotiva, Mogi das Cruzes.",
+    "Marque o que incomoda no seu carro (sujeira, banco manchado, cheiro, plástico esbranquiçado, vai vender...) e veja a combinação de serviços certa, com preço de referência. Clean Car Estética Automotiva, Mogi das Cruzes.",
   alternates: { canonical: `${SITE_URL}/qual-cuidado` },
 };
 
@@ -73,8 +73,8 @@ export default async function QualCuidadoPage() {
             <p className="font-display text-verniz-shine tracking-[0.3em] uppercase text-sm">Teste rápido · 30 segundos</p>
             <h1 className="font-display font-extrabold text-4xl md:text-6xl text-steel text-balance leading-[0.95]">Qual cuidado o seu carro precisa?</h1>
             <p className="text-lg text-steel-line">
-              Responda 5 perguntas e veja o serviço indicado, com preço de referência. Sem cadastro: o resultado aparece na hora e você
-              manda para a gente pelo WhatsApp se quiser.
+              Marque tudo o que você quer resolver — pode ser mais de uma coisa — e veja a combinação de serviços indicada, com preço
+              de referência. Sem cadastro: o resultado aparece na hora e você manda para a gente pelo WhatsApp se quiser.
             </p>
           </div>
           <QuizCuidado
@@ -137,7 +137,7 @@ export default async function QualCuidadoPage() {
               inLanguage: "pt-BR",
               offers: { "@type": "Offer", price: 0, priceCurrency: "BRL" },
               provider: { "@id": `${SITE_URL}/#empresa` },
-              description: "Teste gratuito que indica o serviço de estética automotiva certo para o carro, com preço de referência da Clean Car em Mogi das Cruzes.",
+              description: "Teste gratuito: marque o que incomoda no carro e veja a combinação de serviços de estética automotiva indicada, com preço de referência da Clean Car em Mogi das Cruzes.",
             }),
           }}
         />
